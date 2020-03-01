@@ -1,0 +1,19 @@
+{
+    "env": {
+        "node": true,
+        "jest": true
+    },
+    "extends": [
+        "airbnb-base",
+        "plugin:prettier/recommended",
+        "prettier"
+    ],
+    "plugins": [
+        "prettier"
+    ],
+    "rules": {
+        "no-console": "off",
+        "func-names": "off",
+        "consistent-return": "off"
+    }
+}
