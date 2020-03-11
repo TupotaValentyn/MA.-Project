@@ -1,9 +1,9 @@
 import express from 'express';
 
+import rootRouter from './routes';
+
 const app = express();
 
-app.get('/', (request, response) => {
-    response.json({ name: 'ma-project' });
-});
+app.use('/', rootRouter);
 
 export default app;
