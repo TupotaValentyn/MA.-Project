@@ -98,3 +98,38 @@ async googleUser => {
 }
 ```
 См. [доку](https://developers.google.com/identity/sign-in/web/sign-in#before_you_begin) чтобы получить больше инфы
+
+### Facebook
+Для получения возможности входа через Facebook необходимо создать [проект](https://developers.facebook.com/docs/apps/) и получить API ключ.
+\
+На сайт нужно подключить Facebook Auth SDK:
+```html
+<script src="https://connect.facebook.net/en_US/sdk.js" async defer></script>
+```
+После загрузки скрипта нужно инициализировать модуль авторизации:
+```js
+window.FB.init({
+    appId: process.env.FACEBOOK_CLIENT_ID,
+    cookie: true,
+    xfbml: true,
+    version: 'v6.0',
+});
+```
+Далее можем навесить обработчик на кнопку входа через Facebook. В нем нужно получить токен пользователя и его ID и отправить эти данные на сервер:
+```js
+window.FB.login(async response => {
+    const accessToken = response.authResponse.accessToken;
+    const userId = response.authResponse.userID;
+
+    const res = await axios.post('/login/facebook', { accessToken, userId });
+    const { tokenData, userData } = res.data;
+
+    // Сохраняем токен и публичные данные о пользователе в localStorage, например
+    // ...
+
+    this.$router.replace({ name: 'home' });
+});
+```
+См. [доку](https://developers.facebook.com/docs/javascript) чтобы получить больше инфы
+
+### Twitter
