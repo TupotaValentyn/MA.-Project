@@ -1,11 +1,11 @@
-import { BadRequest } from '@curveball/http-errors';
-
 import { Router } from 'express';
 
 const router = Router();
 
-router.get('/', ((req, res) => {
-    throw new BadRequest('Bad request');
-}));
+router.get('/', (request, response) => {
+    response.json({
+        success: true,
+    });
+});
 
 export default router;
