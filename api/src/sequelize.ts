@@ -18,5 +18,7 @@ export default async () => {
 
     sequelize.addModels([User]);
 
-    await sequelize.sync({ force: true });
+    if (process.env.NODE_ENV === 'production') {
+        await sequelize.sync({ force: true });
+    }
 }

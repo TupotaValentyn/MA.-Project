@@ -10,7 +10,8 @@ const router = Router();
 
 router.post('/local', async (request, response) => {
     const user = await User.create({
-        name: 'Dmitry',
+        id: null,
+        email: 123
     });
 
     await user.save();
