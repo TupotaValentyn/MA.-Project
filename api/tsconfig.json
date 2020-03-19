@@ -5,6 +5,7 @@
         "allowSyntheticDefaultImports": true,
         "target": "es6",
         "experimentalDecorators": true,
+        "resolveJsonModule": true,
         "emitDecoratorMetadata": true,
         "noImplicitAny": true,
         "moduleResolution": "node",

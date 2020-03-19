@@ -1,13 +1,11 @@
 import { Router } from 'express';
 
 import authRouter from './auth';
-import mainRouter from './home';
-
-import { authorized } from '../guards';
+import swaggerRouter from './swagger';
 
 const router = Router();
 
-// router.use('/', authorized, mainRouter);
 router.use('/auth', authRouter);
+router.use('/api-docs', swaggerRouter);
 
 export default router;
