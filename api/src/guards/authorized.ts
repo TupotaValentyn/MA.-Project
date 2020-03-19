@@ -5,17 +5,19 @@ import { Forbidden, Unauthorized } from "@curveball/http-errors";
 
 import UserPublicData from "../types/";
 
+import { translate } from '../util';
+
 export default async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const { authorization } = request.headers;
 
     if (!authorization) {
-        throw new Forbidden('Действие запрещено');
+        throw new Forbidden(translate(0, 'Действие запрещено'));
     }
 
     const [type, token] = authorization.split(' ');
 
     if (!(token && type === 'Bearer')) {
-        throw new Forbidden('Невалидный заголовок');
+        throw new Forbidden(translate(0, 'Невалидный заголовок'));
     }
 
     try {
@@ -25,11 +27,11 @@ export default async (request: express.Request, response: express.Response, next
         const { name } = error;
 
         if (name === 'TokenExpiredError') {
-            throw new Unauthorized('Недействительный токен');
+            throw new Unauthorized(translate(0, 'Недействительный токен'));
         }
 
         if (name === 'JsonWebTokenError') {
-            throw new Forbidden('Невалидный токен');
+            throw new Forbidden(translate(0, 'Недействительный токен'));
         }
 
         throw error;
