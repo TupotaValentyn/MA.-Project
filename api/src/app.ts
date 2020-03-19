@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import 'express-async-errors';
 
 import rootRouter from './routes';
-import errorsHandler from './errorsHandler';
+import errorsHandler from './routes/errorsHandler';
 
 const app = express();
 

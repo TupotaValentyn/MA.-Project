@@ -7,7 +7,7 @@ import { authorized } from '../guards';
 
 const router = Router();
 
-router.use('/', authorized, mainRouter);
-router.use('/login', authRouter);
+// router.use('/', authorized, mainRouter);
+router.use('/auth', authRouter);
 
 export default router;

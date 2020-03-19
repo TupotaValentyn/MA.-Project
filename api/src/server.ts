@@ -1,6 +1,17 @@
 import server from './app';
 import config from './config';
 
-server.listen(config.PORT, () => {
-    console.log(`Server successfully started at ${config.PORT}.`);
-});
+import connectToSequelize from './sequelize';
+
+(async () => {
+    try {
+        await connectToSequelize();
+
+        server.listen(config.PORT, () => {
+            console.log(`Server successfully started at ${config.PORT}.`);
+        });
+    } catch (e) {
+        console.error(e);
+        process.exit(1);
+    }
+})();

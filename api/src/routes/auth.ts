@@ -1,17 +1,33 @@
 import { Router } from 'express';
 
+import UserPublicData from "../types/";
+
+import { translate } from '../util';
+
+import { User } from '../models';
+
 const router = Router();
 
-router.post('/google', ((req, res) => {
-    res.json({ method: 'google' });
-}));
+router.post('/local', async (request, response) => {
+    const user = await User.create({
+        name: 'Dmitry',
+    });
 
-router.post('/facebook', ((req, res) => {
-    res.json({ method: 'twitter' });
-}));
+    await user.save();
 
-router.post('/twitter', ((req, res) => {
-    res.json({ method: 'twitter' });
-}));
+    response.json({ method: 'local' });
+});
+
+router.post('/register', (request, response) => {
+    response.json({ method: 'register' });
+});
+
+router.post('/google', (request, response) => {
+    response.json({ method: 'google' });
+});
+
+router.post('/facebook', (request, response) => {
+    response.json({ method: 'facebook' });
+});
 
 export default router;
