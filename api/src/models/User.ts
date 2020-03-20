@@ -1,5 +1,35 @@
 import {Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement} from 'sequelize-typescript';
 
+/**
+ * !@swagger
+ *
+ * definitions:
+ *   User:
+ *     type: object
+ *     required:
+ *       - id
+ *     properties:
+ *       id:
+ *         type: number
+ *       email:
+ *         type: string
+ *         format: email
+ *       password:
+ *         type: string
+ *         format: password
+ *         nullable: true
+ *       googleId:
+ *         type: string
+ *         nullable: true
+ *       facebookId:
+ *         type: string
+ *         nullable: true
+ *       isAdmin:
+ *         type: boolean
+ *       isConfirmed:
+ *         type: boolean
+ */
+
 @Table
 export class User extends Model<User> {
     @PrimaryKey
@@ -24,5 +54,8 @@ export class User extends Model<User> {
     facebookId: string;
 
     @Column({ defaultValue: false })
-    active: boolean;
+    isAdmin: boolean;
+
+    @Column({ defaultValue: false })
+    isConfirmed: boolean;
 }
