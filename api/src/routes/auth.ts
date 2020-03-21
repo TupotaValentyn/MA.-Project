@@ -1,34 +1,20 @@
-import { Router } from 'express';
+import express from 'express';
+import bcrypt from 'bcrypt';
+import nodeMailer from 'nodemailer';
+import { BadRequest } from "@curveball/http-errors";
 
-import UserPublicData from "../types/";
+import {TokenData, UserPublicData} from "index";
 
-import { translate } from '../util';
+import config from "../config";
+
+import { ApiInformation } from 'swagger-jsdoc';
+
+import { translate, isValidEmail, generateTokenData, createMailTransporter } from '../util';
 
 import { User } from '../models';
 
-const router = Router();
+const router = express.Router();
 
-/**
- * @swagger
- * /cookies:
- *    post:
- *      tags:
- *          - Cookies
- *      summary: This should create a new cookie.
- *      consumes:
- *        - application/json
- *      parameters:
- *        - name: body
- *          in: body
- *          schema:
- *            type: object
- *            properties:
- *              flavor:
- *                type: string
- *      responses:
- *        200:
- *          description: Receive back flavor and flavor Id of recently added cookie.
- */
 router.post('/local', async (request, response) => {
     const user = await User.create({
         id: null,
@@ -42,51 +28,114 @@ router.post('/local', async (request, response) => {
 
 /**
  * @swagger
- * /ice-cream:
- *    get:
+ * /auth/register:
+ *    post:
  *      tags:
- *          - Ice Cream
- *      summary: This should return all cookie flavors.
+ *        - Auth
+ *      summary: Регистрирует нового пользователя в системе.
  *      consumes:
  *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "body"
+ *          required: true
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                format: email
+ *              password:
+ *                type: string
+ *                format: password
+ *                example: 12345678
+ *                description: Должен быть 8+ символов
  *      responses:
- *        200:
- *          description: Receive back flavor and flavor Id of all cookie flavors.
+ *        '200':
+ *          description: "Пользователь успешно зарегистрирован в системе. <br>Возвращает публичные данные о пользователе и данные о токене вида ```{ userData: UserPublicData, tokenData: TokenData }```. См. описание этих типов в моделях"
+ *        '400':
+ *          description: Неправильный запрос. Некорректный email/пароль, пользователь с таким email уже зарегистрирован в системе.
+ *        '500':
+ *          description: Разные ошибки сервера
+ *
  */
-router.post('/register', (request, response) => {
-    response.json({ method: 'register' });
+router.post('/register', async (request: express.Request, response: express.Response) => {
+    let { email, password } = request.body;
+
+    if (email) {
+        email = email.trim();
+    }
+
+    if (password) {
+        password = password.toString().trim();
+    }
+
+    console.log(email, password);
+
+    if (!(email && isValidEmail(email))) {
+        throw new BadRequest(translate(0, 'Некорректный email'));
+    }
+
+    if (!(password && password.length >= 8)) {
+        throw new BadRequest(translate(0, 'Некорректный пароль'));
+    }
+
+    const usersWithSameMail = await User.findAll({ where: { email } });
+
+    if (usersWithSameMail.length) {
+        throw new BadRequest(translate(0, 'Пользователь с такой почтой уже зарегистрирован в системе'));
+    }
+
+    const salt = await bcrypt.genSalt(3);
+    const encryptedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+        email,
+        password: encryptedPassword,
+        isConfirmed: false,
+    });
+
+    const transporter = createMailTransporter();
+
+    const mailOptions = {
+        from: `"Rest Finder" <${config.MAIL_USER}>`,
+        to: email,
+        subject: translate(0, 'Регистрация в системе'),
+        html: '<b>Вы успешно зарегистрировались в системе!</b>',
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+
+        console.log('Message %s sent: %s', info.messageId, info.response);
+
+        response.json({
+            success: true
+        });
+    });
+
+    // const userPublicData: UserPublicData = {
+    //     id: user.id,
+    //     email: user.email,
+    //     isConfirmed: user.isConfirmed,
+    //     isAdmin: user.isAdmin,
+    //     authType: 'local',
+    // };
+    //
+    // const tokenData: TokenData = generateTokenData(userPublicData);
+    //
+    // response.json({
+    //     tokenData,
+    //     userData: userPublicData,
+    // });
 });
 
-/**
- * @swagger
- * /ice-cream2:
- *    get:
- *      tags:
- *          - Ice Cream
- *      summary: This should return all cookie flavors.
- *      consumes:
- *        - application/json
- *      responses:
- *        200:
- *          description: Receive back flavor and flavor Id of all cookie flavors.
- */
 router.post('/google', (request, response) => {
     response.json({ method: 'google' });
 });
 
-/**
- * @swagger
- * /ice-cream3:
- *    get:
- *      tags:
- *          - Ice Cream
- *      summary: This should return all cookie flavors.
- *      consumes:
- *        - application/json
- *      responses:
- *        200:
- *          description: Receive back flavor and flavor Id of all cookie flavors.
- */
 router.post('/facebook', (request, response) => {
     response.json({ method: 'facebook' });
 });

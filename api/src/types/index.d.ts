@@ -21,7 +21,7 @@
  *         description: Способ авторизации пользователя (локальный, гугл или фейсбук)
  *
  */
-export default interface UserPublicData {
+export interface UserPublicData {
     id: number,
     email: string,
     isAdmin: boolean,
@@ -37,17 +37,17 @@ export default interface UserPublicData {
  *     description: Данные о токене авторизации, которые передаются на фронт после авторизации
  *     type: object
  *     properties:
- *       expired:
+ *       expires:
  *         type: number
  *         format: timestamp
  *         description: Дата завершения срока действия текущего токена в формате timestamp. Позволяет фронту проверять при навигации на защищенные роуты, не истек ли еще срок годности у текущего токена. Если истек - перенаправить пользователя на страницу авторизации
  *       token:
  *         type: string
- *         description: Сам токен, который нужно передавать в заголовках при запросах на защищенные пути
+ *         description: "Сам токен, который нужно передавать в заголовках при запросах на защищенные пути. Заголовок должен иметь вид: ```authorization: Bearer TOKEN```"
  *
  */
-export default interface TokenData {
-    expired: number,
+export interface TokenData {
+    expires: number,
     token: string,
 }
 

@@ -13,6 +13,7 @@
     },
     "author": "Dmitry Kit",
     "devDependencies": {
+        "@types/bcrypt": "^3.0.0",
         "@types/body-parser": "^1.19.0",
         "@types/cookie-parser": "^1.4.2",
         "@types/cors": "^2.8.6",
@@ -31,6 +32,7 @@
     },
     "dependencies": {
         "@curveball/http-errors": "^0.3.0",
+        "@types/nodemailer": "^6.4.0",
         "axios": "^0.19.2",
         "bcrypt": "^4.0.1",
         "body-parser": "^1.19.0",
@@ -43,6 +45,7 @@
         "http-custom-errors": "^8.0.0",
         "jsonwebtoken": "^8.5.1",
         "mysql2": "^2.1.0",
+        "nodemailer": "^6.4.6",
         "reflect-metadata": "^0.1.13",
         "sequelize": "^5.21.5",
         "sequelize-cli": "^5.5.1",
