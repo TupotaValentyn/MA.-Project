@@ -1,8 +1,8 @@
-import { TokenData } from 'index';
+import {TokenData, UserPublicData} from 'index';
 
 import { sign } from 'jsonwebtoken';
 
-export default (userPublicData: { id: number, email: string }): TokenData => {
+export default (userPublicData: UserPublicData): TokenData => {
     const tokenDuration = 60 * 60 * 24 * 7;
 
     const expires = Math.floor(Date.now() / 1000 + tokenDuration);

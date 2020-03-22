@@ -53,6 +53,10 @@ export class User extends Model<User> {
     @Column
     facebookId: string;
 
+    @AllowNull(true)
+    @Column
+    userHash: string;
+
     @Column({ defaultValue: false })
     isAdmin: boolean;
 

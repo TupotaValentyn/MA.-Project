@@ -9,7 +9,7 @@ import config from "../config";
 
 import { ApiInformation } from 'swagger-jsdoc';
 
-import { translate, isValidEmail, generateTokenData, createMailTransporter } from '../util';
+import { translate, isValidEmail, generateTokenData, createMailTransporter, generateUserHash } from '../util';
 
 import { User } from '../models';
 
@@ -70,8 +70,6 @@ router.post('/register', async (request: express.Request, response: express.Resp
         password = password.toString().trim();
     }
 
-    console.log(email, password);
-
     if (!(email && isValidEmail(email))) {
         throw new BadRequest(translate(0, 'Некорректный email'));
     }
@@ -89,8 +87,11 @@ router.post('/register', async (request: express.Request, response: express.Resp
     const salt = await bcrypt.genSalt(3);
     const encryptedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const userHash = generateUserHash(email);
+
+    await User.create({
         email,
+        userHash,
         password: encryptedPassword,
         isConfirmed: false,
     });
@@ -101,7 +102,12 @@ router.post('/register', async (request: express.Request, response: express.Resp
         from: `"Rest Finder" <${config.MAIL_USER}>`,
         to: email,
         subject: translate(0, 'Регистрация в системе'),
-        html: '<b>Вы успешно зарегистрировались в системе!</b>',
+        html: `
+            <h3>Вы успешно зарегистрировались в системе!</h3>
+            <a href="http://localhost:3000/auth/verify_email/${userHash}">
+                Подтвердить почту
+            </a>
+        `,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -111,9 +117,7 @@ router.post('/register', async (request: express.Request, response: express.Resp
 
         console.log('Message %s sent: %s', info.messageId, info.response);
 
-        response.json({
-            success: true
-        });
+        response.json({ userHash });
     });
 
     // const userPublicData: UserPublicData = {
@@ -130,6 +134,26 @@ router.post('/register', async (request: express.Request, response: express.Resp
     //     tokenData,
     //     userData: userPublicData,
     // });
+});
+
+router.get('/verify_email/:userHash', async (request, response) => {
+    const { userHash } = request.params;
+
+    const userByHash = await User.findOne({
+        where: { userHash }
+    });
+
+    if (!userByHash) {
+        return response.send(translate(0, 'Неправильный хеш'));
+    }
+
+    if (userByHash.isConfirmed) {
+        return response.send(translate(0, 'Почта уже подтверждена'));
+    }
+
+    await User.update({ isConfirmed: true }, { where: { userHash } });
+
+    response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
 });
 
 router.post('/google', (request, response) => {
