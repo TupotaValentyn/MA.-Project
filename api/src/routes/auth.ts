@@ -156,6 +156,62 @@ router.get('/verify_email/:userHash', async (request, response) => {
     response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
 });
 
+router.get('/check_verification/:userHash', async (request, response) => {
+    const { userHash } = request.params;
+
+    const userByHash = await User.findOne({
+        where: { userHash }
+    });
+
+    if (!userByHash) {
+        throw new BadRequest(translate(0, 'Неправильный хеш'));
+    }
+
+    response.json({
+        isConfirmed: userByHash.isConfirmed,
+    });
+});
+
+router.post('/resend_confirmation/:userHash', async (request, response) => {
+    const { userHash } = request.params;
+
+    const userByHash = await User.findOne({
+        where: { userHash }
+    });
+
+    if (!userByHash) {
+        throw new BadRequest(translate(0, 'Неправильный хеш'));
+    }
+
+    const newUserHash = generateUserHash(userByHash.email);
+    const transporter = createMailTransporter();
+
+    const mailOptions = {
+        from: `"Rest Finder" <${config.MAIL_USER}>`,
+        to: userByHash.email,
+        subject: translate(0, 'Регистрация в системе'),
+        html: `
+            <h3>Вы успешно зарегистрировались в системе!</h3>
+            <a href="http://localhost:3000/auth/verify_email/${newUserHash}">
+                Подтвердить почту
+            </a>
+        `,
+    };
+
+    userByHash.userHash = newUserHash;
+    await userByHash.save();
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+
+        console.log('Message %s sent: %s', info.messageId, info.response);
+
+        response.json({ userHash: newUserHash });
+    });
+});
+
 router.post('/google', (request, response) => {
     response.json({ method: 'google' });
 });
