@@ -1,17 +1,13 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import nodeMailer from 'nodemailer';
-import { BadRequest } from "@curveball/http-errors";
+
+import {BadRequest} from "@curveball/http-errors";
 
 import {TokenData, UserPublicData} from "index";
 
-import config from "../config";
+import {generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate} from '../util';
 
-import { ApiInformation } from 'swagger-jsdoc';
-
-import { translate, isValidEmail, generateTokenData, createMailTransporter, generateUserHash } from '../util';
-
-import { User } from '../models';
+import {User} from '../models';
 
 const router = express.Router();
 
@@ -52,29 +48,22 @@ router.post('/local', async (request, response) => {
  *                description: Должен быть 8+ символов
  *      responses:
  *        '200':
- *          description: "Пользователь успешно зарегистрирован в системе. <br>Возвращает публичные данные о пользователе и данные о токене вида ```{ userData: UserPublicData, tokenData: TokenData }```. См. описание этих типов в моделях"
+ *          description: "Пользователь успешно зарегистрирован в системе. <br>Возвращает уникальный хеш пользователя (```{ userHash: string }```), который необходим для идентификации пользователя в дальнейших запросах."
  *        '400':
  *          description: Неправильный запрос. Некорректный email/пароль, пользователь с таким email уже зарегистрирован в системе.
- *        '500':
- *          description: Разные ошибки сервера
  *
  */
 router.post('/register', async (request: express.Request, response: express.Response) => {
-    let { email, password } = request.body;
+    const requestBody = Object.assign({ email: '', password: '' }, request.body);
 
-    if (email) {
-        email = email.trim();
-    }
+    const email = requestBody.email.toString().trim();
+    const password = requestBody.password.toString().trim();
 
-    if (password) {
-        password = password.toString().trim();
-    }
-
-    if (!(email && isValidEmail(email))) {
+    if (!isValidEmail(email)) {
         throw new BadRequest(translate(0, 'Некорректный email'));
     }
 
-    if (!(password && password.length >= 8)) {
+    if (password.length < 8) {
         throw new BadRequest(translate(0, 'Некорректный пароль'));
     }
 
@@ -93,47 +82,10 @@ router.post('/register', async (request: express.Request, response: express.Resp
         email,
         userHash,
         password: encryptedPassword,
-        isConfirmed: false,
     });
 
-    const transporter = createMailTransporter();
-
-    const mailOptions = {
-        from: `"Rest Finder" <${config.MAIL_USER}>`,
-        to: email,
-        subject: translate(0, 'Регистрация в системе'),
-        html: `
-            <h3>Вы успешно зарегистрировались в системе!</h3>
-            <a href="http://localhost:3000/auth/verify_email/${userHash}">
-                Подтвердить почту
-            </a>
-        `,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
-
-        console.log('Message %s sent: %s', info.messageId, info.response);
-
-        response.json({ userHash });
-    });
-
-    // const userPublicData: UserPublicData = {
-    //     id: user.id,
-    //     email: user.email,
-    //     isConfirmed: user.isConfirmed,
-    //     isAdmin: user.isAdmin,
-    //     authType: 'local',
-    // };
-    //
-    // const tokenData: TokenData = generateTokenData(userPublicData);
-    //
-    // response.json({
-    //     tokenData,
-    //     userData: userPublicData,
-    // });
+    await sendConfirmationEmail(email, userHash);
+    response.json({ userHash });
 });
 
 router.get('/verify_email/:userHash', async (request, response) => {
@@ -156,6 +108,29 @@ router.get('/verify_email/:userHash', async (request, response) => {
     response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
 });
 
+/**
+ * @swagger
+ * /auth/check_verification/{userHash}:
+ *    get:
+ *      tags:
+ *        - Auth
+ *      summary: Позволяет проверить, подтвердил ли пользователь почту или нет.
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "path"
+ *          name: "userHash"
+ *          required: true
+ *          schema:
+ *            type: string
+ *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *      responses:
+ *        '200':
+ *          description: "Если пользователь подтвердил свою почту, возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. В этом случае необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
+ *        '400':
+ *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
+ *
+ */
 router.get('/check_verification/:userHash', async (request, response) => {
     const { userHash } = request.params;
 
@@ -167,11 +142,52 @@ router.get('/check_verification/:userHash', async (request, response) => {
         throw new BadRequest(translate(0, 'Неправильный хеш'));
     }
 
-    response.json({
+    if (!userByHash.isConfirmed) {
+        return response.json({
+            isConfirmed: false,
+        });
+    }
+
+    const userPublicData: UserPublicData = {
+        id: userByHash.id,
+        email: userByHash.email,
         isConfirmed: userByHash.isConfirmed,
+        isAdmin: userByHash.isAdmin,
+        authType: 'local',
+    };
+
+    const tokenData: TokenData = generateTokenData(userPublicData);
+
+    response.json({
+        tokenData,
+        userData: userPublicData,
     });
 });
 
+/**
+ * @swagger
+ * /auth/resend_confirmation/{userHash}:
+ *    post:
+ *      tags:
+ *        - Auth
+ *      summary: Позволяет повторно отправить письмо с ссылкой для подтверждения почты.
+ *      description: "<b>Внимание!</b> Данная операция генерирует новый userHash для пользователя, старый становится недействительным!"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "path"
+ *          name: "userHash"
+ *          required: true
+ *          schema:
+ *            type: string
+ *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *      responses:
+ *        '200':
+ *          description: "Письмо успешно отправлено. В ответ возвращается новый хеш пользователя (```{ userHash: string }```)"
+ *        '400':
+ *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
+ *
+ */
 router.post('/resend_confirmation/:userHash', async (request, response) => {
     const { userHash } = request.params;
 
@@ -184,32 +200,13 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     }
 
     const newUserHash = generateUserHash(userByHash.email);
-    const transporter = createMailTransporter();
-
-    const mailOptions = {
-        from: `"Rest Finder" <${config.MAIL_USER}>`,
-        to: userByHash.email,
-        subject: translate(0, 'Регистрация в системе'),
-        html: `
-            <h3>Вы успешно зарегистрировались в системе!</h3>
-            <a href="http://localhost:3000/auth/verify_email/${newUserHash}">
-                Подтвердить почту
-            </a>
-        `,
-    };
 
     userByHash.userHash = newUserHash;
     await userByHash.save();
 
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
+    await sendConfirmationEmail(userByHash.email, newUserHash);
 
-        console.log('Message %s sent: %s', info.messageId, info.response);
-
-        response.json({ userHash: newUserHash });
-    });
+    response.json({ userHash: newUserHash });
 });
 
 router.post('/google', (request, response) => {
