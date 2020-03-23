@@ -1,6 +1,10 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 
+import axios from 'axios';
+
+import { OAuth2Client } from 'google-auth-library';
+
 import {BadRequest} from "@curveball/http-errors";
 
 import {TokenData, UserPublicData} from "index";
@@ -90,7 +94,7 @@ router.post('/local', async (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Регистрирует нового пользователя в системе.
+ *      summary: Регистрирует нового пользователя в системе используя почту и пароль.
  *      consumes:
  *        - application/json
  *      parameters:
@@ -282,25 +286,69 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Позволяет войти в систему с помощью аккаунта Google
+ *      summary: Позволяет войти в систему с помощью аккаунта Google. Если в базе аккаунта с таким userId нет, он будет создан
  *      consumes:
  *        - application/json
  *      parameters:
- *        - in: "path"
- *          name: "userHash"
+ *        - in: "body"
+ *          name: "body"
  *          required: true
  *          schema:
- *            type: string
- *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *            type: object
+ *            properties:
+ *              token:
+ *                type: string
+ *                description: id_token пользователя, который выдаст Google при авторизации
  *      responses:
  *        '200':
- *          description: "Письмо успешно отправлено. В ответ возвращается новый хеш пользователя (```{ userHash: string }```)"
+ *          description: "Пользователь успешно вошел на сайт. Возвращает данные о пользователе и данные о токене
+ *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. Необходимо сохранить эти данные
+ *          на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
  *        '400':
- *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
+ *          description: Неправильный запрос. Не передан хеш пользователя.
  *
  */
-router.post('/google', (request, response) => {
-    response.json({ method: 'google' });
+router.post('/google', async (request, response) => {
+    const { token } = request.body;
+
+    if (!token) {
+        throw new BadRequest(translate(0, 'Не задан token'));
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const client = new OAuth2Client(clientId);
+
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: clientId,
+    });
+
+    const { sub: userId, email } = ticket.getPayload();
+
+    let userByGoogleUserId = await User.findOne({ where: { googleId: userId } });
+
+    if (!userByGoogleUserId) {
+        userByGoogleUserId = await User.create({
+            email,
+            googleId: userId,
+            isConfirmed: true,
+        });
+    }
+
+    const userPublicData: UserPublicData = {
+        id: userByGoogleUserId.id,
+        email: userByGoogleUserId.email,
+        isConfirmed: userByGoogleUserId.isConfirmed,
+        isAdmin: userByGoogleUserId.isAdmin,
+        authType: 'google',
+    };
+
+    const tokenData: TokenData = generateTokenData(userPublicData);
+
+    response.json({
+        tokenData,
+        userData: userPublicData,
+    });
 });
 
 /**
@@ -309,25 +357,71 @@ router.post('/google', (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Позволяет войти в систему с помощью аккаунта Facebook
+ *      summary: Позволяет войти в систему с помощью аккаунта Facebook. Если в базе аккаунта с таким userId нет, он будет создан
  *      consumes:
  *        - application/json
  *      parameters:
- *        - in: "path"
- *          name: "userHash"
+ *        - in: "body"
+ *          name: "body"
  *          required: true
  *          schema:
- *            type: string
- *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *            type: object
+ *            properties:
+ *              accessToken:
+ *                type: string
+ *                description: Временный accessToken пользователя, который выдаст Facebook при авторизации
+ *              userId:
+ *                type: string
+ *                description: Id аккаунта Facebook пользователя
  *      responses:
  *        '200':
- *          description: "Письмо успешно отправлено. В ответ возвращается новый хеш пользователя (```{ userHash: string }```)"
+ *          description: "Пользователь успешно вошел на сайт. Возвращает данные о пользователе и данные о токене
+ *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. Необходимо сохранить эти данные
+ *          на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
  *        '400':
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
  */
-router.post('/facebook', (request, response) => {
-    response.json({ method: 'facebook' });
+router.post('/facebook', async (request, response) => {
+    const { accessToken, userId } = request.body;
+
+    if (!accessToken) {
+        throw new BadRequest(translate(0, 'Не задан accessToken'));
+    }
+
+    if (!userId) {
+        throw new BadRequest(translate(0, 'Не задан userId'));
+    }
+
+    const url = `https://graph.facebook.com/v2.6/${userId}?fields=email&access_token=${accessToken}`;
+
+    const fbResponse = await axios.get(url);
+    const { email, id } = fbResponse.data;
+
+    let userByFacebookId = await User.findOne({ where: { facebookId: id } });
+
+    if (!userByFacebookId) {
+        userByFacebookId = await User.create({
+            email,
+            facebookId: id,
+            isConfirmed: true,
+        });
+    }
+
+    const userPublicData: UserPublicData = {
+        id: userByFacebookId.id,
+        email: userByFacebookId.email,
+        isConfirmed: userByFacebookId.isConfirmed,
+        isAdmin: userByFacebookId.isAdmin,
+        authType: 'facebook',
+    };
+
+    const tokenData: TokenData = generateTokenData(userPublicData);
+
+    response.json({
+        tokenData,
+        userData: userPublicData,
+    });
 });
 
 export default router;
