@@ -11,15 +11,77 @@ import {User} from '../models';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /auth/local:
+ *    post:
+ *      tags:
+ *        - Auth
+ *      summary: Позволяет войти в систему с помощью почты и пароля
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "body"
+ *          required: true
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                format: email
+ *              password:
+ *                type: string
+ *                format: password
+ *                example: 12345678
+ *      responses:
+ *        '200':
+ *          description: "Пользователь успешно вошел на сайт.<br>Если пользователь подтвердил свою почту, возвращает
+ *          данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
+ *          В этом случае необходимо сохранить эти данные на фронте и перенаправить пользователя в систему.
+ *          Описание этих типов см. в разделе \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
+ *        '400':
+ *          description: Неправильный запрос. Несуществующий email или неправильный пароль.
+ *
+ */
 router.post('/local', async (request, response) => {
-    const user = await User.create({
-        id: null,
-        email: 123
+    const requestBody = Object.assign({ email: '', password: '' }, request.body);
+
+    const email = requestBody.email.toString().trim();
+    const password = requestBody.password.toString().trim();
+
+    const userByEmail = await User.findOne({ where: { email } });
+
+    if (!userByEmail) {
+        throw new BadRequest(translate(0, 'Пользователя с таким email не существует'));
+    }
+
+    const isCorrectPassword = await bcrypt.compare(password, userByEmail.password);
+
+    if (!isCorrectPassword) {
+        throw new BadRequest(translate(0, 'Неправильный пароль'));
+    }
+
+    if (!userByEmail.isConfirmed) {
+        return response.json({
+            isConfirmed: false,
+        });
+    }
+
+    const userPublicData: UserPublicData = {
+        id: userByEmail.id,
+        email: userByEmail.email,
+        isConfirmed: userByEmail.isConfirmed,
+        isAdmin: userByEmail.isAdmin,
+        authType: 'local',
+    };
+
+    const tokenData: TokenData = generateTokenData(userPublicData);
+
+    response.json({
+        tokenData,
+        userData: userPublicData,
     });
-
-    await user.save();
-
-    response.json({ method: 'local' });
 });
 
 /**
@@ -48,7 +110,9 @@ router.post('/local', async (request, response) => {
  *                description: Должен быть 8+ символов
  *      responses:
  *        '200':
- *          description: "Пользователь успешно зарегистрирован в системе. <br>Возвращает уникальный хеш пользователя (```{ userHash: string }```), который необходим для идентификации пользователя в дальнейших запросах."
+ *          description: "Пользователь успешно зарегистрирован в системе.
+ *          <br>Возвращает уникальный хеш пользователя (```{ userHash: string }```),
+ *          который необходим для идентификации пользователя в дальнейших запросах."
  *        '400':
  *          description: Неправильный запрос. Некорректный email/пароль, пользователь с таким email уже зарегистрирован в системе.
  *
@@ -126,7 +190,10 @@ router.get('/verify_email/:userHash', async (request, response) => {
  *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
  *      responses:
  *        '200':
- *          description: "Если пользователь подтвердил свою почту, возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. В этом случае необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
+ *          description: "Если пользователь подтвердил свою почту, возвращает данные о пользователе и данные о токене
+ *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. В этом случае необходимо
+ *          сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе
+ *          \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
  *        '400':
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
@@ -209,10 +276,56 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     response.json({ userHash: newUserHash });
 });
 
+/**
+ * @swagger
+ * /auth/google:
+ *    post:
+ *      tags:
+ *        - Auth
+ *      summary: Позволяет войти в систему с помощью аккаунта Google
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "path"
+ *          name: "userHash"
+ *          required: true
+ *          schema:
+ *            type: string
+ *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *      responses:
+ *        '200':
+ *          description: "Письмо успешно отправлено. В ответ возвращается новый хеш пользователя (```{ userHash: string }```)"
+ *        '400':
+ *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
+ *
+ */
 router.post('/google', (request, response) => {
     response.json({ method: 'google' });
 });
 
+/**
+ * @swagger
+ * /auth/facebook:
+ *    post:
+ *      tags:
+ *        - Auth
+ *      summary: Позволяет войти в систему с помощью аккаунта Facebook
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "path"
+ *          name: "userHash"
+ *          required: true
+ *          schema:
+ *            type: string
+ *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
+ *      responses:
+ *        '200':
+ *          description: "Письмо успешно отправлено. В ответ возвращается новый хеш пользователя (```{ userHash: string }```)"
+ *        '400':
+ *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
+ *
+ */
 router.post('/facebook', (request, response) => {
     response.json({ method: 'facebook' });
 });
