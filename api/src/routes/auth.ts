@@ -12,7 +12,7 @@ import { BadRequest } from '@curveball/http-errors';
 import { TokenData, UserPublicData } from 'index';
 
 import {
-    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate
+    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate, getTemplateHTML
 } from '../util';
 
 import { User } from '../models';
@@ -277,7 +277,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Позволяет войти в систему с помощью аккаунта Google. Если в базе аккаунта с таким userId нет, он будет создан
+ *      summary: "Позволяет войти в систему с помощью аккаунта Google."
  *      consumes:
  *        - application/json
  *      parameters:
@@ -292,9 +292,10 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
  *                description: id_token пользователя, который выдаст Google при авторизации
  *      responses:
  *        '200':
- *          description: "Пользователь успешно вошел на сайт. Возвращает данные о пользователе и данные о токене
- *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. Необходимо сохранить эти данные
- *          на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
+ *          description: "Пользователь успешно вошел на сайт. Если в базе аккаунта с таким userId нет, он будет создан.
+ *          Если в базе уже есть пользователь с таким же email, как в профиле Google, аккаунт Google будет привязан к этому пользователю.
+ *          Возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
+ *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
  *        '400':
  *          description: Неправильный запрос. Не передан хеш пользователя.
  *
@@ -353,7 +354,7 @@ router.post('/google', async (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Позволяет войти в систему с помощью аккаунта Facebook. Если в базе аккаунта с таким userId нет, он будет создан
+ *      summary: "Позволяет войти в систему с помощью аккаунта Facebook."
  *      consumes:
  *        - application/json
  *      parameters:
@@ -371,9 +372,10 @@ router.post('/google', async (request, response) => {
  *                description: Id аккаунта Facebook пользователя
  *      responses:
  *        '200':
- *          description: "Пользователь успешно вошел на сайт. Возвращает данные о пользователе и данные о токене
- *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. Необходимо сохранить эти данные
- *          на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
+ *          description: "Пользователь успешно вошел на сайт. Если в базе аккаунта с таким userId нет, он будет создан.
+ *          Если в базе уже есть пользователь с таким же email, как в профиле Facebook, аккаунт Facebook будет привязан к этому пользователю.
+ *          Возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
+ *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
  *        '400':
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
@@ -433,16 +435,28 @@ router.get('/verify_email/:userHash', async (request, response) => {
     });
 
     if (!userByHash) {
-        return response.send(translate(0, 'Неправильный хеш'));
+        const pageHTML = await getTemplateHTML('email_confirmed', {
+            message: translate(0, 'Неправильный хеш'),
+        });
+
+        return response.send(pageHTML);
     }
 
     if (userByHash.isConfirmed) {
-        return response.send(translate(0, 'Почта уже подтверждена'));
+        const pageHTML = await getTemplateHTML('email_confirmed', {
+            message: translate(0, 'Почта уже подтверждена'),
+        });
+
+        return response.send(pageHTML);
     }
 
     await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
 
-    response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
+    const pageHTML = await getTemplateHTML('email_confirmed', {
+        message: translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'),
+    });
+
+    response.send(pageHTML);
 });
 
 export default router;

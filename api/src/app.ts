@@ -14,6 +14,8 @@ app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
+app.set('view engine', 'ejs');
+
 app.use('/', rootRouter);
 app.use(errorsHandler);
 

@@ -4,6 +4,7 @@ import generateTokenData from './generateTokenData';
 import createMailTransporter from './createMailTransporter';
 import generateUserHash from './generateUserHash';
 import sendConfirmationEmail from './sendConfirmationEmail';
+import getTemplateHTML from './getTemplateHTML';
 
 export {
     translate,
@@ -12,4 +13,5 @@ export {
     createMailTransporter,
     generateUserHash,
     sendConfirmationEmail,
+    getTemplateHTML,
 };
