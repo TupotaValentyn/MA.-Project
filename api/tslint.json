@@ -1,13 +1,21 @@
 {
     "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended",
-        "tslint-config-prettier"
-    ],
+    "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-config-airbnb", "prettier"],
     "jsRules": {},
     "rules": {
-        "trailing-comma": [ false ],
-        "no-console": [ false ]
+        "no-console": "off",
+        "no-debugger": "off",
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "ter-indent": [true, 4, { "SwitchCase": 1 }],
+        "quotes": ["warn", "single"],
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true,
+                "semi": true,
+                "trailingComma": "all"
+            }
+        ]
     },
     "rulesDirectory": []
 }

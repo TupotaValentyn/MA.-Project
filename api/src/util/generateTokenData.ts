@@ -1,4 +1,4 @@
-import {TokenData, UserPublicData} from 'index';
+import { TokenData, UserPublicData } from 'index';
 
 import { sign } from 'jsonwebtoken';
 
@@ -11,4 +11,4 @@ export default (userPublicData: UserPublicData): TokenData => {
     });
 
     return { token, expires };
-}
+};

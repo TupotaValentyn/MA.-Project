@@ -3,17 +3,19 @@ import bcrypt from 'bcrypt';
 
 import axios from 'axios';
 
-import {Op} from "sequelize";
+import { Op } from 'sequelize';
 
 import { OAuth2Client } from 'google-auth-library';
 
-import {BadRequest} from "@curveball/http-errors";
+import { BadRequest } from '@curveball/http-errors';
 
-import {TokenData, UserPublicData} from "index";
+import { TokenData, UserPublicData } from 'index';
 
-import {generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate} from '../util';
+import {
+    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate
+} from '../util';
 
-import {User} from '../models';
+import { User } from '../models';
 
 const router = express.Router();
 
@@ -51,7 +53,7 @@ const router = express.Router();
  *
  */
 router.post('/local', async (request, response) => {
-    const requestBody = Object.assign({ email: '', password: '' }, request.body);
+    const requestBody = { email: '', password: '', ...request.body };
 
     const email = requestBody.email.toString().trim();
     const password = requestBody.password.toString().trim();
@@ -61,8 +63,8 @@ router.post('/local', async (request, response) => {
             email,
             password: {
                 [Op.ne]: null,
-            }
-        }
+            },
+        },
     });
 
     if (!userByEmail) {
@@ -131,7 +133,7 @@ router.post('/local', async (request, response) => {
  *
  */
 router.post('/register', async (request: express.Request, response: express.Response) => {
-    const requestBody = Object.assign({ email: '', password: '' }, request.body);
+    const requestBody = { email: '', password: '', ...request.body };
 
     const email = requestBody.email.toString().trim();
     const password = requestBody.password.toString().trim();
@@ -195,7 +197,7 @@ router.get('/check_verification/:userHash', async (request, response) => {
     const { userHash } = request.params;
 
     const userByHash = await User.findOne({
-        where: { userHash }
+        where: { userHash },
     });
 
     if (!userByHash) {
@@ -252,7 +254,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     const { userHash } = request.params;
 
     const userByHash = await User.findOne({
-        where: { userHash }
+        where: { userHash },
     });
 
     if (!userByHash) {
@@ -427,7 +429,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
     const { userHash } = request.params;
 
     const userByHash = await User.findOne({
-        where: { userHash }
+        where: { userHash },
     });
 
     if (!userByHash) {

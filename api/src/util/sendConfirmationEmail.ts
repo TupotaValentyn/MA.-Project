@@ -1,6 +1,6 @@
-import config from "../config";
-import {translate, createMailTransporter} from "./index";
-import {SentMessageInfo} from "nodemailer";
+import { SentMessageInfo } from 'nodemailer';
+import config from '../config';
+import { translate, createMailTransporter } from './index';
 
 export default (email: string, userHash: string): Promise<SentMessageInfo> => {
     const transporter = createMailTransporter();
@@ -18,4 +18,4 @@ export default (email: string, userHash: string): Promise<SentMessageInfo> => {
     };
 
     return transporter.sendMail(mailOptions);
-}
+};

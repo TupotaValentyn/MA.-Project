@@ -1,9 +1,9 @@
-import express from "express";
+import express from 'express';
 
 import { verify } from 'jsonwebtoken';
-import { Forbidden, Unauthorized } from "@curveball/http-errors";
+import { Forbidden, Unauthorized } from '@curveball/http-errors';
 
-import { UserPublicData } from "index";
+import { UserPublicData } from 'index';
 
 import { translate } from '../util';
 

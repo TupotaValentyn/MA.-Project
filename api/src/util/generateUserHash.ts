@@ -10,4 +10,4 @@ export default (email: string): string => {
         .createHash('sha256')
         .update(JSON.stringify(dataToEncrypt))
         .digest('hex');
-}
+};

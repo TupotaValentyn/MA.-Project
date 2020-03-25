@@ -1,4 +1,6 @@
-import {Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement} from 'sequelize-typescript';
+import {
+    Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement
+} from 'sequelize-typescript';
 
 /**
  * !@swagger
