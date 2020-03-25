@@ -18,5 +18,5 @@ export default async () => {
 
     sequelize.addModels([User]);
 
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
 }

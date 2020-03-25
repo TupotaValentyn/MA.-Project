@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 
 import axios from 'axios';
 
+import {Op} from "sequelize";
+
 import { OAuth2Client } from 'google-auth-library';
 
 import {BadRequest} from "@curveball/http-errors";
@@ -54,7 +56,14 @@ router.post('/local', async (request, response) => {
     const email = requestBody.email.toString().trim();
     const password = requestBody.password.toString().trim();
 
-    const userByEmail = await User.findOne({ where: { email } });
+    const userByEmail = await User.findOne({
+        where: {
+            email,
+            password: {
+                [Op.ne]: null,
+            }
+        }
+    });
 
     if (!userByEmail) {
         throw new BadRequest(translate(0, 'Пользователя с таким email не существует'));
@@ -154,26 +163,6 @@ router.post('/register', async (request: express.Request, response: express.Resp
 
     await sendConfirmationEmail(email, userHash);
     response.json({ userHash });
-});
-
-router.get('/verify_email/:userHash', async (request, response) => {
-    const { userHash } = request.params;
-
-    const userByHash = await User.findOne({
-        where: { userHash }
-    });
-
-    if (!userByHash) {
-        return response.send(translate(0, 'Неправильный хеш'));
-    }
-
-    if (userByHash.isConfirmed) {
-        return response.send(translate(0, 'Почта уже подтверждена'));
-    }
-
-    await User.update({ isConfirmed: true }, { where: { userHash } });
-
-    response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
 });
 
 /**
@@ -325,10 +314,15 @@ router.post('/google', async (request, response) => {
 
     const { sub: userId, email } = ticket.getPayload();
 
-    let userByGoogleUserId = await User.findOne({ where: { googleId: userId } });
+    let userByEmail = await User.findOne({ where: { email } });
 
-    if (!userByGoogleUserId) {
-        userByGoogleUserId = await User.create({
+    if (userByEmail) {
+        userByEmail.googleId = userId;
+        userByEmail.isConfirmed = true;
+
+        await userByEmail.save();
+    } else {
+        userByEmail = await User.create({
             email,
             googleId: userId,
             isConfirmed: true,
@@ -336,10 +330,10 @@ router.post('/google', async (request, response) => {
     }
 
     const userPublicData: UserPublicData = {
-        id: userByGoogleUserId.id,
-        email: userByGoogleUserId.email,
-        isConfirmed: userByGoogleUserId.isConfirmed,
-        isAdmin: userByGoogleUserId.isAdmin,
+        id: userByEmail.id,
+        email: userByEmail.email,
+        isConfirmed: userByEmail.isConfirmed,
+        isAdmin: userByEmail.isAdmin,
         authType: 'google',
     };
 
@@ -398,10 +392,15 @@ router.post('/facebook', async (request, response) => {
     const fbResponse = await axios.get(url);
     const { email, id } = fbResponse.data;
 
-    let userByFacebookId = await User.findOne({ where: { facebookId: id } });
+    let userByEmail = await User.findOne({ where: { email } });
 
-    if (!userByFacebookId) {
-        userByFacebookId = await User.create({
+    if (userByEmail) {
+        userByEmail.facebookId = id;
+        userByEmail.isConfirmed = true;
+
+        await userByEmail.save();
+    } else {
+        userByEmail = await User.create({
             email,
             facebookId: id,
             isConfirmed: true,
@@ -409,10 +408,10 @@ router.post('/facebook', async (request, response) => {
     }
 
     const userPublicData: UserPublicData = {
-        id: userByFacebookId.id,
-        email: userByFacebookId.email,
-        isConfirmed: userByFacebookId.isConfirmed,
-        isAdmin: userByFacebookId.isAdmin,
+        id: userByEmail.id,
+        email: userByEmail.email,
+        isConfirmed: userByEmail.isConfirmed,
+        isAdmin: userByEmail.isAdmin,
         authType: 'facebook',
     };
 
@@ -422,6 +421,26 @@ router.post('/facebook', async (request, response) => {
         tokenData,
         userData: userPublicData,
     });
+});
+
+router.get('/verify_email/:userHash', async (request, response) => {
+    const { userHash } = request.params;
+
+    const userByHash = await User.findOne({
+        where: { userHash }
+    });
+
+    if (!userByHash) {
+        return response.send(translate(0, 'Неправильный хеш'));
+    }
+
+    if (userByHash.isConfirmed) {
+        return response.send(translate(0, 'Почта уже подтверждена'));
+    }
+
+    await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
+
+    response.send(translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'));
 });
 
 export default router;
