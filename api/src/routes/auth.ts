@@ -1,21 +1,16 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-
 import axios from 'axios';
 
 import { Op } from 'sequelize';
-
 import { OAuth2Client } from 'google-auth-library';
-
 import { BadRequest } from '@curveball/http-errors';
-
 import { TokenData, UserPublicData } from 'index';
+import { User } from '../models';
 
 import {
     generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate, getTemplateHTML
 } from '../util';
-
-import { User } from '../models';
 
 const router = express.Router();
 
@@ -105,7 +100,7 @@ router.post('/local', async (request, response) => {
  *    post:
  *      tags:
  *        - Auth
- *      summary: Регистрирует нового пользователя в системе используя почту и пароль.
+ *      summary: Регистрирует нового пользователя в системе с помощью почты и пароля.
  *      consumes:
  *        - application/json
  *      parameters:
@@ -127,7 +122,8 @@ router.post('/local', async (request, response) => {
  *        '200':
  *          description: "Пользователь успешно зарегистрирован в системе.
  *          <br>Возвращает уникальный хеш пользователя (```{ userHash: string }```),
- *          который необходим для идентификации пользователя в дальнейших запросах."
+ *          который необходим для идентификации пользователя в дальнейших запросах (проверки подтверждения почты
+ *          и повторной отправки письма для ее подтверждения)."
  *        '400':
  *          description: Неправильный запрос. Некорректный email/пароль, пользователь с таким email уже зарегистрирован в системе.
  *
