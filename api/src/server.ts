@@ -1,17 +1,22 @@
-import server from './app';
-import config from './config';
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
-import connectToSequelize from './sequelize';
+import 'express-async-errors';
 
-(async () => {
-    try {
-        await connectToSequelize();
+import rootRouter from './routes';
+import errorsHandler from './routes/errorsHandler';
 
-        server.listen(config.PORT, () => {
-            console.log(`Server successfully started at ${config.PORT}.`);
-        });
-    } catch (e) {
-        console.error(e);
-        process.exit(1);
-    }
-})();
+const app = express();
+
+app.use(cors());
+app.use(cookieParser());
+app.use(bodyParser.json());
+
+app.set('view engine', 'ejs');
+
+app.use('/', rootRouter);
+app.use(errorsHandler);
+
+export default app;

@@ -1,15 +1,14 @@
 {
     "name": "ma-project-api",
-    "main": "src/server.ts",
+    "main": "src/app.ts",
     "scripts": {
-        "dev": "nodemon src/server.ts",
+        "dev": "nodemon src/app.ts",
         "lint": "npx eslint . --ignore-path .gitignore --ext .js,.ts --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests",
         "test": "jest --no-cache --silent --passWithNoTests",
-        "prebuild": "npm run lint",
         "build": "tsc",
         "prestart": "npm run build",
-        "start": "node dist/server.js"
+        "start": "node dist/src/app.js"
     },
     "author": "Dmitry Kit",
     "devDependencies": {
@@ -38,6 +37,8 @@
     },
     "dependencies": {
         "@curveball/http-errors": "^0.3.0",
+        "@types/bluebird": "^3.5.30",
+        "@types/validator": "^12.0.1",
         "axios": "^0.19.2",
         "bcrypt": "^4.0.1",
         "body-parser": "^1.19.0",
