@@ -4,6 +4,12 @@ import {
 
 import { RestPlaceReview } from './RestPlaceReview';
 
+// - времени (час/два/весь день), которое человек хочет провести там,
+// - кол-ву денег, которые может потратить
+// - по дистанции до этого места (1км/5км/весь город и т.д)
+// - по размеру компании (один чел/2/3/10)
+// - активный/пассивный отдых
+
 @Table
 export class RestPlace extends Model<RestPlace> {
     @PrimaryKey
@@ -31,6 +37,9 @@ export class RestPlace extends Model<RestPlace> {
 
     @Column
     restCost: string;
+
+    @Column
+    isActiveRest: boolean;
 
     @HasMany(() => RestPlaceReview)
     reviews: RestPlaceReview[];

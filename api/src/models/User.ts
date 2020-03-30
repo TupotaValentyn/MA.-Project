@@ -55,6 +55,9 @@ export class User extends Model<User> {
     @Column
     facebookId: string;
 
+    @Column({ defaultValue: 'ru' })
+    locale: string;
+
     @AllowNull(true)
     @Column
     userHash: string;
