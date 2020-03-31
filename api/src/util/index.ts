@@ -1,4 +1,4 @@
-import translate from './translate';
+import translateText from './translateText';
 import isValidEmail from './isValidEmail';
 import generateTokenData from './generateTokenData';
 import createMailTransporter from './createMailTransporter';
@@ -7,7 +7,7 @@ import sendConfirmationEmail from './sendConfirmationEmail';
 import getTemplateHTML from './getTemplateHTML';
 
 export {
-    translate,
+    translateText,
     isValidEmail,
     generateTokenData,
     createMailTransporter,

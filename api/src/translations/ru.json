@@ -1,0 +1,23 @@
+{
+    "errors": {
+        "noUserWithEmail": "Пользователя с таким email не существует",
+        "wrongPassword": "Неправильный пароль",
+        "wrongEmail": "Некорректный email",
+        "notUniqueEmail": "Пользователь с такой почтой уже зарегистрирован в системе",
+        "wrongHash": "Неправильный хеш",
+        "wrongGoogleToken": "Не задан token",
+        "wrongFacebookToken": "Не задан accessToken",
+        "wrongFacebookUserId": "Не задан userId",
+        "emailAlreadyConfirmed": "Почта уже подтверждена",
+        "actionIsForbidden": "Действие запрещено",
+        "wrongAuthHeader": "Невалидный заголовок",
+        "wrongAuthToken": "Недействительный токен"
+    },
+
+    "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
+    "confirmationEmailTitle": "Регистрация в системе",
+
+    "categories": {
+        "cafe": "Кафе и рестораны"
+    }
+}

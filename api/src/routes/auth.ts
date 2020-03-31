@@ -9,7 +9,7 @@ import { TokenData, UserPublicData } from 'index';
 import { User } from '../models';
 
 import {
-    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, translate, getTemplateHTML
+    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, getTemplateHTML, translateText
 } from '../util';
 
 const router = express.Router();
@@ -63,13 +63,13 @@ router.post('/local', async (request, response) => {
     });
 
     if (!userByEmail) {
-        throw new BadRequest(translate(0, 'Пользователя с таким email не существует'));
+        throw new BadRequest(translateText('errors.noUserWithEmail'));
     }
 
     const isCorrectPassword = await bcrypt.compare(password, userByEmail.password);
 
     if (!isCorrectPassword) {
-        throw new BadRequest(translate(0, 'Неправильный пароль'));
+        throw new BadRequest(translateText('errors.wrongPassword'));
     }
 
     if (!userByEmail.isConfirmed) {
@@ -135,17 +135,17 @@ router.post('/register', async (request: express.Request, response: express.Resp
     const password = requestBody.password.toString().trim();
 
     if (!isValidEmail(email)) {
-        throw new BadRequest(translate(0, 'Некорректный email'));
+        throw new BadRequest(translateText('errors.wrongEmail'));
     }
 
     if (password.length < 8) {
-        throw new BadRequest(translate(0, 'Некорректный пароль'));
+        throw new BadRequest(translateText('errors.wrongPassword'));
     }
 
     const usersWithSameMail = await User.findAll({ where: { email } });
 
     if (usersWithSameMail.length) {
-        throw new BadRequest(translate(0, 'Пользователь с такой почтой уже зарегистрирован в системе'));
+        throw new BadRequest(translateText('errors.notUniqueEmail'));
     }
 
     const salt = await bcrypt.genSalt(3);
@@ -197,7 +197,7 @@ router.get('/check_verification/:userHash', async (request, response) => {
     });
 
     if (!userByHash) {
-        throw new BadRequest(translate(0, 'Неправильный хеш'));
+        throw new BadRequest(translateText('errors.wrongHash'));
     }
 
     if (!userByHash.isConfirmed) {
@@ -254,7 +254,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     });
 
     if (!userByHash) {
-        throw new BadRequest(translate(0, 'Неправильный хеш'));
+        throw new BadRequest(translateText('errors.wrongHash'));
     }
 
     const newUserHash = generateUserHash(userByHash.email);
@@ -300,7 +300,7 @@ router.post('/google', async (request, response) => {
     const { token } = request.body;
 
     if (!token) {
-        throw new BadRequest(translate(0, 'Не задан token'));
+        throw new BadRequest(translateText('errors.wrongGoogleToken'));
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -380,11 +380,11 @@ router.post('/facebook', async (request, response) => {
     const { accessToken, userId } = request.body;
 
     if (!accessToken) {
-        throw new BadRequest(translate(0, 'Не задан accessToken'));
+        throw new BadRequest(translateText('errors.wrongFacebookToken'));
     }
 
     if (!userId) {
-        throw new BadRequest(translate(0, 'Не задан userId'));
+        throw new BadRequest(translateText('errors.wrongFacebookUserId'));
     }
 
     const url = `https://graph.facebook.com/v2.6/${userId}?fields=email&access_token=${accessToken}`;
@@ -432,7 +432,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
 
     if (!userByHash) {
         const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translate(0, 'Неправильный хеш'),
+            message: translateText('errors.wrongHash'),
         });
 
         return response.send(pageHTML);
@@ -440,7 +440,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
 
     if (userByHash.isConfirmed) {
         const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translate(0, 'Почта уже подтверждена'),
+            message: translateText('errors.emailAlreadyConfirmed'),
         });
 
         return response.send(pageHTML);
@@ -449,7 +449,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
     await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
 
     const pageHTML = await getTemplateHTML('email_confirmed', {
-        message: translate(0, 'Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку "Проверить подтверждение"'),
+        message: translateText('emailConfirmed'),
     });
 
     response.send(pageHTML);
