@@ -67,3 +67,13 @@ export interface RestPlaceCategory {
     googleId: string;
     name: string;
 }
+
+export interface RestPlaceCost {
+    id: number;
+    name: string;
+}
+
+export interface RestPlaceDuration {
+    id: number;
+    name: string;
+}

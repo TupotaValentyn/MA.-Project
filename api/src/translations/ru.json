@@ -33,5 +33,13 @@
         "stadium": "Стадион",
         "touristAttraction": "Достопримечательность для туристов",
         "zoo": "Зоопарк"
+    },
+
+    "costs": {
+        "free": "Бесплатный",
+        "inexpensive": "Недорогой",
+        "moderate": "Средний",
+        "expensive": "Дорогой",
+        "veryExpensive": "Очень дорогой",
     }
 }
