@@ -61,3 +61,9 @@ declare global {
         }
     }
 }
+
+export interface RestPlaceCategory {
+    id: number;
+    googleId: string;
+    name: string;
+}

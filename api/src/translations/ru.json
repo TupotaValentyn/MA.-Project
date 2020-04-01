@@ -18,6 +18,20 @@
     "confirmationEmailTitle": "Регистрация в системе",
 
     "categories": {
-        "cafe": "Кафе и рестораны"
+        "amusementPark": "Парк развлечений",
+        "aquarium": "Аквариум",
+        "artGallery": "Галерея исскуств",
+        "bar": "Бар",
+        "cafe": "Кафе",
+        "library": "Библиотека",
+        "movieTheater": "Кинотеатр",
+        "museum": "Музей",
+        "nightClub": "Ночной клуб",
+        "park": "Парк",
+        "restaurant": "Ресторан",
+        "spa": "СПА",
+        "stadium": "Стадион",
+        "touristAttraction": "Достопримечательность для туристов",
+        "zoo": "Зоопарк"
     }
 }
