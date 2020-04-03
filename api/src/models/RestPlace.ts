@@ -9,6 +9,7 @@ import { RestPlaceReview } from './RestPlaceReview';
 // - по дистанции до этого места (1км/5км/весь город и т.д)
 // - по размеру компании (один чел/2/3/10)
 // - активный/пассивный отдых
+// - открыто сейчас
 
 @Table
 export class RestPlace extends Model<RestPlace> {
