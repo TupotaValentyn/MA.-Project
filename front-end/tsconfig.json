@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,9 +13,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "baseUrl": "./src"
   },
-  "include": [
-    "src"
-  ]
+
+  /* Experimental Options */
+  "experimentalDecorators": false /* Enables experimental support for ES7 decorators. */,
+  "emitDecoratorMetadata": false /* Enables experimental support for emitting type metadata for decorators. */,
+
+  "typeRoots": ["node_modules/@types", "src/typings.d.ts"],
+  "include": ["src"]
 }
