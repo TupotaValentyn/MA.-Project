@@ -6,7 +6,10 @@ import { translate, createMailTransporter, getTemplateHTML } from './index';
 export default async (email: string, userHash: string): Promise<SentMessageInfo> => {
     const transporter = createMailTransporter();
 
-    const html = await getTemplateHTML('email_confirmation', { userHash });
+    const html = await getTemplateHTML('email_confirmation', {
+        userHash,
+        serverURL: config.SERVER_URL,
+    });
 
     const mailOptions = {
         html,
