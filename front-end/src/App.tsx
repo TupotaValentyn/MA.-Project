@@ -1,15 +1,13 @@
 import React, { FC } from 'react';
 import './App.css';
-import { Button } from '@material-ui/core';
+import { Login } from './components/pages';
 
 type Props = {};
 
 const App: FC<Props> = () => {
   return (
     <div className="App">
-      <Button color="primary" variant="contained">
-        text
-      </Button>
+      <Login />
     </div>
   );
 };
