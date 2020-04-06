@@ -40,9 +40,11 @@ const router = express.Router();
  *      responses:
  *        '200':
  *          description: "Пользователь успешно вошел на сайт.<br>Если пользователь подтвердил свою почту, возвращает
- *          данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
+ *          данные о токене авторизации вида ```{ tokenData: TokenData }```.
  *          В этом случае необходимо сохранить эти данные на фронте и перенаправить пользователя в систему.
- *          Описание этих типов см. в разделе \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
+ *          <br>Если почта не подтверждена, в ответ фронт получит уникальный
+ *          хеш пользователя (```{ userHash: string }```), который необходим для идентификации пользователя в дальнейших
+ *          запросах (проверки подтверждения почты и повторной отправки письма для ее подтверждения)."
  *        '400':
  *          description: Неправильный запрос. Несуществующий email или неправильный пароль.
  *
@@ -74,7 +76,7 @@ router.post('/local', async (request, response) => {
 
     if (!userByEmail.isConfirmed) {
         return response.json({
-            isConfirmed: false,
+            userHash: userByEmail.userHash,
         });
     }
 
@@ -88,10 +90,7 @@ router.post('/local', async (request, response) => {
 
     const tokenData: TokenData = generateTokenData(userPublicData);
 
-    response.json({
-        tokenData,
-        userData: userPublicData,
-    });
+    response.json({ tokenData });
 });
 
 /**
@@ -181,10 +180,10 @@ router.post('/register', async (request: express.Request, response: express.Resp
  *            example: 3f1beaef8cee09ce627d7a5b929a12fc5592fc5b19cebf6d44c732d0f1a13ec6
  *      responses:
  *        '200':
- *          description: "Если пользователь подтвердил свою почту, возвращает данные о пользователе и данные о токене
- *          авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```. В этом случае необходимо
- *          сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе
- *          \"Модели\"<br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
+ *          description: "Если пользователь подтвердил свою почту, возвращает данные о токене
+ *          авторизации вида ```{ tokenData: TokenData }```. В этом случае необходимо
+ *          сохранить эти данные на фронте и перенаправить пользователя в систему.
+ *          <br>Если почта не подтверждена, в ответ фронт получит ```{ isConfirmed: false }```"
  *        '400':
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
@@ -216,10 +215,7 @@ router.get('/check_verification/:userHash', async (request, response) => {
 
     const tokenData: TokenData = generateTokenData(userPublicData);
 
-    response.json({
-        tokenData,
-        userData: userPublicData,
-    });
+    response.json({ tokenData });
 });
 
 /**
@@ -290,8 +286,8 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
  *        '200':
  *          description: "Пользователь успешно вошел на сайт. Если в базе аккаунта с таким userId нет, он будет создан.
  *          Если в базе уже есть пользователь с таким же email, как в профиле Google, аккаунт Google будет привязан к этому пользователю.
- *          Возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
- *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
+ *          Возвращает данные о токене авторизации вида ```{ tokenData: TokenData }```.
+ *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему."
  *        '400':
  *          description: Неправильный запрос. Не передан хеш пользователя.
  *
@@ -338,10 +334,7 @@ router.post('/google', async (request, response) => {
 
     const tokenData: TokenData = generateTokenData(userPublicData);
 
-    response.json({
-        tokenData,
-        userData: userPublicData,
-    });
+    response.json({ tokenData });
 });
 
 /**
@@ -370,8 +363,8 @@ router.post('/google', async (request, response) => {
  *        '200':
  *          description: "Пользователь успешно вошел на сайт. Если в базе аккаунта с таким userId нет, он будет создан.
  *          Если в базе уже есть пользователь с таким же email, как в профиле Facebook, аккаунт Facebook будет привязан к этому пользователю.
- *          Возвращает данные о пользователе и данные о токене авторизации вида ```{ userData: UserPublicData, tokenData: TokenData }```.
- *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему. Описание этих типов см. в разделе \"Модели\""
+ *          Возвращает данные о токене авторизации вида ```{ tokenData: TokenData }```.
+ *          Необходимо сохранить эти данные на фронте и перенаправить пользователя в систему."
  *        '400':
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
@@ -417,10 +410,7 @@ router.post('/facebook', async (request, response) => {
 
     const tokenData: TokenData = generateTokenData(userPublicData);
 
-    response.json({
-        tokenData,
-        userData: userPublicData,
-    });
+    response.json({ tokenData });
 });
 
 router.get('/verify_email/:userHash', async (request, response) => {

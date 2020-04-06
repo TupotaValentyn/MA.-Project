@@ -13,7 +13,7 @@ export class RestPlaceReview extends Model<RestPlaceReview> {
 
     @Column
     @ForeignKey(() => RestPlace)
-    restPlaceId: Number;
+    restPlaceId: number;
 
     @Column({ type: DataType.TEXT })
     review: string;

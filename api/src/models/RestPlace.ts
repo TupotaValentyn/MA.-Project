@@ -3,6 +3,7 @@ import {
 } from 'sequelize-typescript';
 
 import { RestPlaceReview } from './RestPlaceReview';
+import { BusinessHours } from './BusinessHours';
 
 // - времени (час/два/весь день), которое человек хочет провести там,
 // - кол-ву денег, которые может потратить
@@ -19,6 +20,9 @@ export class RestPlace extends Model<RestPlace> {
     id: number;
 
     @Column
+    googleId: string;
+
+    @Column
     name: string;
 
     @Column
@@ -29,6 +33,9 @@ export class RestPlace extends Model<RestPlace> {
 
     @Column({ defaultValue: 0 })
     meanRating: number;
+
+    @Column({ defaultValue: 0 })
+    reviewsCount: number;
 
     @Column
     categoryId: string;
@@ -44,4 +51,7 @@ export class RestPlace extends Model<RestPlace> {
 
     @HasMany(() => RestPlaceReview)
     reviews: RestPlaceReview[];
+
+    @HasMany(() => BusinessHours)
+    businessHours: BusinessHours[];
 }
