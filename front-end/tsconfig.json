@@ -7,6 +7,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -15,12 +16,27 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "./src",
+
+    /* Experimental Options */
+    "experimentalDecorators": false /* Enables experimental support for ES7 decorators. */,
+    "emitDecoratorMetadata": false /* Enables experimental support for emitting type metadata for decorators. */,
+
     "paths": {
       "@actions/*": ["actions/*"],
+      "@admin-pages": ["components/admin/pages/index.ts"],
+      "@admin-pages/*": ["components/admin/pages/*"],
       "@assets/*": ["assets/*"],
+      "@atoms": ["components/atoms/index.ts"],
       "@components": ["components/index.ts"],
       "@components/*": ["components/*"],
+      "@config": ["config.ts"],
+      "@contexts/*": ["contexts/*"],
+      "@icons": ["components/atoms/icons/index.ts"],
+      "@icons/*": ["components/atoms/icons/*"],
       "@models/*": ["models/*"],
+      "@molecules": ["components/molecules/index.ts"],
+      "@organisms": ["components/organisms/index.ts"],
+      "@organisms/*": ["components/organisms/*"],
       "@pages": ["components/pages/index.ts"],
       "@pages/*": ["components/pages/*"],
       "@reducers/*": ["reducers/*"],
@@ -32,10 +48,8 @@
       "@slices": ["slices/index.ts"],
       "@slices/*": ["slices/*"],
       "@utils/*": ["utils/*"]
-    }
+    },
+    "typeRoots": ["node_modules/@types", "src/typings.d.ts"]
   },
-  "experimentalDecorators": false,
-  "emitDecoratorMetadata": false,
-  "typeRoots": ["node_modules/@types", "src/typings.d.ts"],
   "include": ["src"]
 }

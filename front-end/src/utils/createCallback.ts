@@ -1,4 +1,4 @@
-import { RootStore } from '@reducers/index';
+import { RootStore } from '../reducers';
 
 const createCallback = <D>(
   callback: (arg0: D) => void,

@@ -3,7 +3,7 @@ import {
   PayloadAction,
   SliceCaseReducers
 } from '@reduxjs/toolkit';
-import { State, StateStatuses } from '@utils/State';
+import { State, StateStatuses } from './State';
 
 enum SliceAction {
   REQUESTED = 'Requested',

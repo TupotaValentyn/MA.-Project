@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import rootStore from '../../rootStore';
-import createCallback from '../../utils/createCallback';
 import { State, StateStatuses } from '../../utils/State';
 import { ITokensProvider, TokensDto } from './apiTypes';
 
@@ -19,8 +18,6 @@ export interface IApiClientBuilder {
 export default class ApiClientBuilder implements IApiClientBuilder {
   private readonly _tokensProvider: ITokensProvider;
   private readonly _client: AxiosInstance;
-  private _isRefreshing = false;
-  private _pendingRequests: Array<AxiosRequestConfig> = [];
 
   constructor(tokensProvider: ITokensProvider) {
     this._tokensProvider = tokensProvider;
@@ -31,19 +28,8 @@ export default class ApiClientBuilder implements IApiClientBuilder {
       this.createErrorInterceptor()
     );
 
-    rootStore.subscribe(this.onTokensUpdated);
+    // rootStore.subscribe(this.onTokensUpdated);
   }
-
-  private onTokensUpdated = () => {
-    return createCallback<State<TokensDto>>(
-      (tokensState) => {
-        if (tokensState.status === StateStatuses.LOADED) {
-          console.log(tokensState.payload);
-        }
-      },
-      (state) => state as any
-    );
-  };
 
   private createAuthInterceptor(): IOnFulfilledInterceptor<AxiosRequestConfig> {
     const tokensProvider = this._tokensProvider;
