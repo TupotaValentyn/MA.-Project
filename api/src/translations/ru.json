@@ -40,6 +40,18 @@
         "inexpensive": "Недорогой",
         "moderate": "Средний",
         "expensive": "Дорогой",
-        "veryExpensive": "Очень дорогой",
+        "veryExpensive": "Очень дорогой"
+    },
+
+    "durations": {
+        "low": "Непродолжительный",
+        "medium": "Средний",
+        "high": "Продолжительный"
+    },
+
+    "companySizes": {
+        "low": "1 человек",
+        "medium": "Небольшая компания",
+        "high": "Большая компания"
     }
 }

@@ -38,13 +38,16 @@ export class RestPlace extends Model<RestPlace> {
     reviewsCount: number;
 
     @Column
-    categoryId: string;
+    categoryId: number;
 
     @Column
-    restDuration: string;
+    restDuration: number;
 
     @Column
-    restCost: string;
+    restCost: number;
+
+    @Column
+    companySize: number;
 
     @Column
     isActiveRest: boolean;

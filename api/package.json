@@ -8,7 +8,8 @@
         "test": "jest --no-cache --silent --passWithNoTests",
         "build": "tsc",
         "prestart": "npm run build",
-        "start": "node dist/src/app.js"
+        "start": "node dist/src/app.js",
+        "loadPlaces": "cls && npx ts-node src/loadAndParseRestPlaces.ts"
     },
     "author": "Dmitry Kit",
     "devDependencies": {

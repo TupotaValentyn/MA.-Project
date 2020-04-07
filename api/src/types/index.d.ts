@@ -62,18 +62,23 @@ declare global {
     }
 }
 
-export interface RestPlaceCategory {
-    id: number;
-    googleId: string;
-    name: string;
-}
-
-export interface RestPlaceCost {
-    id: number;
-    name: string;
-}
-
-export interface RestPlaceDuration {
-    id: number;
-    name: string;
-}
+// export interface RestPlaceCategory {
+//     id: number;
+//     googleId: string;
+//     name: string;
+// }
+//
+// export interface RestPlaceCost {
+//     id: number;
+//     name: string;
+// }
+//
+// export interface RestPlaceDuration {
+//     id: number;
+//     name: string;
+// }
+//
+// export interface CompanySize {
+//     id: number;
+//     name: string;
+// }

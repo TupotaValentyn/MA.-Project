@@ -1,19 +1,11 @@
-import { RestPlaceCost } from 'index';
 import { translateText } from '../../util';
 
-export function getAllCosts(locale: string = 'ru'): RestPlaceCost[] {
-    return [
-        'free',
-        'inexpensive',
-        'moderate',
-        'expensive',
-        'veryExpensive',
-    ].map((priceLevel, index) => ({
-        id: index + 1,
-        name: translateText(`costs.${priceLevel}`, locale),
-    }));
-}
+export enum Costs { Free, Inexpensive, Moderate, Expensive, VeryExpensive }
 
-export function getById(id: number): RestPlaceCost {
-    return getAllCosts().find((cost) => cost.id === id);
-}
+export const getAllCosts = (locale: string = 'ru'): Map<Costs, string> => new Map<number, string>([
+    [Costs.Free, translateText('costs.free', locale)],
+    [Costs.Inexpensive, translateText('costs.inexpensive', locale)],
+    [Costs.Moderate, translateText('costs.moderate', locale)],
+    [Costs.Expensive, translateText('costs.expensive', locale)],
+    [Costs.VeryExpensive, translateText('costs.veryExpensive', locale)],
+]);
