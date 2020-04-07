@@ -66,8 +66,7 @@ export default class ApiClientBuilder implements IApiClientBuilder {
           return ApiClientBuilder.handleErrorResponse(error);
         case 419:
           console.log('token expired');
-          return null;
-        // return this.handleTokenExpired(error);
+          return this;
         default:
           return error;
       }

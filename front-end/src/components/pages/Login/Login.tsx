@@ -65,14 +65,14 @@ const Login: FC<Props> = () => {
     <div className={formWrapper}>
       <form onSubmit={handleSubmit} className={formClass}>
         <TextField
-          name="login"
+          name="email"
           onChange={handleChange}
           onBlur={handleBlur}
-          placeholder="login"
+          placeholder="email"
           type="text"
           label="Login"
-          error={handleError('login')}
-          helperText={errorHintHandler('login')}
+          error={handleError('email')}
+          helperText={errorHintHandler('email')}
           value={values.login}
         />
         <TextField

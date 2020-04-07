@@ -5,12 +5,12 @@ export type Values = {
 };
 
 export const loginDefaultData = {
-  login: 'user@test.com',
+  email: 'user@test.com',
   password: '12345678'
 };
 
 export const loginValidationSchema = Yup.object().shape({
-  login: Yup.string()
+  email: Yup.string()
     .email('Wrong format')
     .required('Email is required'),
   password: Yup.string().required('Password is required')
