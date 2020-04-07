@@ -42,7 +42,7 @@ const requests = {
 //         }, 2000);
 //     }
 //
-//     // eslint-disable-next-line max-len
+// eslint-disable-next-line max-len
 //     // const fields = 'opening_hours, price_level, rating, address_component, adr_address, formatted_address, geometry, icon, name, permanently_closed, photo, place_id, plus_code, type, url, utc_offset, vicinity'.split(', ')
 //
 //     // console.log(fields)
