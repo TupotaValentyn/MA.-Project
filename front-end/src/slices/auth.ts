@@ -4,4 +4,4 @@ export const { reducer: loginReducer, actions: loginActions } = sliceGenerator(
   'login'
 );
 
-export const { loginRequested } = loginActions;
+export const { loginRequested }: any = loginActions;

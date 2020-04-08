@@ -1,9 +1,12 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Button, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
 import { loginDefaultData, loginValidationSchema, Values } from './loginData';
-import { login } from '../../../services/api/auth/auth';
+import { loginRequested } from '../../../slices';
+import { useDispatch } from 'react-redux';
+import authContext, { AuthContext } from '../../../context/authContext';
+import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
 
 type Props = {};
 
@@ -29,9 +32,18 @@ const useClasses = makeStyles(() => {
 
 const Login: FC<Props> = () => {
   const { formWrapper, submitButton, formClass } = useClasses();
+  const dispatch = useDispatch();
+  const context = useContext<AuthContext>(authContext);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (context.authenticated) {
+      setLoggedIn(true);
+    }
+  }, [context]);
 
   const onSubmit = (values: any) => {
-    login(values);
+    dispatch(loginRequested(values));
   };
 
   const {
@@ -61,7 +73,9 @@ const Login: FC<Props> = () => {
     [errors, touched]
   );
 
-  return (
+  return loggedIn ? (
+    <AfterLoginRedirect />
+  ) : (
     <div className={formWrapper}>
       <form onSubmit={handleSubmit} className={formClass}>
         <TextField

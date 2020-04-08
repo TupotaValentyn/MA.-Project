@@ -58,6 +58,7 @@ class CookiesTokensProvider implements ITokensProvider {
   // }
 
   saveTokens(tokens: TokensDto) {
+    console.log(tokens);
     this.saveAccessToken(tokens.token);
     // this.saveRefreshToken(tokens.refreshToken);
   }

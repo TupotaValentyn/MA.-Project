@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import rootStore from '../../rootStore';
 import { State, StateStatuses } from '../../utils/State';
 import { ITokensProvider, TokensDto } from './apiTypes';
 
