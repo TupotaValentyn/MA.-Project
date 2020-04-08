@@ -8,10 +8,6 @@ import 'express-async-errors';
 import rootRouter from './routes';
 import errorsHandler from './routes/errorsHandler';
 
-import { getAllCategories } from './models/filters/categories';
-
-console.log(getAllCategories('night_club'));
-
 const app = express();
 
 app.use(cors());

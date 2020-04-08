@@ -1,20 +1,26 @@
 import { Client } from '@googlemaps/google-maps-services-js';
-import { Categories, getAllCategories } from './models/filters/categories';
-import { Durations } from './models/filters/durations';
-import { CompanySizes } from './models/filters/companySizes';
-
-console.log(getAllCategories().get(Categories.Cafe).googleId);
+import { CategoryDescription } from 'index';
+import { RestPlaceCategory, getAllCategories } from './models/filters/restPlaceCategory';
+import { translateText } from './util';
 
 const client = new Client();
 
-const requests = {
-    [Categories.Cafe]: {
-        queries: ['Кафе Черкассы', 'Кафе Черкаси'],
-        duration: Durations.Medium,
-        companySize: CompanySizes.Medium,
-        isActiveRest: false,
+async function processCategory(category: CategoryDescription) {
+    const categoryRuName = translateText(category.nameTextId);
+    const categoryUaName = translateText(category.nameTextId, 'ua');
+
+    const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
+
+    console.log(searchQueries);
+}
+
+(async function run() {
+    // eslint-disable-next-line guard-for-in,no-restricted-syntax
+    for (const categoryData of getAllCategories().values()) {
+        // eslint-disable-next-line no-await-in-loop
+        await processCategory(categoryData);
     }
-};
+}());
 
 // async function loadPlaces(pageToken: string) {
 //     const response = await client.textSearch({

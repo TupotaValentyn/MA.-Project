@@ -1,3 +1,6 @@
+import { RestDuration } from '../models/filters/restDuration';
+import { CompanySize } from '../models/filters/companySize';
+
 /**
  * @swagger
  *
@@ -21,6 +24,7 @@
  *         description: Способ авторизации пользователя (локальный, гугл или фейсбук)
  *
  */
+
 export interface UserPublicData {
     id: number,
     email: string,
@@ -62,6 +66,14 @@ declare global {
     }
 }
 
+interface CategoryDescription {
+    nameTextId: string,
+    googleId: string,
+    restDuration: RestDuration,
+    companySize: CompanySize,
+    isActiveRest: boolean,
+}
+
 // export interface RestPlaceCategory {
 //     id: number;
 //     googleId: string;
@@ -72,13 +84,13 @@ declare global {
 //     id: number;
 //     name: string;
 // }
-//
-// export interface RestPlaceDuration {
+
+// export interface RestDuration {
 //     id: number;
-//     name: string;
+//     nameTextId: string;
 // }
-//
+
 // export interface CompanySize {
 //     id: number;
-//     name: string;
+//     nameTextId: string;
 // }

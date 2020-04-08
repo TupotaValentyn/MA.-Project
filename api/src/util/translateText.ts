@@ -1,4 +1,5 @@
 const ru = require('../translations/ru.json');
+const ua = require('../translations/ua.json');
 
 export default (
     textId: string,
@@ -8,7 +9,7 @@ export default (
     const idsParts = textId.split('.');
     const lastIdPart = idsParts.pop();
 
-    let storage = ru;
+    let storage = locale === 'ru' ? ru : ua;
 
     // eslint-disable-next-line no-restricted-syntax
     for (const idPart of idsParts) {

@@ -18,20 +18,20 @@
     "confirmationEmailTitle": "Регистрация в системе",
 
     "restPlaceCategory": {
-        "amusementPark": "Парк развлечений",
-        "aquarium": "Аквариум",
-        "artGallery": "Галерея исскуств",
+        "amusementPark": "Парк розваг",
+        "aquarium": "Акваріум",
+        "artGallery": "Галерея мистецтв",
         "bar": "Бар",
         "cafe": "Кафе",
-        "library": "Библиотека",
-        "movieTheater": "Кинотеатр",
+        "library": "Бібліотека",
+        "movieTheater": "Кінотеатр",
         "museum": "Музей",
-        "nightClub": "Ночной клуб",
+        "nightClub": "Нічний клуб",
         "park": "Парк",
         "restaurant": "Ресторан",
         "spa": "СПА",
-        "stadium": "Стадион",
-        "touristAttraction": "Достопримечательность для туристов",
+        "stadium": "Стадіон",
+        "touristAttraction": "Визначна пам'ятка для туристів",
         "zoo": "Зоопарк"
     },
 
