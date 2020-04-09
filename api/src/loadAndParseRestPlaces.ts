@@ -1,22 +1,68 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { CategoryDescription } from 'index';
+import { promisify } from 'util';
 import { RestPlaceCategory, getAllCategories } from './models/filters/restPlaceCategory';
 import { translateText } from './util';
+import config from './config';
+
+const promisifiedSetTimeout = promisify(setTimeout);
 
 const client = new Client();
+
+async function processSearchQuery(searchQuery: string, pageToken?: string): Promise<object[]> {
+    const places = <object[]>[];
+
+    const response = await client.textSearch({
+        params: {
+            query: searchQuery,
+            key: config.GOOGLE_PLACES_API_KEY,
+            pagetoken: pageToken,
+        }
+    });
+
+    // console.log(response.data);
+
+    const { status, results, next_page_token: nextPageToken } = response.data;
+
+    if (status === 'OK') {
+        results.forEach((place) => console.log(place.name, place.types));
+        console.log();
+
+        if (nextPageToken) {
+            await promisifiedSetTimeout(2000);
+
+            const placesFromNextPages = await processSearchQuery(searchQuery, nextPageToken);
+            places.push(...placesFromNextPages);
+        }
+    }
+
+    return places;
+}
 
 async function processCategory(category: CategoryDescription) {
     const categoryRuName = translateText(category.nameTextId);
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
     const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
+    const placesData: object[] = [];
 
-    console.log(searchQueries);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const searchQuery of searchQueries) {
+        // eslint-disable-next-line no-await-in-loop
+        const responses = await processSearchQuery(searchQuery);
+        placesData.push(...responses);
+    }
+
+    // console.log(placesData.length);
 }
 
 (async function run() {
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
     for (const categoryData of getAllCategories().values()) {
+        console.log();
+        console.log(translateText(categoryData.nameTextId));
+        console.log();
+
         // eslint-disable-next-line no-await-in-loop
         await processCategory(categoryData);
     }
