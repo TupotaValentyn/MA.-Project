@@ -1,5 +1,5 @@
 import { Client } from '@googlemaps/google-maps-services-js';
-import { CategoryDescription } from 'index';
+// import { CategoryDescription } from 'index';
 import { promisify } from 'util';
 // import { getAllCategories } from './models/mappings/RestPlaceCategory';
 import { translateText } from './util';
@@ -39,7 +39,7 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
     return places;
 }
 
-async function processCategory(category: CategoryDescription) {
+async function processCategory(category: any) {
     const categoryRuName = translateText(category.nameTextId);
     const categoryUaName = translateText(category.nameTextId, 'ua');
 

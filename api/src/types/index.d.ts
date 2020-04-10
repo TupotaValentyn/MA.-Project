@@ -1,6 +1,3 @@
-import { RestDuration } from 'RestDuration.ts';
-import { CompanySize } from 'CompanySize.ts';
-
 /**
  * @swagger
  *
@@ -66,13 +63,13 @@ declare global {
     }
 }
 
-interface CategoryDescription {
-    nameTextId: string,
-    googleId: string,
-    restDuration: RestDuration,
-    companySize: CompanySize,
-    isActiveRest: boolean,
-}
+// interface CategoryDescription {
+//     nameTextId: string,
+//     googleId: string,
+//     restDuration: RestDuration,
+//     companySize: CompanySize,
+//     isActiveRest: boolean,
+// }
 
 // export interface RestPlaceCategory {
 //     id: number;
