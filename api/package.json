@@ -9,7 +9,8 @@
         "build": "tsc",
         "prestart": "npm run build",
         "start": "node dist/src/app.js",
-        "loadPlaces": "cls && npx ts-node src/loadAndParseRestPlaces.ts"
+        "loadPlaces": "npx ts-node src/loadAndParseRestPlaces",
+        "prepareDB": "npx ts-node ./src/migrations/prepareDB"
     },
     "author": "Dmitry Kit",
     "devDependencies": {

@@ -1,5 +1,5 @@
-import { RestDuration } from '../models/filters/restDuration';
-import { CompanySize } from '../models/filters/companySize';
+import { RestDuration } from 'RestDuration.ts';
+import { CompanySize } from 'CompanySize.ts';
 
 /**
  * @swagger

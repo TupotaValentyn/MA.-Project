@@ -2,9 +2,11 @@ import { Sequelize } from 'sequelize-typescript';
 
 import config from './config';
 
-import { User } from './models';
+import {
+    User, CompanySize, RestDuration, BusinessHours, RestCost, RestPlace, RestPlaceCategory, RestPlaceReview
+} from './models';
 
-export default async () => {
+export default (): Sequelize => {
     const sequelize = new Sequelize({
         database: config.DB_NAME,
         username: config.DB_USER,
@@ -14,9 +16,10 @@ export default async () => {
             freezeTableName: false,
             timestamps: true,
         },
+        logging: false,
     });
 
-    sequelize.addModels([User]);
+    sequelize.addModels([User, CompanySize, RestPlaceReview, RestPlaceCategory, RestPlace, RestCost, BusinessHours, RestDuration]);
 
-    // await sequelize.sync({ alter: true });
+    return sequelize;
 };

@@ -1,7 +1,7 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { CategoryDescription } from 'index';
 import { promisify } from 'util';
-import { RestPlaceCategory, getAllCategories } from './models/filters/restPlaceCategory';
+// import { getAllCategories } from './models/mappings/RestPlaceCategory';
 import { translateText } from './util';
 import config from './config';
 
@@ -58,14 +58,14 @@ async function processCategory(category: CategoryDescription) {
 
 (async function run() {
     // eslint-disable-next-line guard-for-in,no-restricted-syntax
-    for (const categoryData of getAllCategories().values()) {
-        console.log();
-        console.log(translateText(categoryData.nameTextId));
-        console.log();
-
-        // eslint-disable-next-line no-await-in-loop
-        await processCategory(categoryData);
-    }
+    // for (const categoryData of []) {
+    //     console.log();
+    //     console.log(translateText(categoryData.nameTextId));
+    //     console.log();
+    //
+    //     // eslint-disable-next-line no-await-in-loop
+    //     await processCategory(categoryData);
+    // }
 }());
 
 // async function loadPlaces(pageToken: string) {
