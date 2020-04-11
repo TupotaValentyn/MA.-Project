@@ -78,6 +78,7 @@ async function processCategory(category: RestPlaceCategory) {
         return places;
     }, []);
 
+    // eslint-disable-next-line max-len
     const fields = 'address_component, opening_hours, price_level, rating, formatted_address, geometry, name, permanently_closed, place_id, type'.split(', ');
 
     // eslint-disable-next-line no-restricted-syntax
