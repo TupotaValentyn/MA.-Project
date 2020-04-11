@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript';
 import config from './config';
 
 import {
-    User, CompanySize, RestDuration, BusinessHours, RestCost, RestPlace, RestPlaceCategory, RestPlaceReview
+    User, CompanySize, RestDuration, BusinessHours, RestCost, RestPlace, RestPlaceCategory, RestPlaceReview,
 } from './models';
 
 export default (): Sequelize => {
