@@ -10,7 +10,7 @@ import config from './config';
 import createSequelizeInstance from './sequelize';
 
 import {
-    User, CompanySize, RestDuration, RestCost, RestPlaceCategory
+    User, CompanySize, RestDuration, RestCost, RestPlaceCategory, RestPlace,
 } from './models';
 
 const promisifiedSetTimeout = promisify(setTimeout);
@@ -94,6 +94,12 @@ async function processCategory(category: RestPlaceCategory) {
         });
 
         const placeDetails = response.data.result;
+
+        const placeModel = RestPlace.findOne({
+            where: {
+                googleId: placeDetails.place_id,
+            }
+        });
 
         console.log(placeDetails);
 
