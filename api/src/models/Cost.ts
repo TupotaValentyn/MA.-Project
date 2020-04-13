@@ -3,7 +3,7 @@ import {
 } from 'sequelize-typescript';
 
 @Table
-export class RestCost extends Model<RestCost> {
+export class Cost extends Model<Cost> {
     @PrimaryKey
     @AutoIncrement
     @Column({ primaryKey: true })

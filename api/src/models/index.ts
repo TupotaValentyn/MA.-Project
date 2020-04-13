@@ -1,19 +1,19 @@
 import { User } from './User';
-import { RestCost } from './RestCost';
-import { RestDuration } from './RestDuration';
+import { Cost } from './Cost';
+import { Duration } from './Duration';
 import { RestPlace } from './RestPlace';
-import { RestPlaceReview } from './RestPlaceReview';
+import { Review } from './Review';
 import { CompanySize } from './CompanySize';
 import { BusinessHours } from './BusinessHours';
-import { RestPlaceCategory } from './RestPlaceCategory';
+import { Category } from './Category';
 
 export {
     User,
-    RestCost,
-    RestDuration,
+    Cost,
+    Duration,
     RestPlace,
-    RestPlaceReview,
+    Review,
     CompanySize,
     BusinessHours,
-    RestPlaceCategory,
+    Category,
 };

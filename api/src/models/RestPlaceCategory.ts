@@ -1,45 +1,17 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey,
+    Column, ForeignKey, Model, Table
 } from 'sequelize-typescript';
 
-import { RestDuration } from './RestDuration';
-import { CompanySize } from './companySize';
-import { RestCost } from './RestCost';
+import { RestPlace } from './RestPlace';
+import { Category } from './Category';
 
 @Table
-export class RestPlaceCategory extends Model<RestPlaceCategory> {
-    @PrimaryKey
-    @AutoIncrement
-    @Column({ primaryKey: true })
-    id: number;
-
+class RestPlaceCategory extends Model<RestPlaceCategory> {
+    @ForeignKey(() => Category)
     @Column
-    nameTextId: string;
+    categoryId: number;
 
+    @ForeignKey(() => RestPlace)
     @Column
-    googleId: string;
-
-    @Column
-    isActiveRest: boolean;
-
-    @Column
-    @ForeignKey(() => RestDuration)
-    defaultRestDurationId: number;
-
-    @BelongsTo(() => RestDuration)
-    defaultRestDuration: RestDuration;
-
-    @Column
-    @ForeignKey(() => RestCost)
-    defaultRestCostId: number;
-
-    @BelongsTo(() => RestCost)
-    defaultRestCost: RestDuration;
-
-    @Column
-    @ForeignKey(() => CompanySize)
-    defaultCompanySizeId: number;
-
-    @BelongsTo(() => CompanySize)
-    defaultCompanySize: RestDuration;
+    restPlaceId: number;
 }

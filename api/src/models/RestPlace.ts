@@ -2,7 +2,7 @@ import {
     Column, Model, Table, PrimaryKey, AutoIncrement, HasMany,
 } from 'sequelize-typescript';
 
-import { RestPlaceReview } from './RestPlaceReview';
+import { Review } from './Review';
 import { BusinessHours } from './BusinessHours';
 
 // - времени (час/два/весь день), которое человек хочет провести там,
@@ -32,6 +32,12 @@ export class RestPlace extends Model<RestPlace> {
     longitude: number;
 
     @Column({ defaultValue: 0 })
+    googleMeanRating: number;
+
+    @Column({ defaultValue: 0 })
+    googleReviewsCount: number;
+
+    @Column({ defaultValue: 0 })
     meanRating: number;
 
     @Column({ defaultValue: 0 })
@@ -52,8 +58,8 @@ export class RestPlace extends Model<RestPlace> {
     @Column
     isActiveRest: boolean;
 
-    @HasMany(() => RestPlaceReview)
-    reviews: RestPlaceReview[];
+    @HasMany(() => Review)
+    reviews: Review[];
 
     @HasMany(() => BusinessHours)
     businessHours: BusinessHours[];

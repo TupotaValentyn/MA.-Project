@@ -3,7 +3,7 @@ import {
 } from 'sequelize-typescript';
 
 @Table
-export class RestDuration extends Model<RestDuration> {
+export class Duration extends Model<Duration> {
     @PrimaryKey
     @AutoIncrement
     @Column({ primaryKey: true })

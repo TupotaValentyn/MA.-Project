@@ -1,16 +1,17 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 // import { CategoryDescription } from 'index';
 import { promisify } from 'util';
-// import { getAllCategories } from './models/mappings/RestPlaceCategory';
+// import { getAllCategories } from './models/mappings/Category';
 import { Place } from '@googlemaps/google-maps-services-js/dist/common';
 import { PlaceDetailsResponseData } from '@googlemaps/google-maps-services-js/dist/places/details';
+import { Column, HasMany } from 'sequelize-typescript';
 import { translateText } from './util';
 import config from './config';
 
 import createSequelizeInstance from './sequelize';
 
 import {
-    User, CompanySize, RestDuration, RestCost, RestPlaceCategory, RestPlace,
+    User, CompanySize, Duration, Cost, Category, RestPlace, Review, BusinessHours,
 } from './models';
 
 const promisifiedSetTimeout = promisify(setTimeout);
@@ -50,7 +51,7 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
     return places;
 }
 
-async function processCategory(category: RestPlaceCategory) {
+async function processCategory(category: Category) {
     const categoryRuName = translateText(category.nameTextId);
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
@@ -79,7 +80,7 @@ async function processCategory(category: RestPlaceCategory) {
     }, []);
 
     // eslint-disable-next-line max-len
-    const fields = 'address_component, opening_hours, price_level, rating, formatted_address, geometry, name, permanently_closed, place_id, type'.split(', ');
+    const fields = 'user_ratings_total, address_component, opening_hours, price_level, rating, formatted_address, geometry, name, permanently_closed, place_id, type'.split(', ');
 
     // eslint-disable-next-line no-restricted-syntax
     for (const uniquePlace of uniquePlaces) {
@@ -93,15 +94,49 @@ async function processCategory(category: RestPlaceCategory) {
             },
         });
 
+        //     id: number;
+        //     googleId: string;
+        //     name: string;
+        //     latitude: number;
+        //     longitude: number;
+        //     meanRating: number;
+        //     reviewsCount: number;
+
+        //     categoryId: number;
+
+        //     restDuration: number;
+        //     restCost: number;
+        //     companySize: number;
+        //     isActiveRest: boolean;
+
+        //     businessHours: BusinessHours[];
+
         const placeDetails = response.data.result;
 
-        const placeModel = RestPlace.findOne({
+        console.log(placeDetails);
+        console.log((<any>placeDetails).user_ratings_total);
+
+        const placeModel = {
+            googleId: placeDetails.place_id,
+            name: placeDetails.name,
+            latitude: placeDetails.geometry.location.lat,
+            longitude: placeDetails.geometry.location.lng,
+            googleMeanRating: placeDetails.rating,
+            googleReviewsCount: (placeDetails as any).user_ratings_total,
+            restDuration: category.defaultRestDurationId,
+            restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDurationId,
+            companySize: category.defaultCompanySizeId,
+            isActiveRest: category.isActiveRest,
+        };
+
+        // eslint-disable-next-line no-await-in-loop
+        const placeModel2 = await RestPlace.findOne({
             where: {
                 googleId: placeDetails.place_id,
             }
         });
 
-        console.log(placeDetails);
+        // console.log(placeDetails);
 
         // uniquePlacesDetails.push(response.data.result);
     }
@@ -119,10 +154,10 @@ async function processCategory(category: RestPlaceCategory) {
 (async function run() {
     createSequelizeInstance();
 
-    const categories = await RestPlaceCategory.findAll({
+    const categories = await Category.findAll({
         // include: [
-        //     { model: RestCost, as: 'defaultRestCost' },
-        //     { model: RestDuration, as: 'defaultRestDuration' },
+        //     { model: Cost, as: 'defaultRestCost' },
+        //     { model: Duration, as: 'defaultRestDuration' },
         //     { model: CompanySize, as: 'defaultCompanySize' },
         // ]
     });

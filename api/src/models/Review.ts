@@ -5,7 +5,7 @@ import {
 import { RestPlace } from './RestPlace';
 
 @Table
-export class RestPlaceReview extends Model<RestPlaceReview> {
+export class Review extends Model<Review> {
     @PrimaryKey
     @AutoIncrement
     @Column({ primaryKey: true })

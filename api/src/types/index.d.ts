@@ -62,32 +62,3 @@ declare global {
         }
     }
 }
-
-// interface CategoryDescription {
-//     nameTextId: string,
-//     googleId: string,
-//     restDuration: RestDuration,
-//     companySize: CompanySize,
-//     isActiveRest: boolean,
-// }
-
-// export interface RestPlaceCategory {
-//     id: number;
-//     googleId: string;
-//     name: string;
-// }
-//
-// export interface RestPlaceCost {
-//     id: number;
-//     name: string;
-// }
-
-// export interface RestDuration {
-//     id: number;
-//     nameTextId: string;
-// }
-
-// export interface CompanySize {
-//     id: number;
-//     nameTextId: string;
-// }

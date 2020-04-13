@@ -1,5 +1,5 @@
 import {
-    User, CompanySize, RestDuration, RestCost, RestPlaceCategory
+    User, CompanySize, Duration, Cost, Category
 } from '../models';
 
 import {
@@ -24,39 +24,39 @@ import createSequelizeInstance from '../sequelize';
     console.log('CompanySize - Finish\n');
 
 
-    console.log('RestCost - Start');
+    console.log('Cost - Start');
     const restCosts = ['free', 'inexpensive', 'moderate', 'expensive', 'veryExpensive'];
 
     // eslint-disable-next-line no-restricted-syntax
     for (const nameTextId of restCosts) {
         // eslint-disable-next-line no-await-in-loop
-        await RestCost.create({ nameTextId: `restCost.${nameTextId}` });
+        await Cost.create({ nameTextId: `restCost.${nameTextId}` });
     }
 
-    console.log('RestCost - Finish\n');
+    console.log('Cost - Finish\n');
 
 
-    console.log('RestDuration - Start');
+    console.log('Duration - Start');
     const restDurations = ['low', 'medium', 'high'];
 
     // eslint-disable-next-line no-restricted-syntax
     for (const nameTextId of restDurations) {
         // eslint-disable-next-line no-await-in-loop
-        await RestDuration.create({ nameTextId: `restDuration.${nameTextId}` });
+        await Duration.create({ nameTextId: `restDuration.${nameTextId}` });
     }
 
-    console.log('RestDuration - Finish\n');
+    console.log('Duration - Finish\n');
 
 
-    console.log('RestPlaceCategory - Start');
+    console.log('Category - Start');
 
     // eslint-disable-next-line no-restricted-syntax,no-use-before-define
     for (const categoryData of getCategories()) {
         // eslint-disable-next-line no-await-in-loop
-        await RestPlaceCategory.create(categoryData);
+        await Category.create(categoryData);
     }
 
-    console.log('RestPlaceCategory - Finish\n');
+    console.log('Category - Finish\n');
 
     console.log('User - Start');
 
