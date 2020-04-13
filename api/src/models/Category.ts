@@ -1,10 +1,12 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey,
+    Column, Model, Table, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey, BelongsToMany,
 } from 'sequelize-typescript';
 
 import { Duration } from './Duration';
 import { CompanySize } from './companySize';
 import { Cost } from './Cost';
+import { RestPlaceCategory } from './RestPlaceCategory';
+import { RestPlace } from './RestPlace';
 
 @Table
 export class Category extends Model<Category> {
@@ -34,12 +36,15 @@ export class Category extends Model<Category> {
     defaultRestCostId: number;
 
     @BelongsTo(() => Cost)
-    defaultRestCost: Duration;
+    defaultRestCost: Cost;
 
     @Column
     @ForeignKey(() => CompanySize)
     defaultCompanySizeId: number;
 
     @BelongsTo(() => CompanySize)
-    defaultCompanySize: Duration;
+    defaultCompanySize: CompanySize;
+
+    @BelongsToMany(() => RestPlace, () => RestPlaceCategory)
+    places: RestPlace[];
 }

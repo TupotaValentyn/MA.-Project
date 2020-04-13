@@ -1,12 +1,18 @@
 import {
-    Column, ForeignKey, Model, Table
+    AutoIncrement,
+    Column, ForeignKey, Model, PrimaryKey, Table,
 } from 'sequelize-typescript';
 
 import { RestPlace } from './RestPlace';
 import { Category } from './Category';
 
 @Table
-class RestPlaceCategory extends Model<RestPlaceCategory> {
+export class RestPlaceCategory extends Model<RestPlaceCategory> {
+    @PrimaryKey
+    @AutoIncrement
+    @Column({ primaryKey: true })
+    id: number;
+
     @ForeignKey(() => Category)
     @Column
     categoryId: number;

@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript';
 import config from './config';
 
 import {
-    User, CompanySize, Duration, BusinessHours, Cost, RestPlace, Category, Review,
+    User, CompanySize, Duration, BusinessHours, Cost, RestPlace, Category, Review, RestPlaceCategory
 } from './models';
 
 export default (): Sequelize => {
@@ -12,14 +12,14 @@ export default (): Sequelize => {
         username: config.DB_USER,
         password: config.DB_PASSWORD,
         dialect: 'mysql',
+        logging: false,
         define: {
             freezeTableName: false,
-            timestamps: true,
+            timestamps: false,
         },
-        logging: false,
     });
 
-    sequelize.addModels([User, CompanySize, Review, Category, RestPlace, Cost, BusinessHours, Duration]);
+    sequelize.addModels([User, CompanySize, Review, Category, RestPlace, Cost, BusinessHours, Duration, RestPlaceCategory]);
 
     return sequelize;
 };

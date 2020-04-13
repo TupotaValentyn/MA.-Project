@@ -1,9 +1,11 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany,
+    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany,
 } from 'sequelize-typescript';
 
 import { Review } from './Review';
 import { BusinessHours } from './BusinessHours';
+import { Category } from './Category';
+import { RestPlaceCategory } from './RestPlaceCategory';
 
 // - времени (час/два/весь день), которое человек хочет провести там,
 // - кол-ву денег, которые может потратить
@@ -44,9 +46,6 @@ export class RestPlace extends Model<RestPlace> {
     reviewsCount: number;
 
     @Column
-    categoryId: number;
-
-    @Column
     restDuration: number;
 
     @Column
@@ -63,4 +62,7 @@ export class RestPlace extends Model<RestPlace> {
 
     @HasMany(() => BusinessHours)
     businessHours: BusinessHours[];
+
+    @BelongsToMany(() => Category, () => RestPlaceCategory)
+    categories: Category[];
 }

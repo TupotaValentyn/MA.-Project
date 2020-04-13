@@ -6,6 +6,7 @@ import { Review } from './Review';
 import { CompanySize } from './CompanySize';
 import { BusinessHours } from './BusinessHours';
 import { Category } from './Category';
+import { RestPlaceCategory } from './RestPlaceCategory';
 
 export {
     User,
@@ -16,4 +17,5 @@ export {
     CompanySize,
     BusinessHours,
     Category,
+    RestPlaceCategory,
 };
