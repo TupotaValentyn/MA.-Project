@@ -8,11 +8,6 @@ import { Category } from './Category';
 
 @Table
 export class RestPlaceCategory extends Model<RestPlaceCategory> {
-    @PrimaryKey
-    @AutoIncrement
-    @Column({ primaryKey: true })
-    id: number;
-
     @ForeignKey(() => Category)
     @Column
     categoryId: number;

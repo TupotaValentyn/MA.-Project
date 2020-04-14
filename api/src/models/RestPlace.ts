@@ -1,5 +1,5 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany,
+    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany, DataType,
 } from 'sequelize-typescript';
 
 import { Review } from './Review';
@@ -27,19 +27,19 @@ export class RestPlace extends Model<RestPlace> {
     @Column
     name: string;
 
-    @Column
+    @Column({ type: DataType.DOUBLE })
     latitude: number;
 
-    @Column
+    @Column({ type: DataType.DOUBLE })
     longitude: number;
 
-    @Column({ defaultValue: 0 })
+    @Column({ defaultValue: 0, type: DataType.DOUBLE })
     googleMeanRating: number;
 
     @Column({ defaultValue: 0 })
     googleReviewsCount: number;
 
-    @Column({ defaultValue: 0 })
+    @Column({ defaultValue: 0, type: DataType.DOUBLE })
     meanRating: number;
 
     @Column({ defaultValue: 0 })
