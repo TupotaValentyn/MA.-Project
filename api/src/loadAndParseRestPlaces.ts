@@ -1,17 +1,19 @@
-import { Client } from '@googlemaps/google-maps-services-js';
-// import { CategoryDescription } from 'index';
-import { promisify } from 'util';
-// import { getAllCategories } from './models/mappings/Category';
-import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
-import { PlaceDetailsResponseData } from '@googlemaps/google-maps-services-js/dist/places/details';
-import { Column, HasMany } from 'sequelize-typescript';
-import { translateText } from './util';
-import config from './config';
+/* eslint no-await-in-loop: 0 */
+/* eslint guard-for-in: 0 */
+/* eslint no-restricted-syntax: 0 */
+/* eslint no-continue: 0 */
+/* eslint no-use-before-define: 0 */
 
+import { Client } from '@googlemaps/google-maps-services-js';
+import { promisify } from 'util';
+import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
+import { translateText } from './util';
+
+import config from './config';
 import createSequelizeInstance from './sequelize';
 
 import {
-    User, CompanySize, Duration, Cost, Category, RestPlace, Review, BusinessHours, RestPlaceCategory,
+    User, CompanySize, Duration, Cost, Category, RestPlace, Review, WorkingPeriod, RestPlaceCategory,
 } from './models';
 
 const promisifiedSetTimeout = promisify(setTimeout);
@@ -53,9 +55,7 @@ async function processCategory(category: Category) {
     const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
     const placesData: Place[] = [];
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const searchQuery of searchQueries) {
-        // eslint-disable-next-line no-await-in-loop
         const responses = await processSearchQuery(searchQuery);
         placesData.push(...responses);
     }
@@ -70,12 +70,9 @@ async function processCategory(category: Category) {
         return places;
     }, []);
 
-    // eslint-disable-next-line max-len
-    const fields = 'user_ratings_total, address_component, opening_hours, price_level, rating, formatted_address, geometry, name, permanently_closed, place_id, type'.split(', ');
+    const fields = getFieldNames();
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const uniquePlace of uniquePlaces) {
-        // eslint-disable-next-line no-await-in-loop
         const response = await client.placeDetails({
             params: {
                 key: process.env.GOOGLE_PLACES_API_KEY,
@@ -87,10 +84,73 @@ async function processCategory(category: Category) {
 
         const placeDetails = response.data.result;
 
-        if (category.id !== 15 && !placeDetails.types.includes(category.googleId as AddressType)) {
-            // eslint-disable-next-line no-continue
+        if (/* category.id !== 15 && */!placeDetails.types.includes(category.googleId as AddressType)) {
             continue;
         }
+
+        console.log();
+        console.log(placeDetails.opening_hours?.periods);
+        console.log(placeDetails.opening_hours && placeDetails.opening_hours.weekday_text);
+
+        const businessHours = Array(7).fill(0).map((_, index) => {
+            const startDate = dateAtMidnight();
+            const endDate = dateAtMidnight();
+
+            const model = {
+                placeId: placeDetails.place_id,
+                dayOfWeekStart: index,
+                startTime: startDate,
+                dayOfWeekEnd: index,
+                endTime: endDate,
+            };
+
+            const dayInfo = placeDetails.opening_hours.periods[index];
+
+            if (!dayInfo) {
+                return model;
+            }
+
+            if (dayInfo.open) {
+                if (dayInfo.open.time) {
+                    const hours = dayInfo.open.time.substring(0, 2);
+                    const minutes = dayInfo.open.time.substring(2);
+
+                    model.startTime.setHours(Number(hours));
+                    model.startTime.setMinutes(Number(minutes));
+                }
+
+                if (dayInfo.open.day) {
+                    model.dayOfWeekStart = dayInfo.open.day;
+                }
+            }
+
+            if (dayInfo.close) {
+                if (dayInfo.close.time) {
+                    const hours = dayInfo.close.time.substring(0, 2);
+                    const minutes = dayInfo.close.time.substring(2);
+
+                    model.startTime.setHours(Number(hours));
+                    model.startTime.setMinutes(Number(minutes));
+                }
+
+                if (dayInfo.close.day) {
+                    model.dayOfWeekStart = dayInfo.close.day;
+                }
+            }
+
+            return model;
+        });
+
+        // console.log(businessHours)
+
+        await WorkingPeriod.create({
+            placeId: 2153,
+            dayOfWeek: 0,
+            startTime: new Date(),
+            endTime: new Date(),
+        });
+
+        // break;
 
         const placeModel = {
             googleId: placeDetails.place_id,
@@ -106,31 +166,51 @@ async function processCategory(category: Category) {
             categories: [category],
         };
 
-        // eslint-disable-next-line no-await-in-loop
         const dbPlaceModel = await RestPlace.findOne({
             where: { googleId: placeDetails.place_id },
             include: [Category],
         });
 
         if (!dbPlaceModel) {
-            // eslint-disable-next-line no-await-in-loop
             const place = await RestPlace.create(placeModel);
-
-            // eslint-disable-next-line no-await-in-loop
             await place.$add('categories', [category]);
-
-            // eslint-disable-next-line no-continue
             continue;
         }
 
         const savedCategory = dbPlaceModel.categories.find((item) => item.id === category.id);
 
         if (!savedCategory) {
-            // eslint-disable-next-line no-await-in-loop
             await dbPlaceModel.$add('categories', [category]);
             console.log('Updated', dbPlaceModel.categories.length, dbPlaceModel.id);
         }
     }
+}
+
+function dateAtMidnight() {
+    const date = new Date();
+
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    return date;
+}
+
+function getFieldNames() {
+    return [
+        'user_ratings_total',
+        'address_component',
+        'opening_hours',
+        'price_level',
+        'rating',
+        'formatted_address',
+        'geometry',
+        'name',
+        'permanently_closed',
+        'place_id',
+        'type',
+    ];
 }
 
 (async function run() {
@@ -138,9 +218,7 @@ async function processCategory(category: Category) {
 
     const categories = await Category.findAll();
 
-    // eslint-disable-next-line guard-for-in, no-restricted-syntax
     for (const categoryData of categories) {
-        // eslint-disable-next-line no-await-in-loop
         await processCategory(categoryData);
     }
 }());

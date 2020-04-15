@@ -3,7 +3,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Review } from './Review';
-import { BusinessHours } from './BusinessHours';
+import { WorkingPeriod } from './WorkingPeriod';
 import { Category } from './Category';
 import { RestPlaceCategory } from './RestPlaceCategory';
 
@@ -60,8 +60,8 @@ export class RestPlace extends Model<RestPlace> {
     @HasMany(() => Review)
     reviews: Review[];
 
-    @HasMany(() => BusinessHours)
-    businessHours: BusinessHours[];
+    @HasMany(() => WorkingPeriod)
+    businessHours: WorkingPeriod[];
 
     @BelongsToMany(() => Category, () => RestPlaceCategory)
     categories: Category[];

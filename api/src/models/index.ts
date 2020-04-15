@@ -4,7 +4,7 @@ import { Duration } from './Duration';
 import { RestPlace } from './RestPlace';
 import { Review } from './Review';
 import { CompanySize } from './CompanySize';
-import { BusinessHours } from './BusinessHours';
+import { WorkingPeriod } from './WorkingPeriod';
 import { Category } from './Category';
 import { RestPlaceCategory } from './RestPlaceCategory';
 
@@ -15,7 +15,7 @@ export {
     RestPlace,
     Review,
     CompanySize,
-    BusinessHours,
+    WorkingPeriod,
     Category,
     RestPlaceCategory,
 };

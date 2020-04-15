@@ -5,7 +5,7 @@ import {
 import { RestPlace } from './RestPlace';
 
 @Table
-export class BusinessHours extends Model<BusinessHours> {
+export class WorkingPeriod extends Model<WorkingPeriod> {
     @PrimaryKey
     @AutoIncrement
     @Column({ primaryKey: true })
@@ -16,10 +16,13 @@ export class BusinessHours extends Model<BusinessHours> {
     placeId: number;
 
     @Column
-    dayOfWeek: number;
+    dayOfWeekStart: number;
 
     @Column({ type: DataType.TIME })
     startTime: Date;
+
+    @Column
+    dayOfWeekEnd: number;
 
     @Column({ type: DataType.TIME })
     endTime: Date;
