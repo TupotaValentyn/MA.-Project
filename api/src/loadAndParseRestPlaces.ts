@@ -104,7 +104,16 @@ async function processCategory(category: Category) {
                 endTime: endDate,
             };
 
-            const dayInfo = placeDetails.opening_hours.periods[index];
+            // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
+            if (placeDetails.opening_hours.periods.length === 1) {
+                model.endTime.setHours(23);
+                model.endTime.setMinutes(59);
+                model.endTime.setSeconds(59);
+
+                return model;
+            }
+
+            const dayInfo = placeDetails.opening_hours.periods[index === 6 ? 0 : index + 1];
 
             if (!dayInfo) {
                 return model;
@@ -129,13 +138,17 @@ async function processCategory(category: Category) {
                     const hours = dayInfo.close.time.substring(0, 2);
                     const minutes = dayInfo.close.time.substring(2);
 
-                    model.startTime.setHours(Number(hours));
-                    model.startTime.setMinutes(Number(minutes));
+                    model.endTime.setHours(Number(hours));
+                    model.endTime.setMinutes(Number(minutes));
                 }
 
                 if (dayInfo.close.day) {
                     model.dayOfWeekStart = dayInfo.close.day;
                 }
+            } else {
+                model.endTime.setHours(23);
+                model.endTime.setMinutes(59);
+                model.endTime.setSeconds(59);
             }
 
             return model;
