@@ -89,79 +89,8 @@ async function processCategory(category: Category) {
         }
 
         console.log();
-        console.log(placeDetails.opening_hours?.periods);
+        // console.log(placeDetails.opening_hours?.periods);
         console.log(placeDetails.opening_hours && placeDetails.opening_hours.weekday_text);
-
-        const businessHours = Array(7).fill(0).map((_, index) => {
-            const startDate = dateAtMidnight();
-            const endDate = dateAtMidnight();
-
-            const model = {
-                placeId: placeDetails.place_id,
-                dayOfWeekStart: index,
-                startTime: startDate,
-                dayOfWeekEnd: index,
-                endTime: endDate,
-            };
-
-            // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
-            if (placeDetails.opening_hours.periods.length === 1) {
-                model.endTime.setHours(23);
-                model.endTime.setMinutes(59);
-                model.endTime.setSeconds(59);
-
-                return model;
-            }
-
-            const dayInfo = placeDetails.opening_hours.periods[index === 6 ? 0 : index + 1];
-
-            if (!dayInfo) {
-                return model;
-            }
-
-            if (dayInfo.open) {
-                if (dayInfo.open.time) {
-                    const hours = dayInfo.open.time.substring(0, 2);
-                    const minutes = dayInfo.open.time.substring(2);
-
-                    model.startTime.setHours(Number(hours));
-                    model.startTime.setMinutes(Number(minutes));
-                }
-
-                if (dayInfo.open.day) {
-                    model.dayOfWeekStart = dayInfo.open.day;
-                }
-            }
-
-            if (dayInfo.close) {
-                if (dayInfo.close.time) {
-                    const hours = dayInfo.close.time.substring(0, 2);
-                    const minutes = dayInfo.close.time.substring(2);
-
-                    model.endTime.setHours(Number(hours));
-                    model.endTime.setMinutes(Number(minutes));
-                }
-
-                if (dayInfo.close.day) {
-                    model.dayOfWeekStart = dayInfo.close.day;
-                }
-            } else {
-                model.endTime.setHours(23);
-                model.endTime.setMinutes(59);
-                model.endTime.setSeconds(59);
-            }
-
-            return model;
-        });
-
-        // console.log(businessHours)
-
-        await WorkingPeriod.create({
-            placeId: 2153,
-            dayOfWeek: 0,
-            startTime: new Date(),
-            endTime: new Date(),
-        });
 
         // break;
 
@@ -187,6 +116,79 @@ async function processCategory(category: Category) {
         if (!dbPlaceModel) {
             const place = await RestPlace.create(placeModel);
             await place.$add('categories', [category]);
+
+            const businessHours = Array(7).fill(0).map((_, index) => {
+                const startDate = dateAtMidnight();
+                const endDate = dateAtMidnight();
+
+                const model = {
+                    placeId: place.id,
+                    dayOfWeekStart: index,
+                    startTime: startDate,
+                    dayOfWeekEnd: index,
+                    endTime: endDate,
+                };
+
+                if (!placeDetails.opening_hours) {
+                    return model;
+                }
+
+                // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
+                if (placeDetails.opening_hours.periods.length === 1) {
+                    model.endTime.setHours(23);
+                    model.endTime.setMinutes(59);
+                    model.endTime.setSeconds(59);
+
+                    return model;
+                }
+
+                // В API 0 - это воскресенье, нужно сделать первым днем понедельник
+                const apiDayIndex = index === 6 ? 0 : index + 1;
+                const dayInfo = placeDetails.opening_hours.periods
+                    .find((period) => period.open && period.open.day === apiDayIndex);
+
+                // Данных об этом дне нет - выходной в заведении
+                if (!dayInfo) {
+                    return model;
+                }
+
+                if (dayInfo.open) {
+                    if (dayInfo.open.time) {
+                        const hours = dayInfo.open.time.substring(0, 2);
+                        const minutes = dayInfo.open.time.substring(2);
+
+                        model.startTime.setHours(Number(hours));
+                        model.startTime.setMinutes(Number(minutes));
+                    }
+
+                    if (dayInfo.open.day) {
+                        model.dayOfWeekStart = dayInfo.open.day;
+                    }
+                }
+
+                if (dayInfo.close) {
+                    if (dayInfo.close.time) {
+                        const hours = dayInfo.close.time.substring(0, 2);
+                        const minutes = dayInfo.close.time.substring(2);
+
+                        model.endTime.setHours(Number(hours));
+                        model.endTime.setMinutes(Number(minutes));
+                    }
+
+                    if (dayInfo.close.day) {
+                        model.dayOfWeekEnd = dayInfo.close.day;
+                    }
+                } else {
+                    model.dayOfWeekEnd = dayInfo.open.day;
+                }
+
+                return model;
+            });
+
+            console.log(businessHours);
+
+            await WorkingPeriod.create(businessHours[0]);
+
             continue;
         }
 
