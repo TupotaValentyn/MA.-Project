@@ -121,6 +121,8 @@ async function processCategory(category: Category) {
                 const startDate = dateAtMidnight();
                 const endDate = dateAtMidnight();
 
+                const apiDayIndex = index === 6 ? 0 : index + 1;
+
                 const model = {
                     placeId: place.id,
                     dayOfWeekStart: index,
@@ -143,7 +145,6 @@ async function processCategory(category: Category) {
                 }
 
                 // В API 0 - это воскресенье, нужно сделать первым днем понедельник
-                const apiDayIndex = index === 6 ? 0 : index + 1;
                 const dayInfo = placeDetails.opening_hours.periods
                     .find((period) => period.open && period.open.day === apiDayIndex);
 
@@ -187,7 +188,10 @@ async function processCategory(category: Category) {
 
             console.log(businessHours);
 
-            await WorkingPeriod.create(businessHours[0]);
+            const period = await WorkingPeriod.create(businessHours[0]);
+
+            console.log(period.startTime);
+            console.log(period.endTime);
 
             continue;
         }
