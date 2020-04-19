@@ -114,14 +114,18 @@ async function processCategory(category: Category) {
         });
 
         if (!dbPlaceModel) {
-            const place = await RestPlace.create(placeModel);
-            await place.$add('categories', [category]);
+            // const place = await RestPlace.create(placeModel);
+            // await place.$add('categories', [category]);
+
+            const place = { id: 1 };
 
             const businessHours = Array(7).fill(0).map((_, index) => {
                 const startDate = dateAtMidnight();
                 const endDate = dateAtMidnight();
 
                 const apiDayIndex = index === 6 ? 0 : index + 1;
+
+                // console.log(apiDayIndex, index);
 
                 const model = {
                     placeId: place.id,
@@ -137,9 +141,11 @@ async function processCategory(category: Category) {
 
                 // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
                 if (placeDetails.opening_hours.periods.length === 1) {
-                    model.endTime.setHours(23);
-                    model.endTime.setMinutes(59);
-                    model.endTime.setSeconds(59);
+                    model.endTime.setUTCHours(23);
+                    model.endTime.setUTCMinutes(59);
+                    model.endTime.setUTCSeconds(59);
+
+                    console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
 
                     return model;
                 }
@@ -150,6 +156,7 @@ async function processCategory(category: Category) {
 
                 // Данных об этом дне нет - выходной в заведении
                 if (!dayInfo) {
+                    console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
                     return model;
                 }
 
@@ -158,13 +165,13 @@ async function processCategory(category: Category) {
                         const hours = dayInfo.open.time.substring(0, 2);
                         const minutes = dayInfo.open.time.substring(2);
 
-                        model.startTime.setHours(Number(hours));
-                        model.startTime.setMinutes(Number(minutes));
+                        model.startTime.setUTCHours(Number(hours));
+                        model.startTime.setUTCMinutes(Number(minutes));
                     }
 
-                    if (dayInfo.open.day) {
-                        model.dayOfWeekStart = dayInfo.open.day;
-                    }
+                    // if (dayInfo.open.day) {
+                    //     model.dayOfWeekStart = dayInfo.open.day;
+                    // }
                 }
 
                 if (dayInfo.close) {
@@ -172,26 +179,35 @@ async function processCategory(category: Category) {
                         const hours = dayInfo.close.time.substring(0, 2);
                         const minutes = dayInfo.close.time.substring(2);
 
-                        model.endTime.setHours(Number(hours));
-                        model.endTime.setMinutes(Number(minutes));
+                        model.endTime.setUTCHours(Number(hours));
+                        model.endTime.setUTCMinutes(Number(minutes));
                     }
 
+
                     if (dayInfo.close.day) {
-                        model.dayOfWeekEnd = dayInfo.close.day;
+                        console.log(dayInfo.close.day, Number(dayInfo.close.day) === 6 ? 0 : Number(dayInfo.close.day) + 1);
+
+                        model.dayOfWeekEnd = Number(dayInfo.close.day) === 6 ? 0 : Number(dayInfo.close.day) + 1;
                     }
-                } else {
-                    model.dayOfWeekEnd = dayInfo.open.day;
                 }
+
+                console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
+
+                // console.error(new Date(Date.UTC(2020, 5, 19, 19, 0, 0)));
+
+                // console.log(123, new Date(model.startTime.getTime() + model.startTime.getTimezoneOffset()))
+
+                // model.startTime = new Date(model.startTime.getTime() - model.startTime.getTimezoneOffset());
 
                 return model;
             });
 
-            console.log(businessHours);
+            // console.log(businessHours);
 
-            const period = await WorkingPeriod.create(businessHours[0]);
+            // const period = await WorkingPeriod.create(businessHours[0]);
 
-            console.log(period.startTime);
-            console.log(period.endTime);
+            // console.log(period.startTime);
+            // console.log(period.endTime);
 
             continue;
         }
@@ -208,10 +224,10 @@ async function processCategory(category: Category) {
 function dateAtMidnight() {
     const date = new Date();
 
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
+    date.setUTCHours(0);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
 
     return date;
 }
