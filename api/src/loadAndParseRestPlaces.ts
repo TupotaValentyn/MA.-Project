@@ -84,13 +84,13 @@ async function processCategory(category: Category) {
 
         const placeDetails = response.data.result;
 
-        if (/* category.id !== 15 && */!placeDetails.types.includes(category.googleId as AddressType)) {
+        if (!placeDetails.types.includes(category.googleId as AddressType)) {
             continue;
         }
 
         console.log();
         // console.log(placeDetails.opening_hours?.periods);
-        console.log(placeDetails.opening_hours && placeDetails.opening_hours.weekday_text);
+        // console.log(placeDetails.opening_hours && placeDetails.opening_hours.weekday_text);
 
         // break;
 
@@ -114,100 +114,10 @@ async function processCategory(category: Category) {
         });
 
         if (!dbPlaceModel) {
-            // const place = await RestPlace.create(placeModel);
-            // await place.$add('categories', [category]);
+            const place = await RestPlace.create(placeModel);
+            await place.$add('categories', [category]);
 
-            const place = { id: 1 };
-
-            const businessHours = Array(7).fill(0).map((_, index) => {
-                const startDate = dateAtMidnight();
-                const endDate = dateAtMidnight();
-
-                const apiDayIndex = index === 6 ? 0 : index + 1;
-
-                // console.log(apiDayIndex, index);
-
-                const model = {
-                    placeId: place.id,
-                    dayOfWeekStart: index,
-                    startTime: startDate,
-                    dayOfWeekEnd: index,
-                    endTime: endDate,
-                };
-
-                if (!placeDetails.opening_hours) {
-                    return model;
-                }
-
-                // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
-                if (placeDetails.opening_hours.periods.length === 1) {
-                    model.endTime.setUTCHours(23);
-                    model.endTime.setUTCMinutes(59);
-                    model.endTime.setUTCSeconds(59);
-
-                    console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
-
-                    return model;
-                }
-
-                // В API 0 - это воскресенье, нужно сделать первым днем понедельник
-                const dayInfo = placeDetails.opening_hours.periods
-                    .find((period) => period.open && period.open.day === apiDayIndex);
-
-                // Данных об этом дне нет - выходной в заведении
-                if (!dayInfo) {
-                    console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
-                    return model;
-                }
-
-                if (dayInfo.open) {
-                    if (dayInfo.open.time) {
-                        const hours = dayInfo.open.time.substring(0, 2);
-                        const minutes = dayInfo.open.time.substring(2);
-
-                        model.startTime.setUTCHours(Number(hours));
-                        model.startTime.setUTCMinutes(Number(minutes));
-                    }
-
-                    // if (dayInfo.open.day) {
-                    //     model.dayOfWeekStart = dayInfo.open.day;
-                    // }
-                }
-
-                if (dayInfo.close) {
-                    if (dayInfo.close.time) {
-                        const hours = dayInfo.close.time.substring(0, 2);
-                        const minutes = dayInfo.close.time.substring(2);
-
-                        model.endTime.setUTCHours(Number(hours));
-                        model.endTime.setUTCMinutes(Number(minutes));
-                    }
-
-
-                    if (dayInfo.close.day) {
-                        console.log(dayInfo.close.day, Number(dayInfo.close.day) === 6 ? 0 : Number(dayInfo.close.day) + 1);
-
-                        model.dayOfWeekEnd = Number(dayInfo.close.day) === 6 ? 0 : Number(dayInfo.close.day) + 1;
-                    }
-                }
-
-                console.log(model.dayOfWeekStart, model.startTime, '-', model.endTime, model.dayOfWeekEnd);
-
-                // console.error(new Date(Date.UTC(2020, 5, 19, 19, 0, 0)));
-
-                // console.log(123, new Date(model.startTime.getTime() + model.startTime.getTimezoneOffset()))
-
-                // model.startTime = new Date(model.startTime.getTime() - model.startTime.getTimezoneOffset());
-
-                return model;
-            });
-
-            // console.log(businessHours);
-
-            // const period = await WorkingPeriod.create(businessHours[0]);
-
-            // console.log(period.startTime);
-            // console.log(period.endTime);
+            await createWorkingPeriods(place.id, placeDetails);
 
             continue;
         }
@@ -218,6 +128,73 @@ async function processCategory(category: Category) {
             await dbPlaceModel.$add('categories', [category]);
             console.log('Updated', dbPlaceModel.categories.length, dbPlaceModel.id);
         }
+    }
+}
+
+async function createWorkingPeriods(placeDBId: number, placeDetails: Place) {
+    const workingPeriods = Array(7).fill(0).map((_, index) => {
+        const startDate = dateAtMidnight();
+        const endDate = dateAtMidnight();
+
+        const model = {
+            placeId: placeDBId,
+            dayOfWeekStart: index,
+            startTime: startDate,
+            dayOfWeekEnd: index,
+            endTime: endDate,
+        };
+
+        if (!placeDetails.opening_hours) {
+            return model;
+        }
+
+        // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
+        if (placeDetails.opening_hours.periods.length === 1) {
+            model.endTime.setUTCHours(23);
+            model.endTime.setUTCMinutes(59);
+            model.endTime.setUTCSeconds(59);
+
+            return model;
+        }
+
+        const dayInfo = placeDetails.opening_hours.periods
+            .find((period) => period.open && period.open.day === index);
+
+        // Данных об этом дне нет - выходной в заведении
+        if (!dayInfo) {
+            return model;
+        }
+
+        if (dayInfo.open) {
+            if (dayInfo.open.time) {
+                const hours = dayInfo.open.time.substring(0, 2);
+                const minutes = dayInfo.open.time.substring(2);
+
+                model.startTime.setUTCHours(Number(hours));
+                model.startTime.setUTCMinutes(Number(minutes));
+            }
+        }
+
+        if (dayInfo.close) {
+            if (dayInfo.close.time) {
+                const hours = dayInfo.close.time.substring(0, 2);
+                const minutes = dayInfo.close.time.substring(2);
+
+                model.endTime.setUTCHours(Number(hours));
+                model.endTime.setUTCMinutes(Number(minutes));
+            }
+
+
+            if (dayInfo.close.day !== undefined) {
+                model.dayOfWeekEnd = Number(dayInfo.close.day);
+            }
+        }
+
+        return model;
+    });
+
+    for (const workingPeriod of workingPeriods) {
+        await WorkingPeriod.create(workingPeriod);
     }
 }
 
