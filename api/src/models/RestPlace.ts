@@ -61,7 +61,7 @@ export class RestPlace extends Model<RestPlace> {
     reviews: Review[];
 
     @HasMany(() => WorkingPeriod)
-    businessHours: WorkingPeriod[];
+    workingPeriods: WorkingPeriod[];
 
     @BelongsToMany(() => Category, () => RestPlaceCategory)
     categories: Category[];

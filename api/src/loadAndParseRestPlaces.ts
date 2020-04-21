@@ -7,14 +7,16 @@
 import { Client } from '@googlemaps/google-maps-services-js';
 import { promisify } from 'util';
 import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
+import { getLogger } from 'log4js';
 import { translateText } from './util';
 
 import config from './config';
 import createSequelizeInstance from './sequelize';
 
-import {
-    User, CompanySize, Duration, Cost, Category, RestPlace, Review, WorkingPeriod, RestPlaceCategory,
-} from './models';
+import { Category, RestPlace, WorkingPeriod } from './models';
+
+const logger = getLogger('LoadPlaces');
+logger.level = 'debug';
 
 const promisifiedSetTimeout = promisify(setTimeout);
 
@@ -37,7 +39,9 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
     if (status === 'OK') {
         places.push(...results);
 
+        // Load places from the next page
         if (nextPageToken) {
+            // Without this delay, an error will be thrown
             await promisifiedSetTimeout(2000);
 
             const placesFromNextPages = await processSearchQuery(searchQuery, nextPageToken);
@@ -52,27 +56,42 @@ async function processCategory(category: Category) {
     const categoryRuName = translateText(category.nameTextId);
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
+    logger.debug(`Ищем места в категории "${categoryRuName}"\n`);
+
     const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
     const placesData: Place[] = [];
 
+    // Load all places from this category
     for (const searchQuery of searchQueries) {
+        logger.debug(`Ищем места по запросу "${searchQuery}"`);
+
         const responses = await processSearchQuery(searchQuery);
         placesData.push(...responses);
+
+        logger.debug(`По запросу "${searchQuery}" найдено ${responses.length} мест\n`);
     }
 
-    const uniquePlaces = placesData.reduce((places, place) => {
-        const sameIdPlaces = places.filter((currentPlace) => currentPlace.place_id === place.place_id);
+    logger.debug(`В категории "${categoryRuName}" всего найдено ${placesData.length} мест`);
 
-        if (!sameIdPlaces.length) {
+    // Get unique places only
+    const uniquePlaces = placesData.reduce((places, place) => {
+        const placesWithSameId = places.filter((currentPlace) => currentPlace.place_id === place.place_id);
+
+        if (!placesWithSameId.length) {
             places.push(place);
         }
 
         return places;
     }, []);
 
+    logger.debug(`В категории "${categoryRuName}" отфильтровано ${uniquePlaces.length} уникальных мест\n`);
+
     const fields = getFieldNames();
 
+    // Get details for each place and map them to our DB model
     for (const uniquePlace of uniquePlaces) {
+        logger.debug(`Получаем детали места "${uniquePlace.name}"`);
+
         const response = await client.placeDetails({
             params: {
                 key: process.env.GOOGLE_PLACES_API_KEY,
@@ -84,15 +103,12 @@ async function processCategory(category: Category) {
 
         const placeDetails = response.data.result;
 
+        // Skip this place if it's not from this category
         if (!placeDetails.types.includes(category.googleId as AddressType)) {
+            logger.debug(`Место "${uniquePlace.name}" не из категории "${categoryRuName}", пропускаем`);
+            logger.debug('--------------------------------');
             continue;
         }
-
-        console.log();
-        // console.log(placeDetails.opening_hours?.periods);
-        // console.log(placeDetails.opening_hours && placeDetails.opening_hours.weekday_text);
-
-        // break;
 
         const placeModel = {
             googleId: placeDetails.place_id,
@@ -105,50 +121,79 @@ async function processCategory(category: Category) {
             restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDurationId,
             companySize: category.defaultCompanySizeId,
             isActiveRest: category.isActiveRest,
-            categories: [category],
         };
 
+        // Check if this place already exists in DB
         const dbPlaceModel = await RestPlace.findOne({
             where: { googleId: placeDetails.place_id },
-            include: [Category],
+            include: [Category, WorkingPeriod],
         });
 
+        // No place in DB yet
         if (!dbPlaceModel) {
+            logger.debug(`Места "${uniquePlace.name}" нет в БД, создаем`);
+
             const place = await RestPlace.create(placeModel);
             await place.$add('categories', [category]);
 
-            await createWorkingPeriods(place.id, placeDetails);
+            if (placeDetails.opening_hours?.periods) {
+                const workingPeriods = await generateWorkingPeriods(place.id, placeDetails);
+
+                for (const workingPeriod of workingPeriods) {
+                    await WorkingPeriod.create(workingPeriod);
+                }
+            }
+
+            logger.debug(`Место "${uniquePlace.name}" успешно добавлено в БД`);
+            logger.debug('--------------------------------');
 
             continue;
         }
 
+        logger.debug(`Место "${uniquePlace.name}" есть в БД, обновляем информацию о нем`);
+
+        // Update categories
         const savedCategory = dbPlaceModel.categories.find((item) => item.id === category.id);
 
         if (!savedCategory) {
             await dbPlaceModel.$add('categories', [category]);
-            console.log('Updated', dbPlaceModel.categories.length, dbPlaceModel.id);
+            logger.debug(`Месту "${uniquePlace.name}" добавлена новая категория "${categoryRuName}"`);
         }
+
+        // Update working periods
+        if (placeDetails.opening_hours?.periods) {
+            const workingPeriods = await generateWorkingPeriods(dbPlaceModel.id, placeDetails);
+
+            for (const workingPeriod of dbPlaceModel.workingPeriods) {
+                const period = workingPeriods.find((item) => workingPeriod.dayOfWeekStart === item.dayOfWeekStart);
+
+                workingPeriod.dayOfWeekStart = period.dayOfWeekStart;
+                workingPeriod.dayOfWeekEnd = 100;
+                workingPeriod.startTime = period.startTime;
+                workingPeriod.endTime = period.endTime;
+
+                await workingPeriod.save();
+            }
+        }
+
+        logger.debug(`Место "${uniquePlace.name}" успешно обновлено`);
+        logger.debug('--------------------------------');
     }
+
+    logger.debug('*****************************************');
 }
 
-async function createWorkingPeriods(placeDBId: number, placeDetails: Place) {
-    const workingPeriods = Array(7).fill(0).map((_, index) => {
-        const startDate = dateAtMidnight();
-        const endDate = dateAtMidnight();
-
+async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
+    return Array(7).fill(0).map((_, index) => {
         const model = {
             placeId: placeDBId,
             dayOfWeekStart: index,
-            startTime: startDate,
+            startTime: dateAtMidnight(),
             dayOfWeekEnd: index,
-            endTime: endDate,
+            endTime: dateAtMidnight(),
         };
 
-        if (!placeDetails.opening_hours) {
-            return model;
-        }
-
-        // Заведение работает 24/7, ставим период работы 00:00:00 - 23:59:59
+        // Place works 24/7 (set period 00:00:00 - 23:59:59)
         if (placeDetails.opening_hours.periods.length === 1) {
             model.endTime.setUTCHours(23);
             model.endTime.setUTCMinutes(59);
@@ -157,45 +202,37 @@ async function createWorkingPeriods(placeDBId: number, placeDetails: Place) {
             return model;
         }
 
-        const dayInfo = placeDetails.opening_hours.periods
-            .find((period) => period.open && period.open.day === index);
+        const dayInfo = placeDetails.opening_hours.periods.find((period) => period.open.day === index);
 
-        // Данных об этом дне нет - выходной в заведении
+        // Place doesn't work this day (set period 00:00:00 - 00:00:00)
         if (!dayInfo) {
             return model;
         }
 
-        if (dayInfo.open) {
-            if (dayInfo.open.time) {
-                const hours = dayInfo.open.time.substring(0, 2);
-                const minutes = dayInfo.open.time.substring(2);
+        // Set working periods
+        if (dayInfo.open?.time) {
+            const hours = dayInfo.open.time.substring(0, 2);
+            const minutes = dayInfo.open.time.substring(2);
 
-                model.startTime.setUTCHours(Number(hours));
-                model.startTime.setUTCMinutes(Number(minutes));
-            }
+            model.startTime.setUTCHours(Number(hours));
+            model.startTime.setUTCMinutes(Number(minutes));
         }
 
-        if (dayInfo.close) {
-            if (dayInfo.close.time) {
-                const hours = dayInfo.close.time.substring(0, 2);
-                const minutes = dayInfo.close.time.substring(2);
+        if (dayInfo.close?.time) {
+            const hours = dayInfo.close.time.substring(0, 2);
+            const minutes = dayInfo.close.time.substring(2);
 
-                model.endTime.setUTCHours(Number(hours));
-                model.endTime.setUTCMinutes(Number(minutes));
-            }
+            model.endTime.setUTCHours(Number(hours));
+            model.endTime.setUTCMinutes(Number(minutes));
+        }
 
 
-            if (dayInfo.close.day !== undefined) {
-                model.dayOfWeekEnd = Number(dayInfo.close.day);
-            }
+        if (dayInfo.close.day !== undefined) {
+            model.dayOfWeekEnd = Number(dayInfo.close.day);
         }
 
         return model;
     });
-
-    for (const workingPeriod of workingPeriods) {
-        await WorkingPeriod.create(workingPeriod);
-    }
 }
 
 function dateAtMidnight() {
@@ -226,11 +263,15 @@ function getFieldNames() {
 }
 
 (async function run() {
-    createSequelizeInstance();
+    try {
+        createSequelizeInstance();
 
-    const categories = await Category.findAll();
+        const categories = await Category.findAll();
 
-    for (const categoryData of categories) {
-        await processCategory(categoryData);
+        for (const categoryData of categories) {
+            await processCategory(categoryData);
+        }
+    } catch (error) {
+        console.error(error);
     }
 }());
