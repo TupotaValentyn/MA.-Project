@@ -10,7 +10,7 @@ const router = express.Router();
 /**
  * @swagger
  * /user/{token}:
- *    post:
+ *    get:
  *      tags:
  *        - User
  *      summary: "Позволяет получить данные о пользователе по токену авторизации"

@@ -168,7 +168,7 @@ async function processCategory(category: Category) {
                 const period = workingPeriods.find((item) => workingPeriod.dayOfWeekStart === item.dayOfWeekStart);
 
                 workingPeriod.dayOfWeekStart = period.dayOfWeekStart;
-                workingPeriod.dayOfWeekEnd = 100;
+                workingPeriod.dayOfWeekEnd = period.dayOfWeekEnd;
                 workingPeriod.startTime = period.startTime;
                 workingPeriod.endTime = period.endTime;
 
