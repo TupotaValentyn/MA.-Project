@@ -17,6 +17,9 @@ export default (): Sequelize => {
             freezeTableName: false,
             timestamps: false,
         },
+        dialectOptions: {
+            charset: 'utf8mb4',
+        },
     });
 
     sequelize.addModels([User, CompanySize, Review, Category, RestPlace, Cost, WorkingPeriod, Duration, RestPlaceCategory]);

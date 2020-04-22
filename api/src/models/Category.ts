@@ -3,7 +3,7 @@ import {
 } from 'sequelize-typescript';
 
 import { Duration } from './Duration';
-import { CompanySize } from './companySize';
+import { CompanySize } from './CompanySize';
 import { Cost } from './Cost';
 import { RestPlaceCategory } from './RestPlaceCategory';
 import { RestPlace } from './RestPlace';
