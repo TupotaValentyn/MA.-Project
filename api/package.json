@@ -6,11 +6,13 @@
         "lint": "npx eslint . --ignore-path .gitignore --ext .js,.ts --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests",
         "test": "jest --no-cache --silent --passWithNoTests",
-        "build": "tsc",
+        "build": "tsc && npm run copyTranslations && npm run copyTemplates",
         "prestart": "npm run build",
         "start": "node dist/src/app.js",
         "loadPlaces": "npx ts-node src/loadAndParseRestPlaces",
-        "prepareDB": "npx ts-node ./src/migrations/prepareDB"
+        "prepareDB": "npx ts-node ./src/migrations/prepareDB",
+        "copyTranslations": "cp -r ./src/translations/ ./dist/src/translations/",
+        "copyTemplates": "cp -r ./src/templates/ ./dist/src/templates/"
     },
     "author": "Dmitry Kit",
     "devDependencies": {

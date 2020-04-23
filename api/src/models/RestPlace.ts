@@ -1,11 +1,14 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany, DataType,
+    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany, DataType, ForeignKey, BelongsTo,
 } from 'sequelize-typescript';
 
 import { Review } from './Review';
 import { WorkingPeriod } from './WorkingPeriod';
 import { Category } from './Category';
 import { RestPlaceCategory } from './RestPlaceCategory';
+import { Duration } from './Duration';
+import { Cost } from './Cost';
+import { CompanySize } from './CompanySize';
 
 // - времени (час/два/весь день), которое человек хочет провести там,
 // - кол-ву денег, которые может потратить
@@ -46,16 +49,28 @@ export class RestPlace extends Model<RestPlace> {
     reviewsCount: number;
 
     @Column
-    restDuration: number;
-
-    @Column
-    restCost: number;
-
-    @Column
-    companySize: number;
-
-    @Column
     isActiveRest: boolean;
+
+    @Column
+    @ForeignKey(() => Duration)
+    restDurationId: number;
+
+    @BelongsTo(() => Duration)
+    restDuration: Duration;
+
+    @Column
+    @ForeignKey(() => Cost)
+    restCostId: number;
+
+    @BelongsTo(() => Cost)
+    restCost: Cost;
+
+    @Column
+    @ForeignKey(() => CompanySize)
+    companySizeId: number;
+
+    @BelongsTo(() => CompanySize)
+    companySize: CompanySize;
 
     @HasMany(() => Review)
     reviews: Review[];

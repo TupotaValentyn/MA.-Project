@@ -117,9 +117,9 @@ async function processCategory(category: Category) {
             longitude: placeDetails.geometry.location.lng,
             googleMeanRating: placeDetails.rating,
             googleReviewsCount: (placeDetails as any).user_ratings_total,
-            restDuration: category.defaultRestDurationId,
-            restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDurationId,
-            companySize: category.defaultCompanySizeId,
+            restDurationId: category.defaultRestDurationId,
+            restCostId: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDurationId,
+            companySizeId: category.defaultCompanySizeId,
             isActiveRest: category.isActiveRest,
         };
 

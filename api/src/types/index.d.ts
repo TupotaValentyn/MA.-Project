@@ -55,6 +55,32 @@ export interface TokenData {
     token: string,
 }
 
+interface DefaultModel {
+    id: number;
+    name: string;
+}
+
+export interface RestPlaceCategoryModel extends DefaultModel {}
+export interface RestDurationModel extends DefaultModel {}
+export interface RestCostModel extends DefaultModel {}
+export interface CompanySizeModel extends DefaultModel {}
+
+export interface RestPlaceModel {
+    id: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+    googleMeanRating: number;
+    googleReviewsCount: number;
+    meanRating: number;
+    reviewsCount: number;
+    isActiveRest: boolean;
+    restDuration?: RestDurationModel;
+    restCost?: RestCostModel;
+    companySize?: CompanySizeModel;
+    categories?: RestPlaceCategoryModel[];
+}
+
 declare global {
     namespace Express {
         interface Request {
