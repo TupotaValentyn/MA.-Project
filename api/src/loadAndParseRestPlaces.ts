@@ -31,6 +31,8 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
             key: config.GOOGLE_PLACES_API_KEY,
             pagetoken: pageToken,
             language: 'ru',
+            location: { lat: 49.444431, lng: 32.059769 },
+            radius: 25 * 1000, // 25km
         }
     });
 
@@ -102,6 +104,8 @@ async function processCategory(category: Category) {
         });
 
         const placeDetails = response.data.result;
+
+        // TODO: exclude places outside Cherkasy area
 
         // Skip this place if it's not from this category
         if (!placeDetails.types.includes(category.googleId as AddressType)) {
