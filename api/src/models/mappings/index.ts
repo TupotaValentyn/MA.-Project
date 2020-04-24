@@ -1,6 +1,7 @@
 enum RestDurationMapping { Low = 1, Medium, High }
 enum CompanySizeMapping { Solo = 1, Little, Medium, Large }
 enum RestCostMapping { Free = 1, Inexpensive, Moderate, Expensive, VeryExpensive }
+enum RestTypesMapping { Active = 1, Passive }
 
 enum RestPlaceCategoryMapping {
     AmusementPark = 1,
@@ -22,6 +23,7 @@ enum RestPlaceCategoryMapping {
 
 export {
     CompanySizeMapping,
+    RestTypesMapping,
     RestCostMapping,
     RestDurationMapping,
     RestPlaceCategoryMapping,

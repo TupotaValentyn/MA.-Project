@@ -1,15 +1,15 @@
 import express from 'express';
 
 import { Op } from 'sequelize';
-import { RestPlaceCategoryModel, RestPlaceModel } from 'index';
+import { RestPlaceModel } from 'index';
 import { translateText } from '../util';
 
 import {
-    Category, CompanySize, Cost, Duration, RestPlace, RestPlaceCategory,
+    Category, CompanySize, Cost, Duration, RestPlace,
 } from '../models';
 
 import {
-    CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping
+    CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping, RestTypesMapping,
 } from '../models/mappings';
 
 const router = express.Router();
@@ -56,13 +56,9 @@ router.get('/', async (request, response) => {
         where.companySize = companySize;
     }
 
-    // 1 - active rest
-    // 2 - passive rest
-    if (['1', '2'].includes(restType)) {
-        where.isActiveRest = restType === '1';
+    if (restType in RestTypesMapping) {
+        where.isActiveRest = restType === RestTypesMapping.Active;
     }
-
-    console.log(where);
 
     const places = await RestPlace.findAll({
         where,
@@ -71,8 +67,6 @@ router.get('/', async (request, response) => {
             attributes: ['id', 'nameTextId'],
         }, Duration, Cost, CompanySize],
     });
-
-    console.log(places[0]);
 
     const models: RestPlaceModel[] = places.map((place) => {
         const model: RestPlaceModel = {
