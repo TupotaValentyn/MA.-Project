@@ -69,23 +69,11 @@ module.exports = {
     'react-hooks/rules-of-hooks': error,
     'react-hooks/exhaustive-deps': off,
     'import/no-unresolved': off,
-    'jsx-a11y/anchor-is-valid': [
-      error,
-      {
-        components: ['Link'],
-        specialLink: ['to']
-      }
-    ],
     'import/no-extraneous-dependencies': error,
     'react/destructuring-assignment': off,
     'react/button-has-type': error,
     'no-underscore-dangle': off,
     'lines-between-class-members': off,
-    'jsx-a11y/label-has-associated-control': off,
-    'jsx-a11y/label-has-for': off,
-    'jsx-a11y/interactive-supports-focus': off,
-    'jsx-a11y/click-events-have-key-events': off,
-    'jsx-a11y/no-noninteractive-element-interactions': off,
     'react/jsx-props-no-spreading': off
   }
 };

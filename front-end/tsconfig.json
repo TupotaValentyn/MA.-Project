@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,9 +21,8 @@
     "jsx": "react",
     "baseUrl": "./src",
 
-    /* Experimental Options */
-    "experimentalDecorators": false /* Enables experimental support for ES7 decorators. */,
-    "emitDecoratorMetadata": false /* Enables experimental support for emitting type metadata for decorators. */,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
 
     "paths": {
       "@actions/*": ["actions/*"],
@@ -31,7 +34,6 @@
       "@pages": ["components/pages/index.ts"],
       "@pages/*": ["components/pages/*"],
       "@reducers/*": ["reducers/*"],
-      //      "@routing": ["routing/index.ts"],
       "@sagas": ["sagas/index.ts"],
       "@sagas/*": ["sagas/*"],
       "@services": ["services/index.ts"],

@@ -52,7 +52,7 @@ export const sliceGenerator = <S = any, CaseReducerState = any>(
         errorResponse: PayloadAction<string, any>
       ) => {
         const data = errorResponse.payload;
-        const type = errorResponse.type;
+        const { type } = errorResponse;
 
         return {
           status: StateStatuses.FAILED,

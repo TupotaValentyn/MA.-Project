@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import * as serviceWorker from './serviceWorker';
+import rootStore from './rootStore';
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
-import { Provider } from 'react-redux';
-import rootStore from './rootStore';
 
 const rootElement = document.getElementById('root');
 ReactDOM.render(

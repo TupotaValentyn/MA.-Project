@@ -2,17 +2,24 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { RootStore } from '../../../reducers';
-import { AuthContext, AuthProvider } from '../../../context/authContext';
+import { AuthProvider } from '../../../context/authContext';
 import { State, StateStatuses } from '../../../utils/State';
 import { tokensProvider } from '../../../services/api';
 import { ROUTES } from '../../../routes';
 
 type Props = {};
+
 const initAuthState = {
   authenticated: false,
   isAdmin: false,
-  toLoginRedirect: () => {},
-  toLogoutRedirect: () => {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  toLoginRedirect: () => {
+    return null;
+  },
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  toLogoutRedirect: () => {
+    return null;
+  }
 };
 
 const Auth: FC<Props> = ({ children }) => {
@@ -39,6 +46,10 @@ const Auth: FC<Props> = ({ children }) => {
     }
   }, [loginState]);
 
+  if (tokensProvider.loadTokens()) {
+    console.log('token loaded');
+  }
+
   const toLoginRedirect = () => {
     return <Redirect to={`${ROUTES.LOGIN}`} />;
   };
@@ -52,8 +63,6 @@ const Auth: FC<Props> = ({ children }) => {
     toLoginRedirect,
     toLogoutRedirect
   };
-
-  console.log(authValues);
 
   return <AuthProvider value={authValues}>{children}</AuthProvider>;
 };

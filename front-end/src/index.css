@@ -12,6 +12,13 @@ code {
     monospace;
 }
 
-html, body, #root, .App {
+html,
+body,
+#root,
+.App {
   height: 100%;
+}
+
+body {
+  margin: 0;
 }

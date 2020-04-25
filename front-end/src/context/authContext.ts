@@ -11,8 +11,8 @@ export interface AuthContext {
 const authContext = createContext<AuthContext>({
   authenticated: false,
   isAdmin: false,
-  toLoginRedirect: () => {},
-  toLogoutRedirect: () => {}
+  toLoginRedirect: () => null,
+  toLogoutRedirect: () => null
 });
 
 export const { Provider: AuthProvider, Consumer: AuthConsumer } = authContext;

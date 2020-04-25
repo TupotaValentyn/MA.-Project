@@ -12,11 +12,10 @@ const CheckAuthenticated: FC<Props> = () => {
 
   const location = useLocation();
 
-  const route = commonRoutes.find((route) => {
-    return matchPath(location.pathname, route);
+  const route = commonRoutes.find((routeProps) => {
+    return matchPath(location.pathname, routeProps);
   });
 
-  console.log(authenticated);
   return route || authenticated ? null : toLoginRedirect();
 };
 

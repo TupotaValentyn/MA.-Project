@@ -1,10 +1,10 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Button, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
 import { loginDefaultData, loginValidationSchema, Values } from './loginData';
 import { loginRequested } from '../../../slices';
-import { useDispatch } from 'react-redux';
 import authContext, { AuthContext } from '../../../context/authContext';
 import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
 
@@ -87,7 +87,7 @@ const Login: FC<Props> = () => {
           label="Login"
           error={handleError('email')}
           helperText={errorHintHandler('email')}
-          value={values.login}
+          value={values.email}
         />
         <TextField
           name="password"

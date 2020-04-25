@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import './App.css';
-import { Login } from './components/pages';
 import { BrowserRouter, Switch } from 'react-router-dom';
-import { commonRoutes, userRoutes } from './routes';
 import { Router } from '@material-ui/icons';
+import { commonRoutes, userRoutes } from './routes';
 import Auth from './components/common/Auth/Auth';
 import CheckAuthenticated from './components/common/CheckAuthenticated';
+import './App.css';
 
 type Props = {};
 
@@ -16,11 +15,11 @@ const App: FC<Props> = () => {
         <Auth>
           <Switch>
             {userRoutes.map((route, i: number) => (
-              <Router key={i} {...route} />
+              <Router key={route.path} {...route} />
             ))}
 
             {commonRoutes.map((route, i: number) => (
-              <Router key={i} {...route} />
+              <Router key={route.path} {...route} />
             ))}
           </Switch>
           <CheckAuthenticated />

@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ROUTES } from '../../../routes';
 import { useSelector } from 'react-redux';
+import { ROUTES } from '../../../routes';
 import { RootStore } from '../../../reducers';
 import { State, StateStatuses } from '../../../utils/State';
 
@@ -15,6 +15,7 @@ const AfterLoginRedirect: FC<Props> = () => {
   const history = useHistory();
   useEffect(() => {
     if (tokensState.status === StateStatuses.LOADED) {
+      console.log('text');
       history.push(returnUrl);
     }
   }, [tokensState]);
