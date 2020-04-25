@@ -1,0 +1,58 @@
+{
+    "errors": {
+        "noUserWithEmail": "Пользователя с таким email не существует",
+        "wrongPassword": "Неправильный пароль",
+        "wrongEmail": "Некорректный email",
+        "notUniqueEmail": "Пользователь с такой почтой уже зарегистрирован в системе",
+        "wrongHash": "Неправильный хеш",
+        "wrongGoogleToken": "Не задан token",
+        "wrongFacebookToken": "Не задан accessToken",
+        "wrongFacebookUserId": "Не задан userId",
+        "emailAlreadyConfirmed": "Почта уже подтверждена",
+        "actionIsForbidden": "Действие запрещено",
+        "wrongAuthHeader": "Невалидный заголовок",
+        "wrongAuthToken": "Недействительный токен"
+    },
+
+    "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
+    "confirmationEmailTitle": "Регистрация в системе",
+
+    "restPlaceCategory": {
+        "amusementPark": "Парк розваг",
+        "aquarium": "Акваріум",
+        "artGallery": "Галерея мистецтв",
+        "bar": "Бар",
+        "cafe": "Кафе",
+        "library": "Бібліотека",
+        "movieTheater": "Кінотеатр",
+        "museum": "Музей",
+        "nightClub": "Нічний клуб",
+        "park": "Парк",
+        "restaurant": "Ресторан",
+        "spa": "СПА",
+        "stadium": "Стадіон",
+        "touristAttraction": "Визначна пам'ятка для туристів",
+        "zoo": "Зоопарк"
+    },
+
+    "restCost": {
+        "free": "Бесплатный",
+        "inexpensive": "Недорогой",
+        "moderate": "Средний",
+        "expensive": "Дорогой",
+        "veryExpensive": "Очень дорогой"
+    },
+
+    "restDuration": {
+        "low": "Непродолжительный",
+        "medium": "Средний",
+        "high": "Продолжительный"
+    },
+
+    "companySize": {
+        "solo": "1 человек",
+        "little": "2-3 человека",
+        "medium": "Небольшая компания",
+        "large": "Большая компания"
+    }
+}

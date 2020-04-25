@@ -2,21 +2,27 @@ import { Sequelize } from 'sequelize-typescript';
 
 import config from './config';
 
-import { User } from './models';
+import {
+    User, CompanySize, Duration, WorkingPeriod, Cost, RestPlace, Category, Review, RestPlaceCategory
+} from './models';
 
-export default async () => {
+export default (): Sequelize => {
     const sequelize = new Sequelize({
         database: config.DB_NAME,
         username: config.DB_USER,
         password: config.DB_PASSWORD,
         dialect: 'mysql',
+        logging: false,
         define: {
             freezeTableName: false,
-            timestamps: true,
+            timestamps: false,
+        },
+        dialectOptions: {
+            charset: 'utf8mb4',
         },
     });
 
-    sequelize.addModels([User]);
+    sequelize.addModels([User, CompanySize, Review, Category, RestPlace, Cost, WorkingPeriod, Duration, RestPlaceCategory]);
 
-    await sequelize.sync({ alter: true });
+    return sequelize;
 };

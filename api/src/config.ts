@@ -14,4 +14,8 @@ export default {
     MAIL_PORT: parseInt(process.env.MAIL_PORT, 10) || 465,
     MAIL_USER: process.env.MAIL_USER || 'root',
     MAIL_PASSWORD: process.env.MAIL_PASSWORD || 'root',
+
+    SERVER_URL: process.env.SERVER_URL,
+
+    GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
 };
