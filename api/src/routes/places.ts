@@ -2,6 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
+import { Sequelize } from 'sequelize-typescript';
 import { translateText } from '../util';
 
 import {
@@ -62,7 +63,7 @@ const router = express.Router();
  */
 router.get('/', async (request, response) => {
     const {
-        categories, restCost, restDuration, companySize, restType
+        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly
     } = request.query;
 
     const where: any = {};
@@ -92,6 +93,14 @@ router.get('/', async (request, response) => {
 
     if (restType in RestTypesMapping) {
         where.isActiveRest = Number(restType) === RestTypesMapping.Active;
+    }
+
+    if (distance && distance >= 1 && distance <= 20 && userLatitude && userLongitude) {
+        where[Op.and] = {
+            // [Sequelize.literal('2 + 2')]: {
+            //     [Op.lte]: 4
+            // }
+        };
     }
 
     const places = await RestPlace.findAll({
