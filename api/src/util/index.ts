@@ -5,6 +5,7 @@ import createMailTransporter from './createMailTransporter';
 import generateUserHash from './generateUserHash';
 import sendConfirmationEmail from './sendConfirmationEmail';
 import getTemplateHTML from './getTemplateHTML';
+import isPointInsideCircle from './isPointInsideCircle';
 
 export {
     translateText,
@@ -14,4 +15,5 @@ export {
     generateUserHash,
     sendConfirmationEmail,
     getTemplateHTML,
+    isPointInsideCircle,
 };

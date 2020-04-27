@@ -4,16 +4,19 @@
 /* eslint no-continue: 0 */
 /* eslint no-use-before-define: 0 */
 
+import fs from 'fs';
 import { Client } from '@googlemaps/google-maps-services-js';
 import { promisify } from 'util';
 import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
 import { getLogger } from 'log4js';
-import { translateText } from './util';
+import { translateText, isPointInsideCircle } from './util';
 
 import config from './config';
 import createSequelizeInstance from './sequelize';
 
 import { Category, RestPlace, WorkingPeriod } from './models';
+
+const stream = fs.createWriteStream('./logs/load.log');
 
 const logger = getLogger('LoadPlaces');
 logger.level = 'debug';
@@ -31,8 +34,6 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
             key: config.GOOGLE_PLACES_API_KEY,
             pagetoken: pageToken,
             language: 'ru',
-            location: { lat: 49.444431, lng: 32.059769 },
-            radius: 25 * 1000, // 25km
         }
     });
 
@@ -58,22 +59,22 @@ async function processCategory(category: Category) {
     const categoryRuName = translateText(category.nameTextId);
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
-    logger.debug(`Ищем места в категории "${categoryRuName}"\n`);
+    log(`Ищем места в категории "${categoryRuName}"\n`);
 
     const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
     const placesData: Place[] = [];
 
     // Load all places from this category
     for (const searchQuery of searchQueries) {
-        logger.debug(`Ищем места по запросу "${searchQuery}"`);
+        log(`Ищем места по запросу "${searchQuery}"`);
 
         const responses = await processSearchQuery(searchQuery);
         placesData.push(...responses);
 
-        logger.debug(`По запросу "${searchQuery}" найдено ${responses.length} мест\n`);
+        log(`По запросу "${searchQuery}" найдено ${responses.length} мест\n`);
     }
 
-    logger.debug(`В категории "${categoryRuName}" всего найдено ${placesData.length} мест`);
+    log(`В категории "${categoryRuName}" всего найдено ${placesData.length} мест`);
 
     // Get unique places only
     const uniquePlaces = placesData.reduce((places, place) => {
@@ -86,13 +87,15 @@ async function processCategory(category: Category) {
         return places;
     }, []);
 
-    logger.debug(`В категории "${categoryRuName}" отфильтровано ${uniquePlaces.length} уникальных мест\n`);
+    log(`В категории "${categoryRuName}" отфильтровано ${uniquePlaces.length} уникальных мест\n`);
 
     const fields = getFieldNames();
+    const cherkasyCenter = { lat: 49.444431, lng: 32.059769 };
+    const cherkasyBoundsRadius = 15; // km
 
     // Get details for each place and map them to our DB model
     for (const uniquePlace of uniquePlaces) {
-        logger.debug(`Получаем детали места "${uniquePlace.name}"`);
+        log(`Получаем детали места "${uniquePlace.name}"`);
 
         const response = await client.placeDetails({
             params: {
@@ -105,12 +108,22 @@ async function processCategory(category: Category) {
 
         const placeDetails = response.data.result;
 
-        // TODO: exclude places outside Cherkasy area
+        const isPlaceInsideCherkasyBounds = isPointInsideCircle(
+            cherkasyCenter,
+            cherkasyBoundsRadius,
+            { lat: placeDetails.geometry.location.lat, lng: placeDetails.geometry.location.lng }
+        );
+
+        if (!isPlaceInsideCherkasyBounds) {
+            log(`Место "${uniquePlace.name} (${uniquePlace.formatted_address})" находится не в Черкассах, пропускаем`);
+            log('--------------------------------');
+            continue;
+        }
 
         // Skip this place if it's not from this category
         if (!placeDetails.types.includes(category.googleId as AddressType)) {
-            logger.debug(`Место "${uniquePlace.name}" не из категории "${categoryRuName}", пропускаем`);
-            logger.debug('--------------------------------');
+            log(`Место "${uniquePlace.name}" не из категории "${categoryRuName}", пропускаем`);
+            log('--------------------------------');
             continue;
         }
 
@@ -135,7 +148,7 @@ async function processCategory(category: Category) {
 
         // No place in DB yet
         if (!dbPlaceModel) {
-            logger.debug(`Места "${uniquePlace.name}" нет в БД, создаем`);
+            log(`Места "${uniquePlace.name}" нет в БД, создаем`);
 
             const place = await RestPlace.create(placeModel);
             await place.$add('categories', [category]);
@@ -148,20 +161,20 @@ async function processCategory(category: Category) {
                 }
             }
 
-            logger.debug(`Место "${uniquePlace.name}" успешно добавлено в БД`);
-            logger.debug('--------------------------------');
+            log(`Место "${uniquePlace.name}" успешно добавлено в БД`);
+            log('--------------------------------');
 
             continue;
         }
 
-        logger.debug(`Место "${uniquePlace.name}" есть в БД, обновляем информацию о нем`);
+        log(`Место "${uniquePlace.name}" есть в БД, обновляем информацию о нем`);
 
         // Update categories
         const savedCategory = dbPlaceModel.categories.find((item) => item.id === category.id);
 
         if (!savedCategory) {
             await dbPlaceModel.$add('categories', [category]);
-            logger.debug(`Месту "${uniquePlace.name}" добавлена новая категория "${categoryRuName}"`);
+            log(`Месту "${uniquePlace.name}" добавлена новая категория "${categoryRuName}"`);
         }
 
         // Update working periods
@@ -180,11 +193,11 @@ async function processCategory(category: Category) {
             }
         }
 
-        logger.debug(`Место "${uniquePlace.name}" успешно обновлено`);
-        logger.debug('--------------------------------');
+        log(`Место "${uniquePlace.name}" успешно обновлено`);
+        log('--------------------------------');
     }
 
-    logger.debug('*****************************************');
+    log('*****************************************');
 }
 
 async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
@@ -266,6 +279,12 @@ function getFieldNames() {
     ];
 }
 
+function log(data: string) {
+    logger.debug(data);
+    stream.write(data);
+    stream.write('\n');
+}
+
 (async function run() {
     try {
         createSequelizeInstance();
@@ -275,6 +294,8 @@ function getFieldNames() {
         for (const categoryData of categories) {
             await processCategory(categoryData);
         }
+
+        stream.close();
     } catch (error) {
         console.error(error);
     }

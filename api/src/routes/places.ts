@@ -3,7 +3,8 @@ import express from 'express';
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
 import { LatLngLiteral } from '@googlemaps/google-maps-services-js/dist/common';
-import { translateText } from '../util';
+import { Sequelize } from 'sequelize-typescript';
+import { translateText, isPointInsideCircle } from '../util';
 
 import {
     Category, CompanySize, Cost, Duration, RestPlace,
@@ -95,31 +96,34 @@ router.get('/', async (request, response) => {
         where.isActiveRest = Number(restType) === RestTypesMapping.Active;
     }
 
-    function arePointsNear(checkPoint: LatLngLiteral, centerPoint: LatLngLiteral, km: number) {
-        const ky = 40000 / 360;
-        // eslint-disable-next-line no-mixed-operators
-        const kx = Math.cos(Math.PI * centerPoint.lat / 180.0) * ky;
-        const dx = Math.abs(centerPoint.lng - checkPoint.lng) * kx;
-        const dy = Math.abs(centerPoint.lat - checkPoint.lat) * ky;
-        return Math.sqrt(dx * dx + dy * dy) <= km;
-    }
-
-    if (distance && distance >= 1 && distance <= 20 && userLatitude && userLongitude) {
-        // (x-x0)^2+(y-y0)^2 < = R^2
-        where[Op.and] = {
-            // [Sequelize.literal('2 + 2')]: {
-            //     [Op.lte]: 4
-            // }
-        };
-    }
-
-    const places = await RestPlace.findAll({
+    let places = await RestPlace.findAll({
         where,
         include: [{
             model: Category,
             attributes: ['id', 'nameTextId'],
         }, Duration, Cost, CompanySize],
     });
+
+    // console.log(arePointsNear(
+    //     { lat: userLatitude, lng: userLongitude },
+    //     { lat: 49.444432, lng: 32.059765 },
+    //     5
+    // ));
+    //
+    // console.log(arePointsNear(
+    //     { lat: userLatitude, lng: userLongitude },
+    //     { lat: 41.444432, lng: 32.059765 },
+    //     5
+    // ));
+
+    if (distance && distance >= 1 && distance <= 20 && userLatitude && userLongitude) {
+        // eslint-disable-next-line no-use-before-define
+        places = places.filter((place) => isPointInsideCircle(
+            { lat: userLatitude, lng: userLongitude },
+            distance,
+            { lat: place.latitude, lng: place.longitude },
+        ));
+    }
 
     const models: RestPlaceModel[] = places.map((place) => {
         const model: RestPlaceModel = {
