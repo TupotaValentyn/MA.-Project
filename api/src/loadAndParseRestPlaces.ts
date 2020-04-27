@@ -5,6 +5,7 @@
 /* eslint no-use-before-define: 0 */
 
 import fs from 'fs';
+import path from 'path';
 import { Client } from '@googlemaps/google-maps-services-js';
 import { promisify } from 'util';
 import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
@@ -16,7 +17,13 @@ import createSequelizeInstance from './sequelize';
 
 import { Category, RestPlace, WorkingPeriod } from './models';
 
-const stream = fs.createWriteStream('./logs/load.log');
+const logsDirectoryPath = path.join(__dirname, '../logs');
+
+if (!fs.existsSync(logsDirectoryPath)) {
+    fs.mkdirSync(path.join(__dirname, '../logs'));
+}
+
+const stream = fs.createWriteStream(path.join(__dirname, '../logs/load.log'), { flags: 'w' });
 
 const logger = getLogger('LoadPlaces');
 logger.level = 'debug';
