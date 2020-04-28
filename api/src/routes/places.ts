@@ -7,7 +7,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { translateText, isPointInsideCircle } from '../util';
 
 import {
-    Category, CompanySize, Cost, Duration, RestPlace,
+    Category, CompanySize, Cost, Duration, RestPlace, WorkingPeriod,
 } from '../models';
 
 import {
@@ -101,28 +101,22 @@ router.get('/', async (request, response) => {
         include: [{
             model: Category,
             attributes: ['id', 'nameTextId'],
-        }, Duration, Cost, CompanySize],
+        }, Duration, Cost, CompanySize, WorkingPeriod],
     });
 
-    // console.log(arePointsNear(
-    //     { lat: userLatitude, lng: userLongitude },
-    //     { lat: 49.444432, lng: 32.059765 },
-    //     5
-    // ));
-    //
-    // console.log(arePointsNear(
-    //     { lat: userLatitude, lng: userLongitude },
-    //     { lat: 41.444432, lng: 32.059765 },
-    //     5
-    // ));
-
     if (distance && distance >= 1 && distance <= 20 && userLatitude && userLongitude) {
-        // eslint-disable-next-line no-use-before-define
         places = places.filter((place) => isPointInsideCircle(
             { lat: userLatitude, lng: userLongitude },
             distance,
             { lat: place.latitude, lng: place.longitude },
         ));
+    }
+
+    console.log(places[0].workingPeriods[0].startTime);
+    console.log(places[0].workingPeriods[0].endTime);
+
+    if (workingOnly) {
+        // Filter by
     }
 
     const models: RestPlaceModel[] = places.map((place) => {
