@@ -6,6 +6,7 @@ import generateUserHash from './generateUserHash';
 import sendConfirmationEmail from './sendConfirmationEmail';
 import getTemplateHTML from './getTemplateHTML';
 import isPointInsideCircle from './isPointInsideCircle';
+import isWorkingNow from './isWorkingNow';
 
 export {
     translateText,
@@ -16,4 +17,5 @@ export {
     sendConfirmationEmail,
     getTemplateHTML,
     isPointInsideCircle,
+    isWorkingNow,
 };

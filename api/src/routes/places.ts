@@ -2,9 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { LatLngLiteral } from '@googlemaps/google-maps-services-js/dist/common';
-import { Sequelize } from 'sequelize-typescript';
-import { translateText, isPointInsideCircle } from '../util';
+import { translateText, isPointInsideCircle, isWorkingNow } from '../util';
 
 import {
     Category, CompanySize, Cost, Duration, RestPlace, WorkingPeriod,
@@ -116,7 +114,7 @@ router.get('/', async (request, response) => {
     console.log(places[0].workingPeriods[0].endTime);
 
     if (workingOnly) {
-        // Filter by
+        places = places.filter(isWorkingNow);
     }
 
     const models: RestPlaceModel[] = places.map((place) => {
