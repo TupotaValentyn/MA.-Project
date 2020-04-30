@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { FC } from 'react';
+import { BrowserRouter, Switch } from 'react-router-dom';
+import { Router } from '@material-ui/icons';
+import { commonRoutes, userRoutes } from './routes';
+import Auth from './components/common/Auth/Auth';
+import CheckAuthenticated from './components/common/CheckAuthenticated';
 import './App.css';
 
-function App() {
+type Props = {};
+
+const App: FC<Props> = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Auth>
+          <Switch>
+            {userRoutes.map((route, i: number) => (
+              <Router key={route.path} {...route} />
+            ))}
+
+            {commonRoutes.map((route, i: number) => (
+              <Router key={route.path} {...route} />
+            ))}
+          </Switch>
+          <CheckAuthenticated />
+        </Auth>
+      </BrowserRouter>
     </div>
   );
-}
+};
 
 export default App;

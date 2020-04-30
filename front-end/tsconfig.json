@@ -11,15 +11,38 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "baseUrl": "./src",
+
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+
+    "paths": {
+      "@actions/*": ["actions/*"],
+      "@assets/*": ["assets/*"],
+      "@components": ["components/index.ts"],
+      "@components/*": ["components/*"],
+      "@contexts/*": ["contexts/*"],
+      "@models/*": ["models/*"],
+      "@pages": ["components/pages/index.ts"],
+      "@pages/*": ["components/pages/*"],
+      "@reducers/*": ["reducers/*"],
+      "@sagas": ["sagas/index.ts"],
+      "@sagas/*": ["sagas/*"],
+      "@services": ["services/index.ts"],
+      "@services/*": ["services/*"],
+      "@slices": ["slices/index.ts"],
+      "@slices/*": ["slices/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "typeRoots": ["node_modules/@types", "src/typings.d.ts"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
