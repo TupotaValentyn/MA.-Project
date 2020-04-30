@@ -1,0 +1,15 @@
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	root /MA.-Project/front-end/build/;
+
+	index index.html;
+
+	server_name front-end;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+}
+
