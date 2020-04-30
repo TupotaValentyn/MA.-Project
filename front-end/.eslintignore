@@ -1,0 +1,5 @@
+package.json
+**/*.json
+src/models/**/*.*
+scripts/*.*
+config/

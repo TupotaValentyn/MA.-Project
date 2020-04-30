@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from '@googlemaps/google-maps-services-js';
 import { promisify } from 'util';
-import { AddressType, Place } from '@googlemaps/google-maps-services-js/dist/common';
+import { AddressType, Language, Place } from '@googlemaps/google-maps-services-js/dist/common';
 import { getLogger } from 'log4js';
 import { translateText, isPointInsideCircle } from './util';
 
@@ -40,7 +40,9 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
             query: searchQuery,
             key: config.GOOGLE_PLACES_API_KEY,
             pagetoken: pageToken,
-            language: 'ru',
+            language: 'ru' as Language,
+            location: { lat: 49.444431, lng: 32.059769 },
+            radius: 25 * 1000, // 25km
         }
     });
 
@@ -109,7 +111,7 @@ async function processCategory(category: Category) {
                 key: process.env.GOOGLE_PLACES_API_KEY,
                 place_id: uniquePlace.place_id,
                 fields,
-                language: 'ru',
+                language: 'ru' as Language,
             },
         });
 
