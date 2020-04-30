@@ -1,0 +1,8 @@
+FROM ubuntu:18.04
+RUN apt update && apt install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_13.x | bash - && apt install -y nodejs
+RUN node -v && npm -v
+COPY api/ MA.-Project/api/
+WORKDIR MA.-Project/api/
+EXPOSE 80
+CMD ["npm", "start"]

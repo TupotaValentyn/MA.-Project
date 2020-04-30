@@ -1,0 +1,7 @@
+FROM ubuntu:18.04
+RUN apt update && apt install -y nginx
+COPY front-end/ MA.-Project/front-end/
+COPY conf/default /etc/nginx/sites-available/
+WORKDIR MA.-Project/front-end/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
