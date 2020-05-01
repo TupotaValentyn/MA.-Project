@@ -2,65 +2,140 @@
 
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
-const chalk = require('react-dev-utils/chalk');
 const paths = require('./paths');
+const chalk = require('react-dev-utils/chalk');
+const resolve = require('resolve');
 
-// Ensure the certificate and key provided are valid and if not
-// throw an easy to debug error
-function validateKeyAndCerts({ cert, key, keyFile, crtFile }) {
-  let encrypted;
-  try {
-    // publicEncrypt will throw an error with an invalid cert
-    encrypted = crypto.publicEncrypt(cert, Buffer.from('test'));
-  } catch (err) {
-    throw new Error(
-      `The certificate "${chalk.yellow(crtFile)}" is invalid.\n${err.message}`
-    );
+/**
+ * Get additional module paths based on the baseUrl of a compilerOptions object.
+ *
+ * @param {Object} options
+ */
+function getAdditionalModulePaths(options = {}) {
+  const baseUrl = options.baseUrl;
+
+  // We need to explicitly check for null and undefined (and not a falsy value) because
+  // TypeScript treats an empty string as `.`.
+  if (baseUrl == null) {
+    // If there's no baseUrl set we respect NODE_PATH
+    // Note that NODE_PATH is deprecated and will be removed
+    // in the next major release of create-react-app.
+
+    const nodePath = process.env.NODE_PATH || '';
+    return nodePath.split(path.delimiter).filter(Boolean);
   }
 
-  try {
-    // privateDecrypt will throw an error with an invalid key
-    crypto.privateDecrypt(key, encrypted);
-  } catch (err) {
-    throw new Error(
-      `The certificate key "${chalk.yellow(keyFile)}" is invalid.\n${
-        err.message
-      }`
-    );
+  const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
+
+  // We don't need to do anything if `baseUrl` is set to `node_modules`. This is
+  // the default behavior.
+  if (path.relative(paths.appNodeModules, baseUrlResolved) === '') {
+    return null;
   }
+
+  // Allow the user set the `baseUrl` to `appSrc`.
+  if (path.relative(paths.appSrc, baseUrlResolved) === '') {
+    return [paths.appSrc];
+  }
+
+  // If the path is equal to the root directory we ignore it here.
+  // We don't want to allow importing from the root directly as source files are
+  // not transpiled outside of `src`. We do allow importing them with the
+  // absolute path (e.g. `src/Components/Button.js`) but we set that up with
+  // an alias.
+  if (path.relative(paths.appPath, baseUrlResolved) === '') {
+    return null;
+  }
+
+  // Otherwise, throw an error.
+  throw new Error(
+    chalk.red.bold(
+      "Your project's `baseUrl` can only be set to `src` or `node_modules`." +
+      ' Create React App does not support other values at this time.'
+    )
+  );
 }
 
-// Read file and throw an error if it doesn't exist
-function readEnvFile(file, type) {
-  if (!fs.existsSync(file)) {
-    throw new Error(
-      `You specified ${chalk.cyan(
-        type
-      )} in your env, but the file "${chalk.yellow(file)}" can't be found.`
-    );
+/**
+ * Get webpack aliases based on the baseUrl of a compilerOptions object.
+ *
+ * @param {*} options
+ */
+function getWebpackAliases(options = {}) {
+  const baseUrl = options.baseUrl;
+
+  if (!baseUrl) {
+    return {};
   }
-  return fs.readFileSync(file);
-}
 
-// Get the https config
-// Return cert files if provided in env, otherwise just true or false
-function getHttpsConfig() {
-  const { SSL_CRT_FILE, SSL_KEY_FILE, HTTPS } = process.env;
-  const isHttps = HTTPS === 'true';
+  const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
 
-  if (isHttps && SSL_CRT_FILE && SSL_KEY_FILE) {
-    const crtFile = path.resolve(paths.appPath, SSL_CRT_FILE);
-    const keyFile = path.resolve(paths.appPath, SSL_KEY_FILE);
-    const config = {
-      cert: readEnvFile(crtFile, 'SSL_CRT_FILE'),
-      key: readEnvFile(keyFile, 'SSL_KEY_FILE'),
+  if (path.relative(paths.appPath, baseUrlResolved) === '') {
+    return {
+      src: paths.appSrc
     };
-
-    validateKeyAndCerts({ ...config, keyFile, crtFile });
-    return config;
   }
-  return isHttps;
 }
 
-module.exports = getHttpsConfig;
+/**
+ * Get jest aliases based on the baseUrl of a compilerOptions object.
+ *
+ * @param {*} options
+ */
+function getJestAliases(options = {}) {
+  const baseUrl = options.baseUrl;
+
+  if (!baseUrl) {
+    return {};
+  }
+
+  const baseUrlResolved = path.resolve(paths.appPath, baseUrl);
+
+  if (path.relative(paths.appPath, baseUrlResolved) === '') {
+    return {
+      'src/(.*)$': '<rootDir>/src/$1'
+    };
+  }
+}
+
+function getModules() {
+  // Check if TypeScript is setup
+  const hasTsConfig = fs.existsSync(paths.appTsConfig);
+  const hasJsConfig = fs.existsSync(paths.appJsConfig);
+
+  if (hasTsConfig && hasJsConfig) {
+    throw new Error(
+      'You have both a tsconfig.json and a jsconfig.json. If you are using TypeScript please remove your jsconfig.json file.'
+    );
+  }
+
+  let config;
+
+  // If there's a tsconfig.json we assume it's a
+  // TypeScript project and set up the config
+  // based on tsconfig.json
+  if (hasTsConfig) {
+    const ts = require(resolve.sync('typescript', {
+      basedir: paths.appNodeModules
+    }));
+    config = ts.readConfigFile(paths.appTsConfig, ts.sys.readFile).config;
+    // Otherwise we'll check if there is jsconfig.json
+    // for non TS projects.
+  } else if (hasJsConfig) {
+    config = require(paths.appJsConfig);
+  }
+
+  config = config || {};
+  const options = config.compilerOptions || {};
+
+  const additionalModulePaths = getAdditionalModulePaths(options);
+
+  return {
+    additionalModulePaths: additionalModulePaths,
+    webpackAliases: getWebpackAliases(options),
+    jestAliases: getJestAliases(options),
+    hasTsConfig
+  };
+}
+
+module.exports = getModules();
