@@ -214,23 +214,20 @@ async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
         const model = {
             placeId: placeDBId,
             dayOfWeekStart: index,
-            startTime: dateAtMidnight(),
+            startTime: '00:00',
             dayOfWeekEnd: index,
-            endTime: dateAtMidnight(),
+            endTime: '00:00',
         };
 
-        // Place works 24/7 (set period 00:00:00 - 23:59:59)
+        // Place works 24/7 (set period 00:00 - 23:59)
         if (placeDetails.opening_hours.periods.length === 1) {
-            model.endTime.setUTCHours(23);
-            model.endTime.setUTCMinutes(59);
-            model.endTime.setUTCSeconds(59);
-
+            model.endTime = '23:59';
             return model;
         }
 
         const dayInfo = placeDetails.opening_hours.periods.find((period) => period.open.day === index);
 
-        // Place doesn't work this day (set period 00:00:00 - 00:00:00)
+        // Place doesn't work this day (set period 00:00 - 00:00)
         if (!dayInfo) {
             return model;
         }
@@ -240,16 +237,14 @@ async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
             const hours = dayInfo.open.time.substring(0, 2);
             const minutes = dayInfo.open.time.substring(2);
 
-            model.startTime.setUTCHours(Number(hours));
-            model.startTime.setUTCMinutes(Number(minutes));
+            model.startTime = `${hours}:${minutes}`;
         }
 
         if (dayInfo.close?.time) {
             const hours = dayInfo.close.time.substring(0, 2);
             const minutes = dayInfo.close.time.substring(2);
 
-            model.endTime.setUTCHours(Number(hours));
-            model.endTime.setUTCMinutes(Number(minutes));
+            model.endTime = `${hours}:${minutes}`;
         }
 
 
@@ -259,17 +254,6 @@ async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
 
         return model;
     });
-}
-
-function dateAtMidnight() {
-    const date = new Date();
-
-    date.setUTCHours(0);
-    date.setUTCMinutes(0);
-    date.setUTCSeconds(0);
-    date.setUTCMilliseconds(0);
-
-    return date;
 }
 
 function getFieldNames() {
