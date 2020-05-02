@@ -102,16 +102,13 @@ router.get('/', async (request, response) => {
         }, Duration, Cost, CompanySize, WorkingPeriod],
     });
 
-    if (distance && distance >= 1 && distance <= 20 && userLatitude && userLongitude) {
+    if (distance && distance >= 1 && distance <= 15 && userLatitude && userLongitude) {
         places = places.filter((place) => isPointInsideCircle(
             { lat: userLatitude, lng: userLongitude },
             distance,
             { lat: place.latitude, lng: place.longitude },
         ));
     }
-
-    console.log(places[0].workingPeriods[0].startTime);
-    console.log(places[0].workingPeriods[0].endTime);
 
     if (workingOnly) {
         places = places.filter(isWorkingNow);
@@ -143,6 +140,13 @@ router.get('/', async (request, response) => {
         model.companySize = {
             id: place.companySize.id,
             name: translateText(place.companySize.nameTextId),
+        };
+
+        model.period = {
+            startTime: place.workingPeriods[5]?.startTime,
+            endTime: place.workingPeriods[5]?.endTime,
+            ed: place.workingPeriods[5]?.dayOfWeekEnd,
+            sd: place.workingPeriods[5]?.dayOfWeekStart,
         };
 
         model.categories = place.categories.map((category) => ({

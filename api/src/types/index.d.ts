@@ -119,6 +119,13 @@ export interface RestCostModel extends DefaultModel {}
  */
 export interface CompanySizeModel extends DefaultModel {}
 
+export interface WorkingPeriodForCurrentDay {
+    startTime: number;
+    endTime: number;
+    sd: number;
+    ed: number;
+}
+
 /**
  * @swagger
  *
@@ -179,6 +186,7 @@ export interface RestPlaceModel {
     restDuration?: RestDurationModel;
     restCost?: RestCostModel;
     companySize?: CompanySizeModel;
+    period?: WorkingPeriodForCurrentDay;
     categories?: RestPlaceCategoryModel[];
 }
 

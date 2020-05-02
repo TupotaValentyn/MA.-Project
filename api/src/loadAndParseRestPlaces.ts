@@ -214,14 +214,14 @@ async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
         const model = {
             placeId: placeDBId,
             dayOfWeekStart: index,
-            startTime: '00:00',
+            startTime: 0,
             dayOfWeekEnd: index,
-            endTime: '00:00',
+            endTime: 0,
         };
 
         // Place works 24/7 (set period 00:00 - 23:59)
         if (placeDetails.opening_hours.periods.length === 1) {
-            model.endTime = '23:59';
+            model.endTime = 2359;
             return model;
         }
 
@@ -237,14 +237,16 @@ async function generateWorkingPeriods(placeDBId: number, placeDetails: Place) {
             const hours = dayInfo.open.time.substring(0, 2);
             const minutes = dayInfo.open.time.substring(2);
 
-            model.startTime = `${hours}:${minutes}`;
+            // 18:00 -> 1800
+            model.startTime = Number(hours) * 100 + Number(minutes);
         }
 
         if (dayInfo.close?.time) {
             const hours = dayInfo.close.time.substring(0, 2);
             const minutes = dayInfo.close.time.substring(2);
 
-            model.endTime = `${hours}:${minutes}`;
+            // 18:00 -> 1800
+            model.endTime = Number(hours) * 100 + Number(minutes);
         }
 
 

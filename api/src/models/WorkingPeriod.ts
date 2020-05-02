@@ -19,13 +19,13 @@ export class WorkingPeriod extends Model<WorkingPeriod> {
     dayOfWeekStart: number;
 
     @Column
-    startTime: string;
+    startTime: number;
 
     @Column
     dayOfWeekEnd: number;
 
     @Column
-    endTime: string;
+    endTime: number;
 
     @BelongsTo(() => RestPlace)
     restPlace: RestPlace;
