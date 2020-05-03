@@ -1,17 +1,11 @@
 import { RestPlace } from '../models';
+import getWorkingPeriodForCurrentDay from './getWorkingPeriodForCurrentDay';
 
 export default (place: RestPlace): boolean => {
     const now = new Date();
-
-    const dayOfWeek = now.getDay();
     const currentTime = now.getHours() * 100 + now.getMinutes();
 
-    const currentDayPeriod = place.workingPeriods.find((workingPeriod) => {
-        const isAfterBeginning = dayOfWeek === workingPeriod.dayOfWeekStart && workingPeriod.startTime <= currentTime;
-        const isBeforeEnding = dayOfWeek === workingPeriod.dayOfWeekEnd && workingPeriod.endTime >= currentTime;
-
-        return isAfterBeginning || isBeforeEnding;
-    });
+    const currentDayPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);
 
     if (!currentDayPeriod) {
         return false;

@@ -119,11 +119,40 @@ export interface RestCostModel extends DefaultModel {}
  */
 export interface CompanySizeModel extends DefaultModel {}
 
-export interface WorkingPeriodForCurrentDay {
-    startTime: number;
-    endTime: number;
-    sd: number;
-    ed: number;
+/**
+ * @swagger
+ *
+ * definitions:
+ *   WorkingPeriod:
+ *     description: "Модель для описания графика работы заведения за 1 день."
+ *     type: object
+ *     properties:
+ *       dayOfWeekOpen:
+ *         type: number
+ *         description: Номер дня недели, когда заведение открылось (0 - воскресенье, 6 - суббота)
+ *       dayOfWeekClose:
+ *         type: number
+ *         description: Номер дня недели, когда заведение закроется (0 - воскресенье, 6 - суббота)
+ *       openTime:
+ *         type: string
+ *         description: Время, когда заведение открылось (00:00 - 23:59)
+ *       closeTime:
+ *         type: string
+ *         description: Время, когда заведение закроется (00:00 - 23:59)
+ *       worksAllDay:
+ *         type: boolean
+ *         description: true, если заведение работает круглосуточно в этот день
+ *       doesNotWorkToday:
+ *         type: boolean
+ *         description: true, если в заведении выходной в этот день
+ */
+export interface WorkingPeriod {
+    openTime: string;
+    closeTime: string;
+    dayOfWeekOpen: number;
+    dayOfWeekClose: number;
+    worksAllDay: boolean;
+    doesNotWorkToday: boolean;
 }
 
 /**
@@ -169,6 +198,10 @@ export interface WorkingPeriodForCurrentDay {
  *       companySize:
  *         type: CompanySizeModel
  *         description: Описание размера компании, стандартного для отдыха в заведении
+ *       workingPeriod:
+ *         type: WorkingPeriod?
+ *         description: "Описание графика работы заведения на текущий день (смену).
+ *         Поля не будет, если нет данных о графике работы заведения"
  *       categories:
  *         type: RestPlaceCategoryModel[]
  *         description: Описание категорий, в которые входит заведение
@@ -186,7 +219,7 @@ export interface RestPlaceModel {
     restDuration?: RestDurationModel;
     restCost?: RestCostModel;
     companySize?: CompanySizeModel;
-    period?: WorkingPeriodForCurrentDay;
+    workingPeriod?: WorkingPeriod;
     categories?: RestPlaceCategoryModel[];
 }
 

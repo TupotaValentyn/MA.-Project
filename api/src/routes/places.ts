@@ -2,7 +2,10 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { translateText, isPointInsideCircle, isWorkingNow } from '../util';
+
+import {
+    translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
+} from '../util';
 
 import {
     Category, CompanySize, Cost, Duration, RestPlace, WorkingPeriod,
@@ -54,6 +57,18 @@ const router = express.Router();
  *          Если не передано или передано невалидное значение - производится выборка по всем типам"
  *          schema:
  *            type: number
+ *        - in: "query"
+ *          name: "workingOnly"
+ *          description: "Если передать строку '1', в выборку попадут только те места, которые сейчас работают"
+ *          schema:
+ *            type: string
+ *        - in: "query"
+ *          name: "distance"
+ *          description: "Значение фильтра максимального расстояния до заведения. Валидные значения - [0.5-15].
+ *          Также необходимо передать текущие гео-координаты пользователя (поля userLatitude, userLongitude).
+ *          Они будут служить центром круга зоны поиска, а значение distance будет радиусом этого круга"
+ *          schema:
+ *            type: string
  *      responses:
  *        '200':
  *          description: "Список заведений успешно получен. В ответ клиент получит список мест, которые подходят
@@ -102,7 +117,7 @@ router.get('/', async (request, response) => {
         }, Duration, Cost, CompanySize, WorkingPeriod],
     });
 
-    if (distance && distance >= 1 && distance <= 15 && userLatitude && userLongitude) {
+    if (distance && distance >= 0.5 && distance <= 15 && userLatitude && userLongitude) {
         places = places.filter((place) => isPointInsideCircle(
             { lat: userLatitude, lng: userLongitude },
             distance,
@@ -110,7 +125,7 @@ router.get('/', async (request, response) => {
         ));
     }
 
-    if (workingOnly) {
+    if (workingOnly && Number(workingOnly) === 1) {
         places = places.filter(isWorkingNow);
     }
 
@@ -142,12 +157,46 @@ router.get('/', async (request, response) => {
             name: translateText(place.companySize.nameTextId),
         };
 
-        model.period = {
-            startTime: place.workingPeriods[5]?.startTime,
-            endTime: place.workingPeriods[5]?.endTime,
-            ed: place.workingPeriods[5]?.dayOfWeekEnd,
-            sd: place.workingPeriods[5]?.dayOfWeekStart,
-        };
+        const workingPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);
+
+        if (workingPeriod) {
+            model.workingPeriod = {
+                closeTime: '',
+                openTime: '',
+                dayOfWeekOpen: workingPeriod.dayOfWeekStart,
+                dayOfWeekClose: workingPeriod.dayOfWeekEnd,
+                worksAllDay: false,
+                doesNotWorkToday: false
+            };
+
+            if (workingPeriod.startTime !== undefined) {
+                const hours = Math.floor(workingPeriod.startTime / 100);
+                const minutes = workingPeriod.startTime % 100;
+
+                model.workingPeriod.openTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+            }
+
+            if (workingPeriod.endTime !== undefined) {
+                const hours = Math.floor(workingPeriod.endTime / 100);
+                const minutes = workingPeriod.endTime % 100;
+
+                model.workingPeriod.closeTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+            }
+
+            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
+                && workingPeriod.startTime === 0
+                && workingPeriod.endTime === 2359
+            ) {
+                model.workingPeriod.worksAllDay = true;
+            }
+
+            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
+                && workingPeriod.startTime === 0
+                && workingPeriod.endTime === 0
+            ) {
+                model.workingPeriod.doesNotWorkToday = true;
+            }
+        }
 
         model.categories = place.categories.map((category) => ({
             id: category.id,

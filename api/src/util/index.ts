@@ -7,6 +7,8 @@ import sendConfirmationEmail from './sendConfirmationEmail';
 import getTemplateHTML from './getTemplateHTML';
 import isPointInsideCircle from './isPointInsideCircle';
 import isWorkingNow from './isWorkingNow';
+import getWorkingPeriodForCurrentDay from './getWorkingPeriodForCurrentDay';
+import formatNumber from './formatNumber';
 
 export {
     translateText,
@@ -18,4 +20,6 @@ export {
     getTemplateHTML,
     isPointInsideCircle,
     isWorkingNow,
+    getWorkingPeriodForCurrentDay,
+    formatNumber,
 };
