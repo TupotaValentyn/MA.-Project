@@ -87,7 +87,7 @@ router.get('/', async (request, response) => {
         const validCategories = selectedCategories.filter((category: number) => category in RestPlaceCategoryMapping);
 
         if (validCategories.length) {
-            where['$Categories.id$'] = {
+            where['$categories.id$'] = {
                 [Op.in]: validCategories,
             };
         }

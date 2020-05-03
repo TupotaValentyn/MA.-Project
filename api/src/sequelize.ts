@@ -16,6 +16,7 @@ export default (): Sequelize => {
         define: {
             freezeTableName: false,
             timestamps: false,
+            underscored: true,
         },
         dialectOptions: {
             charset: 'utf8mb4',
