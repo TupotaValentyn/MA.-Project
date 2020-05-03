@@ -2,10 +2,13 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { translateText } from '../util';
 
 import {
-    Category, CompanySize, Cost, Duration, RestPlace,
+    translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
+} from '../util';
+
+import {
+    Category, CompanySize, Cost, Duration, RestPlace, WorkingPeriod,
 } from '../models';
 
 import {
@@ -54,6 +57,18 @@ const router = express.Router();
  *          Если не передано или передано невалидное значение - производится выборка по всем типам"
  *          schema:
  *            type: number
+ *        - in: "query"
+ *          name: "workingOnly"
+ *          description: "Если передать строку '1', в выборку попадут только те места, которые сейчас работают"
+ *          schema:
+ *            type: string
+ *        - in: "query"
+ *          name: "distance"
+ *          description: "Значение фильтра максимального расстояния до заведения. Валидные значения - [0.5-15].
+ *          Также необходимо передать текущие гео-координаты пользователя (поля userLatitude, userLongitude).
+ *          Они будут служить центром круга зоны поиска, а значение distance будет радиусом этого круга"
+ *          schema:
+ *            type: string
  *      responses:
  *        '200':
  *          description: "Список заведений успешно получен. В ответ клиент получит список мест, которые подходят
@@ -62,7 +77,7 @@ const router = express.Router();
  */
 router.get('/', async (request, response) => {
     const {
-        categories, restCost, restDuration, companySize, restType
+        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly
     } = request.query;
 
     const where: any = {};
@@ -72,7 +87,7 @@ router.get('/', async (request, response) => {
         const validCategories = selectedCategories.filter((category: number) => category in RestPlaceCategoryMapping);
 
         if (validCategories.length) {
-            where['$Categories.id$'] = {
+            where['$categories.id$'] = {
                 [Op.in]: validCategories,
             };
         }
@@ -94,13 +109,25 @@ router.get('/', async (request, response) => {
         where.isActiveRest = Number(restType) === RestTypesMapping.Active;
     }
 
-    const places = await RestPlace.findAll({
+    let places = await RestPlace.findAll({
         where,
         include: [{
             model: Category,
             attributes: ['id', 'nameTextId'],
-        }, Duration, Cost, CompanySize],
+        }, Duration, Cost, CompanySize, WorkingPeriod],
     });
+
+    if (distance && distance >= 0.5 && distance <= 15 && userLatitude && userLongitude) {
+        places = places.filter((place) => isPointInsideCircle(
+            { lat: userLatitude, lng: userLongitude },
+            distance,
+            { lat: place.latitude, lng: place.longitude },
+        ));
+    }
+
+    if (workingOnly && Number(workingOnly) === 1) {
+        places = places.filter(isWorkingNow);
+    }
 
     const models: RestPlaceModel[] = places.map((place) => {
         const model: RestPlaceModel = {
@@ -129,6 +156,47 @@ router.get('/', async (request, response) => {
             id: place.companySize.id,
             name: translateText(place.companySize.nameTextId),
         };
+
+        const workingPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);
+
+        if (workingPeriod) {
+            model.workingPeriod = {
+                closeTime: '',
+                openTime: '',
+                dayOfWeekOpen: workingPeriod.dayOfWeekStart,
+                dayOfWeekClose: workingPeriod.dayOfWeekEnd,
+                worksAllDay: false,
+                doesNotWorkToday: false
+            };
+
+            if (workingPeriod.startTime !== undefined) {
+                const hours = Math.floor(workingPeriod.startTime / 100);
+                const minutes = workingPeriod.startTime % 100;
+
+                model.workingPeriod.openTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+            }
+
+            if (workingPeriod.endTime !== undefined) {
+                const hours = Math.floor(workingPeriod.endTime / 100);
+                const minutes = workingPeriod.endTime % 100;
+
+                model.workingPeriod.closeTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+            }
+
+            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
+                && workingPeriod.startTime === 0
+                && workingPeriod.endTime === 2359
+            ) {
+                model.workingPeriod.worksAllDay = true;
+            }
+
+            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
+                && workingPeriod.startTime === 0
+                && workingPeriod.endTime === 0
+            ) {
+                model.workingPeriod.doesNotWorkToday = true;
+            }
+        }
 
         model.categories = place.categories.map((category) => ({
             id: category.id,
