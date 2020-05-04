@@ -26,11 +26,13 @@ router.get('/', async (request, response) => {
     const restDurations = await Duration.findAll();
     const companySizes = await CompanySize.findAll();
 
+    console.log(request.locale);
+
     response.json({
-        categories: categories.map((category) => ({ id: category.id, name: translateText(category.nameTextId) })),
-        costs: costs.map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId) })),
-        restDurations: restDurations.map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId) })),
-        companySizes: companySizes.map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId) })),
+        categories: categories.map((category) => ({ id: category.id, name: translateText(category.nameTextId, request.locale) })),
+        costs: costs.map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, request.locale) })),
+        restDurations: restDurations.map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId, request.locale) })),
+        companySizes: companySizes.map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, request.locale) })),
     });
 });
 
