@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { translateText } from '../util';
+import { authorized } from '../guards';
 
 import {
     Category, CompanySize, Cost, Duration
@@ -18,9 +19,11 @@ const router = express.Router();
  *      responses:
  *        '200':
  *          description: "Данные фильтров успешно получены."
+ *      security:
+ *        - default: []
  *
  */
-router.get('/', async (request, response) => {
+router.get('/', authorized, async (request, response) => {
     const categories = await Category.findAll();
     const costs = await Cost.findAll();
     const restDurations = await Duration.findAll();

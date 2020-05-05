@@ -2,6 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
+import { authorized } from '../guards';
 
 import {
     translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
@@ -73,9 +74,11 @@ const router = express.Router();
  *        '200':
  *          description: "Список заведений успешно получен. В ответ клиент получит список мест, которые подходят
  *          под переданные фильтры. Ответ имеет вид ```{ places: RestPlaceModel[] }```"
+ *      security:
+ *        - default: []
  *
  */
-router.get('/', async (request, response) => {
+router.get('/', authorized, async (request, response) => {
     const {
         categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly
     } = request.query;

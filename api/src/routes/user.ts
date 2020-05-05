@@ -4,6 +4,9 @@ import { BadRequest } from '@curveball/http-errors';
 import { UserPublicData } from 'index';
 import { verify } from 'jsonwebtoken';
 import { translateText } from '../util';
+import { authorized } from '../guards';
+import { User } from '../models';
+
 
 const router = express.Router();
 
@@ -43,6 +46,40 @@ router.get('/:token', async (request, response) => {
     } catch (error) {
         throw new BadRequest(translateText('errors.wrongAuthToken', request.locale));
     }
+});
+
+/**
+ * @swagger
+ * /user/change_locale:
+ *    post:
+ *      tags:
+ *        - User
+ *      summary: "Позволяет пользователю сменить язык"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "locale"
+ *          required: true
+ *          schema:
+ *            type: string
+ *            description: "Новый язык пользователя. Валидные значения - ('ru' | 'ua')"
+ *      responses:
+ *        '200':
+ *          description: "Язык успешно изменен. Возвращает данные об установленном языке вида ```{ newLocale: string }```."
+ *      security:
+ *        - default: []
+ *
+ */
+router.post('/change_locale', authorized, async (request, response) => {
+    const { locale } = request.body;
+    const validatedLocale = ['ru', 'ua'].includes(locale) ? locale : 'ru';
+
+    const userModel = await User.findOne({ where: { id: request.user.id } });
+    userModel.locale = validatedLocale;
+    await userModel.save();
+
+    response.json({ newLocale: validatedLocale });
 });
 
 export default router;
