@@ -26,8 +26,6 @@ router.get('/', async (request, response) => {
     const restDurations = await Duration.findAll();
     const companySizes = await CompanySize.findAll();
 
-    console.log(request.locale);
-
     response.json({
         categories: categories.map((category) => ({ id: category.id, name: translateText(category.nameTextId, request.locale) })),
         costs: costs.map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, request.locale) })),

@@ -144,17 +144,17 @@ router.get('/', async (request, response) => {
 
         model.restDuration = {
             id: place.restDuration.id,
-            name: translateText(place.restDuration.nameTextId),
+            name: translateText(place.restDuration.nameTextId, request.locale),
         };
 
         model.restCost = {
             id: place.restCost.id,
-            name: translateText(place.restCost.nameTextId),
+            name: translateText(place.restCost.nameTextId, request.locale),
         };
 
         model.companySize = {
             id: place.companySize.id,
-            name: translateText(place.companySize.nameTextId),
+            name: translateText(place.companySize.nameTextId, request.locale),
         };
 
         const workingPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);
@@ -200,7 +200,7 @@ router.get('/', async (request, response) => {
 
         model.categories = place.categories.map((category) => ({
             id: category.id,
-            name: translateText(category.nameTextId),
+            name: translateText(category.nameTextId, request.locale),
         }));
 
         return model;
