@@ -37,10 +37,10 @@
     }
 </style>
 
-<h3 class="mail-title">Вы успешно зарегистрировались в системе!</h3>
+<h3 class="mail-title"><%= message %></h3>
 
-<a class="confirm-button" href="<%= serverURL %>/auth/verify_email/<%= userHash %>">
-    Подтвердить почту
+<a class="confirm-button" href="<%= serverURL %>/<%= locale %>/auth/verify_email/<%= userHash %>">
+    <%= buttonText %>
 </a>
 </body>
 </html>

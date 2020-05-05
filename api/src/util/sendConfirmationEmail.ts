@@ -8,7 +8,10 @@ export default async (email: string, userHash: string, locale: string): Promise<
 
     const html = await getTemplateHTML('email_confirmation', {
         userHash,
+        locale,
         serverURL: config.SERVER_URL,
+        message: translateText('confirmationEmailMessage', locale),
+        buttonText: translateText('confirmationEmailButtonText', locale),
     });
 
     const mailOptions = {
