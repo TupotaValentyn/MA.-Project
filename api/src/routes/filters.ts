@@ -1,7 +1,7 @@
 import express from 'express';
 
+import { authorized } from 'interceptors';
 import { translateText } from '../util';
-import { authorized } from '../guards';
 
 import {
     Category, CompanySize, Cost, Duration

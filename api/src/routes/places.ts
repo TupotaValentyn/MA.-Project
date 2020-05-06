@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { authorized } from '../guards';
+import { authorized } from 'interceptors';
 
 import {
     translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
