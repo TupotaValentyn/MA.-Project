@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { authorized } from 'interceptors';
+import { authorized } from '../interceptors';
 import { translateText } from '../util';
 
 import {

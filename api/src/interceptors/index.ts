@@ -1,7 +1,7 @@
 import authorized from './authorized';
-import locale from './locale';
+import i18n from './i18n';
 
 export {
     authorized,
-    locale,
+    i18n,
 };

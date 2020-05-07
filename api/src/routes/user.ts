@@ -3,7 +3,7 @@ import express from 'express';
 import { BadRequest } from '@curveball/http-errors';
 import { UserPublicData } from 'index';
 import { verify } from 'jsonwebtoken';
-import { authorized } from 'interceptors';
+import { authorized } from '../interceptors';
 import { translateText } from '../util';
 import { User } from '../models';
 
