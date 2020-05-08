@@ -11,8 +11,8 @@
         "start": "node dist/src/app.js",
         "loadPlaces": "npx ts-node src/loadAndParseRestPlaces",
         "prepareDB": "npx ts-node ./src/migrations/prepareDB",
-        "copyTranslations": "cp -r ./src/translations/ ./dist/src/translations/",
-        "copyTemplates": "cp -r ./src/templates/ ./dist/src/templates/"
+        "copyTranslations": "mkdir -p ./dist/src/translations/ && cp -r ./src/translations/*.json ./dist/src/translations/",
+        "copyTemplates": "mkdir -p ./dist/src/templates/ && cp -r ./src/templates/*.ejs ./dist/src/templates/"
     },
     "author": "Dmitry Kit",
     "devDependencies": {
