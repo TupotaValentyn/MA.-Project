@@ -39,7 +39,7 @@
 
 <h3 class="mail-title"><%= message %></h3>
 
-<a class="confirm-button" href="<%= serverURL %>/<%= locale %>/auth/verify_email/<%= userHash %>">
+<a class="confirm-button" href="<%= serverURL %>/auth/verify_email/<%= userHash %>?locale=<%= locale %>">
     <%= buttonText %>
 </a>
 </body>

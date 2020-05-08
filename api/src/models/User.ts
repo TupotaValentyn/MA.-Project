@@ -2,35 +2,7 @@ import {
     Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement
 } from 'sequelize-typescript';
 
-/**
- * !@swagger
- *
- * definitions:
- *   User:
- *     type: object
- *     required:
- *       - id
- *     properties:
- *       id:
- *         type: number
- *       email:
- *         type: string
- *         format: email
- *       password:
- *         type: string
- *         format: password
- *         nullable: true
- *       googleId:
- *         type: string
- *         nullable: true
- *       facebookId:
- *         type: string
- *         nullable: true
- *       isAdmin:
- *         type: boolean
- *       isConfirmed:
- *         type: boolean
- */
+import config from '../config';
 
 @Table
 export class User extends Model<User> {
@@ -55,7 +27,7 @@ export class User extends Model<User> {
     @Column
     facebookId: string;
 
-    @Column({ defaultValue: 'ru' })
+    @Column({ defaultValue: config.DEFAULT_LOCALE })
     locale: string;
 
     @AllowNull(true)

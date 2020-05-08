@@ -65,7 +65,7 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
 }
 
 async function processCategory(category: Category) {
-    const categoryRuName = translateText(category.nameTextId);
+    const categoryRuName = translateText(category.nameTextId, 'ru');
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
     log(`Ищем места в категории "${categoryRuName}"\n`);

@@ -6,6 +6,7 @@ import { verify } from 'jsonwebtoken';
 import { authorized } from '../interceptors';
 import { translateText } from '../util';
 import { User } from '../models';
+import config from '../config';
 
 
 const router = express.Router();
@@ -73,7 +74,7 @@ router.get('/:token', async (request, response) => {
  */
 router.post('/change_locale', authorized, async (request, response) => {
     const { locale } = request.body;
-    const validatedLocale = ['ru', 'ua'].includes(locale) ? locale : 'ru';
+    const validatedLocale = config.AVAILABLE_LOCALES.includes(locale) ? locale : config.DEFAULT_LOCALE;
 
     const userModel = await User.findOne({ where: { id: request.user.id } });
     userModel.locale = validatedLocale;
