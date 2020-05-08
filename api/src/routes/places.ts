@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { authorized, i18n } from '../interceptors';
+import { authorized } from '../interceptors';
 
 import {
     translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
@@ -20,7 +20,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /places [i18n]:
+ * /places:
  *    get:
  *      tags:
  *        - Places
@@ -78,7 +78,7 @@ const router = express.Router();
  *        - default: []
  *
  */
-router.get('/', authorized, i18n, async (request, response) => {
+router.get('/', authorized, async (request, response) => {
     const {
         categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly
     } = request.query;
