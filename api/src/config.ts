@@ -18,4 +18,7 @@ export default {
     SERVER_URL: process.env.SERVER_URL,
 
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
+
+    AVAILABLE_LOCALES: ['ua', 'ru'],
+    DEFAULT_LOCALE: 'ua',
 };

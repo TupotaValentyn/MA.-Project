@@ -41,8 +41,6 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
             key: config.GOOGLE_PLACES_API_KEY,
             pagetoken: pageToken,
             language: 'ru' as Language,
-            location: { lat: 49.444431, lng: 32.059769 },
-            radius: 25 * 1000, // 25km
         }
     });
 
@@ -65,7 +63,7 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
 }
 
 async function processCategory(category: Category) {
-    const categoryRuName = translateText(category.nameTextId);
+    const categoryRuName = translateText(category.nameTextId, 'ru');
     const categoryUaName = translateText(category.nameTextId, 'ua');
 
     log(`Ищем места в категории "${categoryRuName}"\n`);

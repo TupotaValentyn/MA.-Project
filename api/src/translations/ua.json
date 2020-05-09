@@ -1,21 +1,23 @@
 {
     "errors": {
-        "noUserWithEmail": "Пользователя с таким email не существует",
+        "noUserWithEmail": "Користувача з таким email не існує",
         "wrongPassword": "Неправильный пароль",
-        "wrongEmail": "Некорректный email",
-        "notUniqueEmail": "Пользователь с такой почтой уже зарегистрирован в системе",
+        "wrongEmail": "Некоректний email",
+        "notUniqueEmail": "Користувач з таким email вже зареєстрований в системі",
         "wrongHash": "Неправильный хеш",
-        "wrongGoogleToken": "Не задан token",
-        "wrongFacebookToken": "Не задан accessToken",
-        "wrongFacebookUserId": "Не задан userId",
-        "emailAlreadyConfirmed": "Почта уже подтверждена",
-        "actionIsForbidden": "Действие запрещено",
-        "wrongAuthHeader": "Невалидный заголовок",
-        "wrongAuthToken": "Недействительный токен"
+        "wrongGoogleToken": "Не заданий token",
+        "wrongFacebookToken": "Не заданий accessToken",
+        "wrongFacebookUserId": "Не заданий userId",
+        "emailAlreadyConfirmed": "Пошта вже підтверджена",
+        "actionIsForbidden": "Подію не дозволено",
+        "wrongAuthHeader": "Неправильний заголовок",
+        "wrongAuthToken": "Недійсний токен"
     },
 
-    "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
-    "confirmationEmailTitle": "Регистрация в системе",
+    "emailConfirmed": "Дякуємо, Ваша пошта підтверждена! Поверніться на сайт і натисніть кнопку \"Перевірити підтвердження\"",
+    "confirmationEmailTitle": "Реєстрація в системі",
+    "confirmationEmailMessage": "Ви успішно зареєструвались в системі!",
+    "confirmationEmailButtonText": "Підтвердити пошту",
 
     "restPlaceCategory": {
         "amusementPark": "Парк розваг",
@@ -36,23 +38,23 @@
     },
 
     "restCost": {
-        "free": "Бесплатный",
-        "inexpensive": "Недорогой",
-        "moderate": "Средний",
-        "expensive": "Дорогой",
-        "veryExpensive": "Очень дорогой"
+        "free": "Безкоштовний",
+        "inexpensive": "Недорогий",
+        "moderate": "Середній",
+        "expensive": "Дорогий",
+        "veryExpensive": "Дуже дорогий"
     },
 
     "restDuration": {
-        "low": "Непродолжительный",
-        "medium": "Средний",
-        "high": "Продолжительный"
+        "low": "Нетривалий",
+        "medium": "Середній",
+        "high": "Тривалий"
     },
 
     "companySize": {
-        "solo": "1 человек",
-        "little": "2-3 человека",
-        "medium": "Небольшая компания",
-        "large": "Большая компания"
+        "solo": "1 людина",
+        "little": "2-3 людини",
+        "medium": "Невелика компанія",
+        "large": "Велика компанія"
     }
 }

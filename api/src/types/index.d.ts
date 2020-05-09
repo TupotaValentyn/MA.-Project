@@ -227,6 +227,7 @@ declare global {
     namespace Express {
         interface Request {
             user?: UserPublicData,
+            locale?: 'ru' | 'ua',
         }
     }
 }

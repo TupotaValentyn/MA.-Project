@@ -65,13 +65,13 @@ router.post('/local', async (request, response) => {
     });
 
     if (!userByEmail) {
-        throw new BadRequest(translateText('errors.noUserWithEmail'));
+        throw new BadRequest(translateText('errors.noUserWithEmail', request.locale));
     }
 
     const isCorrectPassword = await bcrypt.compare(password, userByEmail.password);
 
     if (!isCorrectPassword) {
-        throw new BadRequest(translateText('errors.wrongPassword'));
+        throw new BadRequest(translateText('errors.wrongPassword', request.locale));
     }
 
     if (!userByEmail.isConfirmed) {
@@ -134,17 +134,17 @@ router.post('/register', async (request: express.Request, response: express.Resp
     const password = requestBody.password.toString().trim();
 
     if (!isValidEmail(email)) {
-        throw new BadRequest(translateText('errors.wrongEmail'));
+        throw new BadRequest(translateText('errors.wrongEmail', request.locale));
     }
 
     if (password.length < 8) {
-        throw new BadRequest(translateText('errors.wrongPassword'));
+        throw new BadRequest(translateText('errors.wrongPassword', request.locale));
     }
 
     const usersWithSameMail = await User.findAll({ where: { email } });
 
     if (usersWithSameMail.length) {
-        throw new BadRequest(translateText('errors.notUniqueEmail'));
+        throw new BadRequest(translateText('errors.notUniqueEmail', request.locale));
     }
 
     const salt = await bcrypt.genSalt(3);
@@ -158,7 +158,7 @@ router.post('/register', async (request: express.Request, response: express.Resp
         password: encryptedPassword,
     });
 
-    await sendConfirmationEmail(email, userHash);
+    await sendConfirmationEmail(email, userHash, request.locale);
     response.json({ userHash });
 });
 
@@ -196,7 +196,7 @@ router.get('/check_verification/:userHash', async (request, response) => {
     });
 
     if (!userByHash) {
-        throw new BadRequest(translateText('errors.wrongHash'));
+        throw new BadRequest(translateText('errors.wrongHash', request.locale));
     }
 
     if (!userByHash.isConfirmed) {
@@ -250,7 +250,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     });
 
     if (!userByHash) {
-        throw new BadRequest(translateText('errors.wrongHash'));
+        throw new BadRequest(translateText('errors.wrongHash', request.locale));
     }
 
     const newUserHash = generateUserHash(userByHash.email);
@@ -258,7 +258,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
     userByHash.userHash = newUserHash;
     await userByHash.save();
 
-    await sendConfirmationEmail(userByHash.email, newUserHash);
+    await sendConfirmationEmail(userByHash.email, newUserHash, request.locale);
 
     response.json({ userHash: newUserHash });
 });
@@ -296,7 +296,7 @@ router.post('/google', async (request, response) => {
     const { token } = request.body;
 
     if (!token) {
-        throw new BadRequest(translateText('errors.wrongGoogleToken'));
+        throw new BadRequest(translateText('errors.wrongGoogleToken', request.locale));
     }
 
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -373,11 +373,11 @@ router.post('/facebook', async (request, response) => {
     const { accessToken, userId } = request.body;
 
     if (!accessToken) {
-        throw new BadRequest(translateText('errors.wrongFacebookToken'));
+        throw new BadRequest(translateText('errors.wrongFacebookToken', request.locale));
     }
 
     if (!userId) {
-        throw new BadRequest(translateText('errors.wrongFacebookUserId'));
+        throw new BadRequest(translateText('errors.wrongFacebookUserId', request.locale));
     }
 
     const url = `https://graph.facebook.com/v2.6/${userId}?fields=email&access_token=${accessToken}`;
@@ -422,7 +422,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
 
     if (!userByHash) {
         const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translateText('errors.wrongHash'),
+            message: translateText('errors.wrongHash', request.locale),
         });
 
         return response.send(pageHTML);
@@ -430,7 +430,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
 
     if (userByHash.isConfirmed) {
         const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translateText('errors.emailAlreadyConfirmed'),
+            message: translateText('errors.emailAlreadyConfirmed', request.locale),
         });
 
         return response.send(pageHTML);
@@ -439,7 +439,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
     await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
 
     const pageHTML = await getTemplateHTML('email_confirmed', {
-        message: translateText('emailConfirmed'),
+        message: translateText('emailConfirmed', request.locale),
     });
 
     response.send(pageHTML);

@@ -16,6 +16,8 @@
 
     "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
     "confirmationEmailTitle": "Регистрация в системе",
+    "confirmationEmailMessage": "Вы успешно зарегистрировались в системе!",
+    "confirmationEmailButtonText": "Подтвердить почту",
 
     "restPlaceCategory": {
         "amusementPark": "Парк развлечений",
