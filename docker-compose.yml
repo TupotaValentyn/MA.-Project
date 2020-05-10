@@ -1,7 +1,21 @@
 version: '3'
 services:
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ma-project
+      MYSQL_USER: ma-user
+      MYSQL_PASSWORD: password
+    restart: always
+
   api:
     container_name: api
+    depends_on:
+      - mysql
     build:
       context: .
       dockerfile: Dockerfile-api
@@ -19,4 +33,15 @@ services:
     ports:
       - "3000:80"
     restart: always
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - frontend
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "80:80"
+      - "443:443"
 
