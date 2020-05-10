@@ -1,7 +1,21 @@
 version: '3'
 services:
+  mysql:
+    image: mysql:5.7
+    container-name: mysql
+    ports:
+      - "3306:3306"
+    enviroment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ma-project
+      MYSQL_USER: ma-user
+      MYSQL_PASSWORD: password
+    restart: always
+
   api:
     container_name: api
+    depends_on:
+      - mysql
     build:
       context: .
       dockerfile: Dockerfile-api
