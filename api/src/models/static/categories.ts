@@ -1,83 +1,24 @@
-import {
-    User, CompanySize, Duration, Cost, Category
-} from '../models';
+import { CompanySizeMapping, RestCostMapping, RestDurationMapping } from './index';
 
-import {
-    CompanySizeMapping, RestDurationMapping, RestCostMapping
-} from '../models/static';
+enum RestPlaceCategoryMapping {
+    AmusementPark = 1,
+    Aquarium,
+    ArtGallery,
+    Bar,
+    Cafe,
+    Library,
+    MovieTheater,
+    Museum,
+    NightClub,
+    Park,
+    Restaurant,
+    Spa,
+    Stadium,
+    TouristAttraction,
+    Zoo,
+}
 
-import createSequelizeInstance from '../sequelize';
-
-(async () => {
-    const sequelizeInstance = createSequelizeInstance();
-    await sequelizeInstance.sync({ alter: true });
-
-    console.log('CompanySize - Start');
-    const companySizes = ['solo', 'little', 'medium', 'large'];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const nameTextId of companySizes) {
-        // eslint-disable-next-line no-await-in-loop
-        await CompanySize.create({ nameTextId: `companySize.${nameTextId}` });
-    }
-
-    console.log('CompanySize - Finish\n');
-
-
-    console.log('Cost - Start');
-    const restCosts = ['free', 'inexpensive', 'moderate', 'expensive', 'veryExpensive'];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const nameTextId of restCosts) {
-        // eslint-disable-next-line no-await-in-loop
-        await Cost.create({ nameTextId: `restCost.${nameTextId}` });
-    }
-
-    console.log('Cost - Finish\n');
-
-
-    console.log('Duration - Start');
-    const restDurations = ['low', 'medium', 'high'];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const nameTextId of restDurations) {
-        // eslint-disable-next-line no-await-in-loop
-        await Duration.create({ nameTextId: `restDuration.${nameTextId}` });
-    }
-
-    console.log('Duration - Finish\n');
-
-
-    console.log('Category - Start');
-
-    // eslint-disable-next-line no-restricted-syntax,no-use-before-define
-    for (const categoryData of getCategories()) {
-        // eslint-disable-next-line no-await-in-loop
-        await Category.create(categoryData);
-    }
-
-    console.log('Category - Finish\n');
-
-    console.log('User - Start');
-
-    await User.create({
-        email: 'admin@test.com',
-        password: '$2b$04$6cqzfP5tUxf3L0.OEOyYM.ppXshp/cGxDST/NZZh5FPAZYgcJ88om',
-        isAdmin: true,
-        isConfirmed: true,
-    });
-
-    await User.create({
-        email: 'user@test.com',
-        password: '$2b$04$6cqzfP5tUxf3L0.OEOyYM.ppXshp/cGxDST/NZZh5FPAZYgcJ88om',
-        isAdmin: false,
-        isConfirmed: true,
-    });
-
-    console.log('User - Finish\n');
-})();
-
-function getCategories() {
+function getAllCategories() {
     return [
         {
             googleId: 'amusement_park',

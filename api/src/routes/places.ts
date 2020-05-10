@@ -14,7 +14,7 @@ import {
 
 import {
     CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping, RestTypesMapping,
-} from '../models/mappings';
+} from '../models/static';
 
 const router = express.Router();
 

@@ -231,3 +231,19 @@ declare global {
         }
     }
 }
+
+export interface DefaultStaticModel {
+    id: number;
+    nameTextId: string;
+}
+
+export interface RestDurationStaticModel extends DefaultStaticModel {}
+export interface RestCostStaticModel extends DefaultStaticModel {}
+export interface CompanySizeStaticModel extends DefaultStaticModel {}
+export interface CategoryStaticModel extends DefaultStaticModel {
+    googleId: string;
+    defaultRestDuration: number;
+    defaultCompanySize: number;
+    defaultRestCost: number;
+    isActiveRest: boolean;
+}
