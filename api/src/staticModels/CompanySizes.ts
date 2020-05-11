@@ -21,6 +21,14 @@ class CompanySizes {
 
         return this.sizes;
     }
+
+    public static isValid(companySize: number): boolean {
+        return companySize >= CompanySizes.Solo && companySize <= CompanySizes.Large;
+    }
+
+    public static findById(id: number): CompanySizeStaticModel {
+        return this.getAll().find((item) => item.id === id);
+    }
 }
 
 export default CompanySizes;

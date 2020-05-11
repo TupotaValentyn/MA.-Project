@@ -9,12 +9,12 @@ import {
 } from '../util';
 
 import {
-    Category, CompanySize, Cost, Duration, RestPlace, WorkingPeriod,
+    Category, RestPlace, WorkingPeriod,
 } from '../models';
 
 import {
-    CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping, RestTypesMapping,
-} from '../models/static';
+    Categories, RestDurations, RestCosts, CompanySizes, RestTypes,
+} from '../staticModels';
 
 const router = express.Router();
 
@@ -87,7 +87,7 @@ router.get('/', authorized, async (request, response) => {
 
     if (categories) {
         const selectedCategories: number[] = typeof categories === 'string' ? [Number(categories)] : categories.map(Number);
-        const validCategories = selectedCategories.filter((category: number) => category in RestPlaceCategoryMapping);
+        const validCategories = selectedCategories.filter((category: number) => Categories.isValid(category));
 
         if (validCategories.length) {
             where['$categories.id$'] = {
@@ -96,20 +96,20 @@ router.get('/', authorized, async (request, response) => {
         }
     }
 
-    if (restCost in RestCostMapping) {
+    if (RestCosts.isValid(restCost)) {
         where.restCost = restCost;
     }
 
-    if (restDuration in RestDurationMapping) {
+    if (RestDurations.isValid(restDuration)) {
         where.restDuration = restDuration;
     }
 
-    if (companySize in CompanySizeMapping) {
+    if (CompanySizes.isValid(companySize)) {
         where.companySize = companySize;
     }
 
-    if (restType in RestTypesMapping) {
-        where.isActiveRest = Number(restType) === RestTypesMapping.Active;
+    if (Number(restType) === RestTypes.Active) {
+        where.isActiveRest = true;
     }
 
     let places = await RestPlace.findAll({
@@ -117,7 +117,7 @@ router.get('/', authorized, async (request, response) => {
         include: [{
             model: Category,
             attributes: ['id', 'nameTextId'],
-        }, Duration, Cost, CompanySize, WorkingPeriod],
+        }, WorkingPeriod],
     });
 
     if (distance && distance >= 0.5 && distance <= 15 && userLatitude && userLongitude) {
@@ -145,19 +145,25 @@ router.get('/', authorized, async (request, response) => {
             isActiveRest: place.isActiveRest,
         };
 
+        const placeRestDuration = RestDurations.findById(place.restDuration);
+
         model.restDuration = {
-            id: place.restDuration.id,
-            name: translateText(place.restDuration.nameTextId, request.locale),
+            id: placeRestDuration.id,
+            name: translateText(placeRestDuration.nameTextId, request.locale),
         };
+
+        const placeRestCost = RestCosts.findById(place.restCost);
 
         model.restCost = {
-            id: place.restCost.id,
-            name: translateText(place.restCost.nameTextId, request.locale),
+            id: placeRestCost.id,
+            name: translateText(placeRestCost.nameTextId, request.locale),
         };
 
+        const placeCompanySize = CompanySizes.findById(place.companySize);
+
         model.companySize = {
-            id: place.companySize.id,
-            name: translateText(place.companySize.nameTextId, request.locale),
+            id: placeCompanySize.id,
+            name: translateText(placeCompanySize.nameTextId, request.locale),
         };
 
         const workingPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);

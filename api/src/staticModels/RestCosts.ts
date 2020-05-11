@@ -23,6 +23,14 @@ class RestCosts {
 
         return this.costs;
     }
+
+    public static isValid(cost: number): boolean {
+        return cost >= RestCosts.Free && cost <= RestCosts.VeryExpensive;
+    }
+
+    public static findById(id: number): RestCostStaticModel {
+        return this.getAll().find((item) => item.id === id);
+    }
 }
 
 export default RestCosts;

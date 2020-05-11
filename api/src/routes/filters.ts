@@ -4,8 +4,8 @@ import { authorized } from '../interceptors';
 import { translateText } from '../util';
 
 import {
-    Category, CompanySize, Cost, Duration
-} from '../models';
+    Categories, CompanySizes, RestCosts, RestDurations, RestTypes,
+} from '../staticModels';
 
 const router = express.Router();
 
@@ -23,17 +23,24 @@ const router = express.Router();
  *        - default: []
  *
  */
-router.get('/', authorized, async (request, response) => {
-    const categories = await Category.findAll();
-    const costs = await Cost.findAll();
-    const restDurations = await Duration.findAll();
-    const companySizes = await CompanySize.findAll();
+router.get('/', authorized, (request, response) => {
+    const categories = Categories.getAll()
+        .map((category) => ({ id: category.id, name: translateText(category.nameTextId, request.locale) }));
+
+    const costs = RestCosts.getAll()
+        .map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, request.locale) }));
+
+    const restDurations = RestDurations.getAll()
+        .map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId, request.locale) }));
+
+    const companySizes = CompanySizes.getAll()
+        .map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, request.locale) }));
 
     response.json({
-        categories: categories.map((category) => ({ id: category.id, name: translateText(category.nameTextId, request.locale) })),
-        costs: costs.map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, request.locale) })),
-        restDurations: restDurations.map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId, request.locale) })),
-        companySizes: companySizes.map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, request.locale) })),
+        categories,
+        costs,
+        restDurations,
+        companySizes,
     });
 });
 

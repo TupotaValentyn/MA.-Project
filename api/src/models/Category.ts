@@ -1,10 +1,7 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, BelongsTo, ForeignKey, BelongsToMany,
+    AutoIncrement, BelongsToMany, Column, Model, PrimaryKey, Table
 } from 'sequelize-typescript';
 
-import { Duration } from './Duration';
-import { CompanySize } from './CompanySize';
-import { Cost } from './Cost';
 import { RestPlaceCategory } from './RestPlaceCategory';
 import { RestPlace } from './RestPlace';
 
@@ -25,25 +22,13 @@ export class Category extends Model<Category> {
     isActiveRest: boolean;
 
     @Column
-    @ForeignKey(() => Duration)
-    defaultRestDurationId: number;
-
-    @BelongsTo(() => Duration)
-    defaultRestDuration: Duration;
+    defaultRestDuration: number;
 
     @Column
-    @ForeignKey(() => Cost)
-    defaultRestCostId: number;
-
-    @BelongsTo(() => Cost)
-    defaultRestCost: Cost;
+    defaultRestCost: number;
 
     @Column
-    @ForeignKey(() => CompanySize)
-    defaultCompanySizeId: number;
-
-    @BelongsTo(() => CompanySize)
-    defaultCompanySize: CompanySize;
+    defaultCompanySize: number;
 
     @BelongsToMany(() => RestPlace, () => RestPlaceCategory)
     places: RestPlace[];

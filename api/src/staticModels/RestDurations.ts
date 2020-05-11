@@ -19,6 +19,14 @@ class RestDurations {
 
         return this.durations;
     }
+
+    public static isValid(duration: number): boolean {
+        return duration >= RestDurations.Low && duration <= RestDurations.High;
+    }
+
+    public static findById(id: number): RestDurationStaticModel {
+        return this.getAll().find((item) => item.id === id);
+    }
 }
 
 export default RestDurations;

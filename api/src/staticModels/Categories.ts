@@ -180,6 +180,14 @@ class Categories {
 
         return this.categories;
     }
+
+    public static isValid(categoryId: number): boolean {
+        return categoryId >= Categories.AmusementPark && categoryId <= Categories.Zoo;
+    }
+
+    public static findById(id: number): CategoryStaticModel {
+        return this.getAll().find((item) => item.id === id);
+    }
 }
 
 export default Categories;
