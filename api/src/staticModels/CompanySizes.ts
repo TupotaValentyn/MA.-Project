@@ -1,6 +1,6 @@
 import { CompanySizeStaticModel } from 'index';
 
-class CompanySize {
+class CompanySizes {
     static Solo = 1;
 
     static Little = 2;
@@ -23,4 +23,4 @@ class CompanySize {
     }
 }
 
-export default CompanySize;
+export default CompanySizes;

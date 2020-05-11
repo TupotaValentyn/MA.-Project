@@ -1,6 +1,6 @@
 import { RestDurationStaticModel } from 'index';
 
-class RestDuration {
+class RestDurations {
     static Low = 1;
 
     static Medium = 2;
@@ -21,4 +21,4 @@ class RestDuration {
     }
 }
 
-export default RestDuration;
+export default RestDurations;

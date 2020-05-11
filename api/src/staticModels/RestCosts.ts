@@ -1,6 +1,6 @@
 import { RestCostStaticModel } from 'index';
 
-class RestCost {
+class RestCosts {
     static Free = 1;
 
     static Inexpensive = 2;
@@ -25,4 +25,4 @@ class RestCost {
     }
 }
 
-export default RestCost;
+export default RestCosts;

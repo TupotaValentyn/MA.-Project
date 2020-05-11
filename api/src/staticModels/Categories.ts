@@ -1,9 +1,9 @@
 import { CategoryStaticModel } from 'index';
-import RestDuration from './RestDuration';
-import RestCost from './RestCost';
-import CompanySize from './CompanySize';
+import RestDurations from './RestDurations';
+import RestCosts from './RestCosts';
+import CompanySizes from './CompanySizes';
 
-class Category {
+class Categories {
     static AmusementPark = 1;
 
     static Aquarium = 2;
@@ -45,135 +45,135 @@ class Category {
             {
                 googleId: 'amusement_park',
                 nameTextId: 'restPlaceCategory.amusementPark',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Large,
-                defaultRestCost: RestCost.Moderate,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Large,
+                defaultRestCost: RestCosts.Moderate,
                 isActiveRest: true,
             },
 
             {
                 googleId: 'aquarium',
                 nameTextId: 'restPlaceCategory.aquarium',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Inexpensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Inexpensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'art_gallery',
                 nameTextId: 'restPlaceCategory.artGallery',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Inexpensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Inexpensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'bar',
                 nameTextId: 'restPlaceCategory.bar',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Expensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Expensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'cafe',
                 nameTextId: 'restPlaceCategory.cafe',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Moderate,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Moderate,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'library',
                 nameTextId: 'restPlaceCategory.library',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Solo,
-                defaultRestCost: RestCost.Free,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Solo,
+                defaultRestCost: RestCosts.Free,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'movie_theater',
                 nameTextId: 'restPlaceCategory.movieTheater',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Moderate,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Moderate,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'museum',
                 nameTextId: 'restPlaceCategory.museum',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Inexpensive,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Inexpensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'night_club',
                 nameTextId: 'restPlaceCategory.nightClub',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Expensive,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Expensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'park',
                 nameTextId: 'restPlaceCategory.park',
-                defaultRestDuration: RestDuration.High,
-                defaultCompanySize: CompanySize.Large,
-                defaultRestCost: RestCost.Free,
+                defaultRestDuration: RestDurations.High,
+                defaultCompanySize: CompanySizes.Large,
+                defaultRestCost: RestCosts.Free,
                 isActiveRest: true,
             },
 
             {
                 googleId: 'restaurant',
                 nameTextId: 'restPlaceCategory.restaurant',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Little,
-                defaultRestCost: RestCost.VeryExpensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Little,
+                defaultRestCost: RestCosts.VeryExpensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'spa',
                 nameTextId: 'restPlaceCategory.spa',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Little,
-                defaultRestCost: RestCost.VeryExpensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Little,
+                defaultRestCost: RestCosts.VeryExpensive,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'stadium',
                 nameTextId: 'restPlaceCategory.stadium',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Little,
-                defaultRestCost: RestCost.Free,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Little,
+                defaultRestCost: RestCosts.Free,
                 isActiveRest: true,
             },
 
             {
                 googleId: 'tourist_attraction',
                 nameTextId: 'restPlaceCategory.touristAttraction',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Free,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Free,
                 isActiveRest: false,
             },
 
             {
                 googleId: 'zoo',
                 nameTextId: 'restPlaceCategory.zoo',
-                defaultRestDuration: RestDuration.Medium,
-                defaultCompanySize: CompanySize.Medium,
-                defaultRestCost: RestCost.Inexpensive,
+                defaultRestDuration: RestDurations.Medium,
+                defaultCompanySize: CompanySizes.Medium,
+                defaultRestCost: RestCosts.Inexpensive,
                 isActiveRest: true,
             },
         ].map((item, index) => ({ ...item, id: index + 1 }));
@@ -182,4 +182,4 @@ class Category {
     }
 }
 
-export default Category;
+export default Categories;
