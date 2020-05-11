@@ -17,7 +17,7 @@ class CompanySizes {
         }
 
         this.sizes = ['solo', 'little', 'medium', 'large']
-            .map((durationValue, index) => ({ id: index + 1, nameTextId: `restCost.${durationValue}` }));
+            .map((durationValue, index) => ({ id: index + 1, nameTextId: `companySize.${durationValue}` }));
 
         return this.sizes;
     }
