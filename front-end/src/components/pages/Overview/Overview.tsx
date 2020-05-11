@@ -5,6 +5,8 @@ import GoogleMaps from '../../common/GoogleMap/GoogleMap';
 import { RootStore } from '../../../reducers';
 import { State, StateStatuses } from '../../../utils/State';
 import { userRequested } from '../../../slices/user';
+import { getFiltersRequested } from '../../../slices/filters';
+import { getPlacesRequested } from '../../../slices/places';
 
 type Props = {};
 
@@ -26,6 +28,8 @@ const Overview: FC<Props> = () => {
     if (tokensState.status === StateStatuses.LOADED) {
       const { token } = tokensState.payload.tokenData;
       dispatch(userRequested(token));
+      dispatch(getFiltersRequested());
+      dispatch(getPlacesRequested());
     }
   }, []);
 
