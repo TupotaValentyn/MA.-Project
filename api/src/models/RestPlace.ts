@@ -50,6 +50,9 @@ export class RestPlace extends Model<RestPlace> {
     @Column
     companySize: number;
 
+    @Column({ defaultValue: true })
+    confirmed: boolean;
+
     @HasMany(() => Review)
     reviews: Review[];
 

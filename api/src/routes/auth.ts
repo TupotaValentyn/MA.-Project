@@ -156,6 +156,7 @@ router.post('/register', async (request: express.Request, response: express.Resp
         email,
         userHash,
         password: encryptedPassword,
+        locale: request.locale,
     });
 
     await sendConfirmationEmail(email, userHash, request.locale);
@@ -436,7 +437,7 @@ router.get('/verify_email/:userHash', async (request, response) => {
         return response.send(pageHTML);
     }
 
-    await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
+    await User.update({ isConfirmed: true }, { where: { userHash } });
 
     const pageHTML = await getTemplateHTML('email_confirmed', {
         message: translateText('emailConfirmed', request.locale),

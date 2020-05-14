@@ -148,7 +148,9 @@ export interface CompanySizeModel extends DefaultModel {}
  */
 export interface WorkingPeriod {
     openTime: string;
+    openTimeNumeric?: number;
     closeTime: string;
+    closeTimeNumeric?: number;
     dayOfWeekOpen: number;
     dayOfWeekClose: number;
     worksAllDay: boolean;

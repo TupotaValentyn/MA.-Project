@@ -2,7 +2,7 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
-import { authorized } from '../interceptors';
+import { authorized, protectedRoute } from '../interceptors';
 
 import {
     translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
@@ -13,7 +13,7 @@ import {
 } from '../models';
 
 import {
-    Categories, RestDurations, RestCosts, CompanySizes, RestTypes,
+    Categories, RestDurations, RestCosts, CompanySizes, RestTypes, PlaceConfirmedStatuses,
 } from '../staticModels';
 
 const router = express.Router();
@@ -80,7 +80,7 @@ const router = express.Router();
  */
 router.get('/', authorized, async (request, response) => {
     const {
-        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly
+        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, confirmed
     } = request.query;
 
     const where: any = {};
@@ -110,6 +110,10 @@ router.get('/', authorized, async (request, response) => {
 
     if (Number(restType) === RestTypes.Active) {
         where.isActiveRest = true;
+    }
+
+    if (PlaceConfirmedStatuses.isValid(Number(confirmed))) {
+        where.confirmed = confirmed === '1';
     }
 
     let places = await RestPlace.findAll({
@@ -172,6 +176,8 @@ router.get('/', authorized, async (request, response) => {
             model.workingPeriod = {
                 closeTime: '',
                 openTime: '',
+                openTimeNumeric: workingPeriod.startTime,
+                closeTimeNumeric: workingPeriod.endTime,
                 dayOfWeekOpen: workingPeriod.dayOfWeekStart,
                 dayOfWeekClose: workingPeriod.dayOfWeekEnd,
                 worksAllDay: false,
@@ -219,6 +225,43 @@ router.get('/', authorized, async (request, response) => {
 
     response.json({
         places: models,
+    });
+});
+
+router.post('/delete', authorized, protectedRoute, async (request, response) => {
+    const { ids } = request.body;
+
+    const removedPlacesCount = await RestPlace.destroy({
+        where: {
+            id: {
+                [Op.in]: Array.isArray(ids) ? ids : [ids],
+            }
+        },
+    });
+
+    response.json({
+        placeRemoved: removedPlacesCount > 0,
+    });
+});
+
+router.post('/update', authorized, protectedRoute, async (request, response) => {
+    const { name } = request.body;
+
+    const placeModel = {
+        // googleId: '',
+        // name: placeDetails.name,
+        // latitude: placeDetails.geometry.location.lat,
+        // longitude: placeDetails.geometry.location.lng,
+        // googleMeanRating: placeDetails.rating,
+        // googleReviewsCount: (placeDetails as any).user_ratings_total,
+        // restDuration: category.defaultRestDuration,
+        // restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
+        // companySize: category.defaultCompanySize,
+        // isActiveRest: category.isActiveRest,
+    };
+
+    response.json({
+
     });
 });
 
