@@ -2,10 +2,11 @@ import express from 'express';
 
 import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
+import { BadRequest } from '@curveball/http-errors';
 import { authorized, protectedRoute } from '../interceptors';
 
 import {
-    translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber
+    translateText, isPointInsideCircle, isWorkingNow, getWorkingPeriodForCurrentDay, formatNumber,
 } from '../util';
 
 import {
@@ -15,6 +16,7 @@ import {
 import {
     Categories, RestDurations, RestCosts, CompanySizes, RestTypes, PlaceConfirmedStatuses,
 } from '../staticModels';
+import config from '../config';
 
 const router = express.Router();
 
@@ -78,7 +80,7 @@ const router = express.Router();
  *        - default: []
  *
  */
-router.get('/', authorized, async (request, response) => {
+router.get('/', authorized, async (request: express.Request, response: express.Response) => {
     const {
         categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, confirmed
     } = request.query;
@@ -228,8 +230,12 @@ router.get('/', authorized, async (request, response) => {
     });
 });
 
-router.post('/delete', authorized, protectedRoute, async (request, response) => {
+router.post('/delete', authorized, protectedRoute, async (request: express.Request, response: express.Response) => {
     const { ids } = request.body;
+
+    if (!ids) {
+        throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
+    }
 
     const removedPlacesCount = await RestPlace.destroy({
         where: {
@@ -240,29 +246,128 @@ router.post('/delete', authorized, protectedRoute, async (request, response) => 
     });
 
     response.json({
-        placeRemoved: removedPlacesCount > 0,
+        removed: removedPlacesCount > 0,
     });
 });
 
-router.post('/update', authorized, protectedRoute, async (request, response) => {
-    const { name } = request.body;
+const validatePlaceParams = (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    const {
+        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds,
+    } = request.body;
+
+    if (!(name && name.toString().length >= 3)) {
+        throw new BadRequest(translateText('errors.wrongPlaceName', request.locale));
+    }
+
+    if (!(latitude && typeof latitude === 'number')) {
+        throw new BadRequest(translateText('errors.wrongPlaceGeoLocation', request.locale));
+    }
+
+    if (!(longitude && typeof longitude === 'number')) {
+        throw new BadRequest(translateText('errors.wrongPlaceGeoLocation', request.locale));
+    }
+
+    const isPlaceInCherkasy = isPointInsideCircle(config.CHERKASY_CENTER, config.CHERKASY_BOUNDS_RADIUS, {
+        lat: latitude,
+        lng: longitude,
+    });
+
+    if (!isPlaceInCherkasy) {
+        throw new BadRequest(translateText('errors.placeIsNotInCherkasy', request.locale));
+    }
+
+    if (!(restDuration && RestDurations.isValid(Number(restDuration)))) {
+        throw new BadRequest(translateText('errors.wrongPlaceRestDuration', request.locale));
+    }
+
+    if (!(restCost && RestCosts.isValid(Number(restCost)))) {
+        throw new BadRequest(translateText('errors.wrongPlaceRestCost', request.locale));
+    }
+
+    if (!(companySize && CompanySizes.isValid(Number(companySize)))) {
+        throw new BadRequest(translateText('errors.wrongPlaceCompanySize', request.locale));
+    }
+
+    if (!(restType && RestTypes.isValid(Number(restType)))) {
+        throw new BadRequest(translateText('errors.wrongPlaceRestType', request.locale));
+    }
+
+    if (!(categoryIds && categoryIds.length)) {
+        throw new BadRequest(translateText('errors.wrongPlaceCategories', request.locale));
+    }
+
+    const areCategoriesValid = categoryIds.every((categoryId: any) => Categories.isValid(Number(categoryId)));
+
+    if (!areCategoriesValid) {
+        throw new BadRequest(translateText('errors.wrongPlaceCategories', request.locale));
+    }
+
+    next();
+};
+
+router.post('/request_new', authorized, validatePlaceParams, async (request: express.Request, response: express.Response) => {
+    const {
+        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds,
+    } = request.body;
 
     const placeModel = {
-        // googleId: '',
-        // name: placeDetails.name,
-        // latitude: placeDetails.geometry.location.lat,
-        // longitude: placeDetails.geometry.location.lng,
-        // googleMeanRating: placeDetails.rating,
-        // googleReviewsCount: (placeDetails as any).user_ratings_total,
-        // restDuration: category.defaultRestDuration,
-        // restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
-        // companySize: category.defaultCompanySize,
-        // isActiveRest: category.isActiveRest,
+        name,
+        latitude,
+        longitude,
+        restDuration,
+        restCost,
+        companySize,
+        isActiveRest: restType === RestTypes.Active,
+        confirmed: false,
     };
 
-    response.json({
-
+    const categories = await Category.findAll({
+        where: {
+            id: { [Op.in]: categoryIds },
+        },
     });
+
+    const place = await RestPlace.create(placeModel);
+    await place.$set('categories', categories);
+
+    response.json({ created: true });
+});
+
+router.post('/update', authorized, protectedRoute, validatePlaceParams, async (request: express.Request, response: express.Response) => {
+    const {
+        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds, id
+    } = request.body;
+
+    if (!id) {
+        throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
+    }
+
+    const place = await RestPlace.findOne({ where: { id } });
+
+    if (!place) {
+        throw new BadRequest(translateText('errors.placeNotFound', request.locale));
+    }
+
+    const placeModel = {
+        name,
+        latitude,
+        longitude,
+        restDuration,
+        restCost,
+        companySize,
+        isActiveRest: restType === RestTypes.Active,
+    };
+
+    const categories = await Category.findAll({
+        where: {
+            id: { [Op.in]: categoryIds },
+        },
+    });
+
+    await place.update(placeModel);
+    await place.$set('categories', categories);
+
+    response.json({ updated: true });
 });
 
 export default router;

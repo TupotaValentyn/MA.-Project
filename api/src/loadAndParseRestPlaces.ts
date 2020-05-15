@@ -97,8 +97,6 @@ async function processCategory(category: Category) {
     log(`В категории "${categoryRuName}" отфильтровано ${uniquePlaces.length} уникальных мест\n`);
 
     const fields = getFieldNames();
-    const cherkasyCenter = { lat: 49.444431, lng: 32.059769 };
-    const cherkasyBoundsRadius = 15; // km
 
     // Get details for each place and map them to our DB model
     for (const uniquePlace of uniquePlaces) {
@@ -116,8 +114,8 @@ async function processCategory(category: Category) {
         const placeDetails = response.data.result;
 
         const isPlaceInsideCherkasyBounds = isPointInsideCircle(
-            cherkasyCenter,
-            cherkasyBoundsRadius,
+            config.CHERKASY_CENTER,
+            config.CHERKASY_BOUNDS_RADIUS,
             { lat: placeDetails.geometry.location.lat, lng: placeDetails.geometry.location.lng }
         );
 

@@ -11,7 +11,18 @@
         "emailAlreadyConfirmed": "Почта уже подтверждена",
         "actionIsForbidden": "Действие запрещено",
         "wrongAuthHeader": "Невалидный заголовок",
-        "wrongAuthToken": "Недействительный токен"
+        "wrongAuthToken": "Недействительный токен",
+
+        "wrongPlaceId": "Неправильный ID заведения",
+        "wrongPlaceName": "Неправильное название заведения",
+        "wrongPlaceGeoLocation": "Неправильные координаты заведения",
+        "wrongPlaceRestDuration": "Некорректная длительность отдыха",
+        "wrongPlaceRestCost": "Некорректная стоимость отдыха",
+        "wrongPlaceCompanySize": "Некорректный размер компании",
+        "wrongPlaceRestType": "Некорректный тип отдыха",
+        "wrongPlaceCategories": "Указаны некорректные категории заведения",
+        "placeNotFound": "Заведение не найдено",
+        "placeIsNotInCherkasy": "Заведение не находится в Черкассах"
     },
 
     "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
