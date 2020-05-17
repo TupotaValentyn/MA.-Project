@@ -8,7 +8,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /placesController:
+ * /places:
  *    get:
  *      tags:
  *        - Places
@@ -77,7 +77,7 @@ router.get('/', authorized, placesController.getPlacesByFilters);
 
 /**
  * @swagger
- * /placesController:
+ * /places/delete:
  *    post:
  *      tags:
  *        - Places
@@ -101,8 +101,133 @@ router.get('/', authorized, placesController.getPlacesByFilters);
  */
 router.post('/delete', authorized, protectedRoute, placesController.deletePlaces);
 
+/**
+ * @swagger
+ * /places/request_new:
+ *    post:
+ *      tags:
+ *        - Places
+ *      summary: "Позволяет пользователю подать заявку на добавление нового заведения в БД. Новое заведение будет иметь
+ *      статус неподтвержденного, пока заявка не будет одобрена администраторами в панели управления. Неподтвержденные места
+ *      не попадают в выборки заведений"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "name"
+ *          description: "Название заведения. Не меньше 3-х символов"
+ *          schema:
+ *            type: string
+ *        - in: "body"
+ *          name: "latitude"
+ *          description: "Значение широты гео-координат заведения"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "longitude"
+ *          description: "Значение долготы гео-координат заведения"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restDuration"
+ *          description: "ID выбранной длительности отдыха. Валидные значения - [1-3]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restCost"
+ *          description: "ID выбранной стоимости отдыха. Валидные значения - [1-5]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "companySize"
+ *          description: "ID выбранного размера компании. Валидные значения - [1-4]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restType"
+ *          description: "Тип отдыха. 1 - активный отдых, 2 - пассивный"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "categoryIds"
+ *          description: "Список ID категорий, в которые входит заведения. Валидные значения - [1-15]"
+ *          schema:
+ *            type: number[]
+ *      responses:
+ *        '200':
+ *          description: "Статус операции: true если заведение было добавлено. Ответ имеет вид ```{ created: boolean }```"
+ *        '400':
+ *          description: "Неправильный запрос: переданы неправильные данные"
+ *      security:
+ *        - default: []
+ *
+ */
 router.post('/request_new', authorized, placesController.validatePlaceParams, placesController.addPlace);
 
+/**
+ * @swagger
+ * /places/update:
+ *    post:
+ *      tags:
+ *        - Places
+ *      summary: "Позволяет администратору обновить данные об заведении"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "id"
+ *          description: "ID заведения"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "name"
+ *          description: "Название заведения. Не меньше 3-х символов"
+ *          schema:
+ *            type: string
+ *        - in: "body"
+ *          name: "latitude"
+ *          description: "Значение широты гео-координат заведения"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "longitude"
+ *          description: "Значение долготы гео-координат заведения"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restDuration"
+ *          description: "ID выбранной длительности отдыха. Валидные значения - [1-3]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restCost"
+ *          description: "ID выбранной стоимости отдыха. Валидные значения - [1-5]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "companySize"
+ *          description: "ID выбранного размера компании. Валидные значения - [1-4]"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "restType"
+ *          description: "Тип отдыха. 1 - активный отдых, 2 - пассивный"
+ *          schema:
+ *            type: number
+ *        - in: "body"
+ *          name: "categoryIds"
+ *          description: "Список ID категорий, в которые входит заведения. Валидные значения - [1-15]"
+ *          schema:
+ *            type: number[]
+ *      responses:
+ *        '200':
+ *          description: "Статус операции: true если данные были обновлены. Ответ имеет вид ```{ updated: boolean }```"
+ *        '400':
+ *          description: "Неправильный запрос: переданы неправильные данные"
+ *      security:
+ *        - default: []
+ *
+ */
 router.post('/update', authorized, protectedRoute, placesController.validatePlaceParams, placesController.updatePlace);
 
 export default router;

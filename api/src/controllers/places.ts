@@ -21,7 +21,9 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, confirmed
     } = request.query;
 
-    const where: any = {};
+    const where: any = {
+        confirmed: true,
+    };
 
     if (categories) {
         const selectedCategories: number[] = typeof categories === 'string' ? [Number(categories)] : categories.map(Number);
