@@ -230,4 +230,30 @@ router.post('/request_new', authorized, placesController.validatePlaceParams, pl
  */
 router.post('/update', authorized, protectedRoute, placesController.validatePlaceParams, placesController.updatePlace);
 
+/**
+ * @swagger
+ * /places/confirm:
+ *    post:
+ *      tags:
+ *        - Places
+ *      summary: "Позволяет администратору изменить статус заведения с неподтвержденного на подтвержденный"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "id"
+ *          description: "ID заведения"
+ *          schema:
+ *            type: number
+ *      responses:
+ *        '200':
+ *          description: "Статус операции: true если данные были обновлены. Ответ имеет вид ```{ updated: true }```"
+ *        '400':
+ *          description: "Неправильный запрос: не передан ID заведения или нет заведения с таким ID"
+ *      security:
+ *        - default: []
+ *
+ */
+router.post('/confirm', authorized, protectedRoute, placesController.confirmPlace);
+
 export default router;

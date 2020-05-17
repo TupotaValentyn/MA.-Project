@@ -306,10 +306,29 @@ async function updatePlace(request: express.Request, response: express.Response)
     response.json({ updated: true });
 }
 
+async function confirmPlace(request: express.Request, response: express.Response) {
+    const { id } = request.body;
+
+    if (!id) {
+        throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
+    }
+
+    const place = await RestPlace.findOne({ where: { id } });
+
+    if (!place) {
+        throw new BadRequest(translateText('errors.placeNotFound', request.locale));
+    }
+
+    await place.update({ confirmed: true });
+
+    response.json({ updated: true });
+}
+
 export default {
     getPlacesByFilters,
     validatePlaceParams,
     addPlace,
     updatePlace,
     deletePlaces,
+    confirmPlace,
 };

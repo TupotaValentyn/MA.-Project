@@ -12,6 +12,6 @@ router.use('/auth', authRouter);
 router.use('/api-docs', swaggerRouter);
 router.use('/user', userRouter);
 router.use('/filters', filtersRouter);
-router.use('/placesController', placesRouter);
+router.use('/places', placesRouter);
 
 export default router;
