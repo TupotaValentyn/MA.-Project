@@ -169,15 +169,13 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
 async function deletePlaces(request: express.Request, response: express.Response) {
     const { ids } = request.body;
 
-    if (!ids) {
+    if (!(ids && Array.isArray(ids) && ids.length > 0)) {
         throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
     }
 
     const removedPlacesCount = await RestPlace.destroy({
         where: {
-            id: {
-                [Op.in]: Array.isArray(ids) ? ids : [ids],
-            }
+            id: { [Op.in]: ids }
         },
     });
 

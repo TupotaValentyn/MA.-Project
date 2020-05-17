@@ -75,6 +75,30 @@ const router = express.Router();
  */
 router.get('/', authorized, placesController.getPlacesByFilters);
 
+/**
+ * @swagger
+ * /placesController:
+ *    post:
+ *      tags:
+ *        - Places
+ *      summary: "Позволяет удалить заведения из БД по их ID. Требует прав администратора"
+ *      consumes:
+ *        - application/json
+ *      parameters:
+ *        - in: "body"
+ *          name: "ids"
+ *          description: "Список id заведений, которые нужно удалить"
+ *          schema:
+ *            type: number[]
+ *      responses:
+ *        '200':
+ *          description: "Статус операции: true если заведения были удалены. Ответ имеет вид ```{ removed: boolean }```"
+ *        '400':
+ *          description: "Неправильный запрос: ids не передан или передан пустой массив"
+ *      security:
+ *        - default: []
+ *
+ */
 router.post('/delete', authorized, protectedRoute, placesController.deletePlaces);
 
 router.post('/request_new', authorized, placesController.validatePlaceParams, placesController.addPlace);
