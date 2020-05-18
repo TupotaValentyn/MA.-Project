@@ -188,7 +188,7 @@ async function deletePlaces(request: express.Request, response: express.Response
 
 function validatePlaceParams(request: express.Request, response: express.Response, next: express.NextFunction) {
     const {
-        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds,
+        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds, periods,
     } = request.body;
 
     if (!(name && name.toString().length >= 3)) {
@@ -237,6 +237,24 @@ function validatePlaceParams(request: express.Request, response: express.Respons
     if (!areCategoriesValid) {
         throw new BadRequest(translateText('errors.wrongPlaceCategories', request.locale));
     }
+
+    if (!(periods && Array.isArray(periods))) {
+        throw new BadRequest(translateText('errors.wrongWorkingPeriods', request.locale));
+    }
+
+    new Array(7).fill(0).forEach((_, index) => {
+        const periodForDay: any = periods.find((period) => period.dayStart === index);
+
+        if (!periodForDay) {
+            throw new BadRequest(translateText('errors.periodForDayNotSpecified', request.locale));
+        }
+
+        if (periodForDay.worksAllDay || periodForDay.dayOff) {
+            return;
+        }
+
+        const { dayEnd, timeStart, timeEnd } = periodForDay;
+    });
 
     next();
 }

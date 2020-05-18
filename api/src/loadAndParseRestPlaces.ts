@@ -49,7 +49,7 @@ async function processSearchQuery(searchQuery: string, pageToken?: string): Prom
     if (status === 'OK') {
         places.push(...results);
 
-        // Load placesController from the next page
+        // Load places from the next page
         if (nextPageToken) {
             // Without this delay, an error will be thrown
             await promisifiedSetTimeout(2000);
@@ -71,7 +71,7 @@ async function processCategory(category: Category) {
     const searchQueries = [`${categoryRuName} Черкассы`, `${categoryUaName} Черкаси`];
     const placesData: Place[] = [];
 
-    // Load all placesController from this category
+    // Load all places from this category
     for (const searchQuery of searchQueries) {
         log(`Ищем места по запросу "${searchQuery}"`);
 
@@ -83,7 +83,7 @@ async function processCategory(category: Category) {
 
     log(`В категории "${categoryRuName}" всего найдено ${placesData.length} мест`);
 
-    // Get unique placesController only
+    // Get unique places only
     const uniquePlaces = placesData.reduce((places, place) => {
         const placesWithSameId = places.filter((currentPlace) => currentPlace.place_id === place.place_id);
 
