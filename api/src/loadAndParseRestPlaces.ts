@@ -132,19 +132,6 @@ async function processCategory(category: Category) {
             continue;
         }
 
-        const placeModel = {
-            googleId: placeDetails.place_id,
-            name: placeDetails.name,
-            latitude: placeDetails.geometry.location.lat,
-            longitude: placeDetails.geometry.location.lng,
-            googleMeanRating: placeDetails.rating,
-            googleReviewsCount: (placeDetails as any).user_ratings_total,
-            restDuration: category.defaultRestDuration,
-            restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
-            companySize: category.defaultCompanySize,
-            isActiveRest: category.isActiveRest,
-        };
-
         // Check if this place already exists in DB
         const dbPlaceModel = await RestPlace.findOne({
             where: { googleId: placeDetails.place_id },
@@ -154,6 +141,19 @@ async function processCategory(category: Category) {
         // No place in DB yet
         if (!dbPlaceModel) {
             log(`Места "${uniquePlace.name}" нет в БД, создаем`);
+
+            const placeModel = {
+                googleId: placeDetails.place_id,
+                name: placeDetails.name,
+                latitude: placeDetails.geometry.location.lat,
+                longitude: placeDetails.geometry.location.lng,
+                googleMeanRating: placeDetails.rating,
+                googleReviewsCount: (placeDetails as any).user_ratings_total,
+                restDuration: category.defaultRestDuration,
+                restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
+                companySize: category.defaultCompanySize,
+                isActiveRest: category.isActiveRest,
+            };
 
             const place = await RestPlace.create(placeModel);
             await place.$add('categories', [category]);
@@ -197,6 +197,16 @@ async function processCategory(category: Category) {
                 await workingPeriod.save();
             }
         }
+
+        // Update non-static data
+        await dbPlaceModel.update({
+            name: placeDetails.name,
+            latitude: placeDetails.geometry.location.lat,
+            longitude: placeDetails.geometry.location.lng,
+            googleMeanRating: placeDetails.rating,
+            googleReviewsCount: (placeDetails as any).user_ratings_total,
+            restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
+        });
 
         log(`Место "${uniquePlace.name}" успешно обновлено`);
         log('--------------------------------');

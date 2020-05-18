@@ -48,7 +48,7 @@ const router = express.Router();
  *            type: number
  *        - in: "query"
  *          name: "workingOnly"
- *          description: "Если передать значение 1, в выборку попадут только те места, которые сейчас работают"
+ *          description: "Если передать значение 1, в выборку попадут только те места, которые сейчас открыты"
  *          schema:
  *            type: number
  *        - in: "query"
@@ -68,7 +68,7 @@ const router = express.Router();
  *      responses:
  *        '200':
  *          description: "Список заведений успешно получен. В ответ клиент получит список мест, которые подходят
- *          под переданные фильтры. Ответ имеет вид ```{ placesController: RestPlaceModel[] }```"
+ *          под переданные фильтры. Ответ имеет вид ```{ places: RestPlaceModel[] }```"
  *      security:
  *        - default: []
  *

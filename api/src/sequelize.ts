@@ -9,6 +9,11 @@ import {
 import Categories from './staticModels/Categories';
 
 export default async (): Promise<Sequelize> => {
+    console.log('Connecting to DB...');
+    console.log(`DB_NAME=${config.DB_NAME}`);
+    console.log(`DB_USER=${config.DB_USER}`);
+    console.log(`DB_PASSWORD=${config.DB_PASSWORD}`);
+
     const sequelize = new Sequelize({
         database: config.DB_NAME,
         username: config.DB_USER,
