@@ -13,7 +13,7 @@ import {
 } from '../models';
 
 import {
-    CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping, RestTypesMapping,
+    CompanySizeMapping, RestCostMapping, RestDurationMapping, RestPlaceCategoryMapping,
 } from '../models/mappings';
 
 const router = express.Router();
@@ -54,15 +54,15 @@ const router = express.Router();
  *            type: number
  *        - in: "query"
  *          name: "restType"
- *          description: "Значение фильтра типа отдыха в заведении. Валидные значения - [1 (активный) - 2 (пассивный)].
+ *          description: "Значение фильтра типа отдыха в заведении: true (активный отдых) - false (пассивный)].
  *          Если не передано или передано невалидное значение - производится выборка по всем типам"
  *          schema:
- *            type: number
+ *            type: boolean
  *        - in: "query"
  *          name: "workingOnly"
- *          description: "Если передать строку '1', в выборку попадут только те места, которые сейчас работают"
+ *          description: "Если передать true, в выборку попадут только те места, которые сейчас работают"
  *          schema:
- *            type: string
+ *            type: boolean
  *        - in: "query"
  *          name: "distance"
  *          description: "Значение фильтра максимального расстояния до заведения. Валидные значения - [0.5-15].
@@ -108,8 +108,8 @@ router.get('/', authorized, async (request, response) => {
         where.companySize = companySize;
     }
 
-    if (restType in RestTypesMapping) {
-        where.isActiveRest = Number(restType) === RestTypesMapping.Active;
+    if (['true', 'false'].includes(restType)) {
+        where.isActiveRest = restType === 'true';
     }
 
     let places = await RestPlace.findAll({
@@ -128,7 +128,7 @@ router.get('/', authorized, async (request, response) => {
         ));
     }
 
-    if (workingOnly && Number(workingOnly) === 1) {
+    if (workingOnly === 'true') {
         places = places.filter(isWorkingNow);
     }
 
@@ -169,7 +169,7 @@ router.get('/', authorized, async (request, response) => {
                 dayOfWeekOpen: workingPeriod.dayOfWeekStart,
                 dayOfWeekClose: workingPeriod.dayOfWeekEnd,
                 worksAllDay: false,
-                doesNotWorkToday: false
+                dayOff: false
             };
 
             if (workingPeriod.startTime !== undefined) {
@@ -197,7 +197,7 @@ router.get('/', authorized, async (request, response) => {
                 && workingPeriod.startTime === 0
                 && workingPeriod.endTime === 0
             ) {
-                model.workingPeriod.doesNotWorkToday = true;
+                model.workingPeriod.dayOff = true;
             }
         }
 
