@@ -142,7 +142,7 @@ export interface CompanySizeModel extends DefaultModel {}
  *       worksAllDay:
  *         type: boolean
  *         description: true, если заведение работает круглосуточно в этот день
- *       doesNotWorkToday:
+ *       dayOff:
  *         type: boolean
  *         description: true, если в заведении выходной в этот день
  */
@@ -152,7 +152,7 @@ export interface WorkingPeriod {
     dayOfWeekOpen: number;
     dayOfWeekClose: number;
     worksAllDay: boolean;
-    doesNotWorkToday: boolean;
+    dayOff: boolean;
 }
 
 /**
