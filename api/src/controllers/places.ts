@@ -48,8 +48,8 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         where.companySize = companySize;
     }
 
-    if (Number(restType) === RestTypes.Active) {
-        where.isActiveRest = true;
+    if (['true', 'false'].includes(restType)) {
+        where.isActiveRest = restType === 'true';
     }
 
     if (PlaceConfirmedStatuses.isValid(Number(confirmed))) {
@@ -72,7 +72,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         ));
     }
 
-    if (workingOnly && Number(workingOnly) === 1) {
+    if (workingOnly === 'true') {
         places = places.filter(isWorkingNow);
     }
 
@@ -121,7 +121,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
                 dayOfWeekOpen: workingPeriod.dayOfWeekStart,
                 dayOfWeekClose: workingPeriod.dayOfWeekEnd,
                 worksAllDay: false,
-                doesNotWorkToday: false
+                dayOff: false
             };
 
             if (workingPeriod.startTime !== undefined) {
@@ -149,7 +149,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
                 && workingPeriod.startTime === 0
                 && workingPeriod.endTime === 0
             ) {
-                model.workingPeriod.doesNotWorkToday = true;
+                model.workingPeriod.dayOff = true;
             }
         }
 
@@ -254,6 +254,8 @@ function validatePlaceParams(request: express.Request, response: express.Respons
         }
 
         const { dayEnd, timeStart, timeEnd } = periodForDay;
+
+        console.log(dayEnd, timeStart, timeEnd);
     });
 
     next();
