@@ -188,7 +188,7 @@ async function deletePlaces(request: express.Request, response: express.Response
 
 function validatePlaceParams(request: express.Request, response: express.Response, next: express.NextFunction) {
     const {
-        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds, periods,
+        name, latitude, longitude, restDuration, restCost, companySize, isActiveRest, categoryIds, periods,
     } = request.body;
 
     if (!(name && name.toString().length >= 3)) {
@@ -224,7 +224,7 @@ function validatePlaceParams(request: express.Request, response: express.Respons
         throw new BadRequest(translateText('errors.wrongPlaceCompanySize', request.locale));
     }
 
-    if (!['true', 'false'].includes(restType)) {
+    if (typeof isActiveRest !== 'boolean') {
         throw new BadRequest(translateText('errors.wrongPlaceRestType', request.locale));
     }
 
@@ -242,7 +242,7 @@ function validatePlaceParams(request: express.Request, response: express.Respons
         throw new BadRequest(translateText('errors.wrongWorkingPeriods', request.locale));
     }
 
-    new Array(7).fill(0).forEach((_, index) => {
+    Array.from({ length: 7 }).forEach((_, index) => {
         const periodForDay: any = periods.find((period) => period.dayStart === index);
 
         if (!periodForDay) {
@@ -253,9 +253,25 @@ function validatePlaceParams(request: express.Request, response: express.Respons
             return;
         }
 
-        const { dayEnd, timeStart, timeEnd } = periodForDay;
+        const {
+            dayStart, dayEnd, timeStart, timeEnd
+        } = periodForDay;
 
-        console.log(dayEnd, timeStart, timeEnd);
+        const nextDayNumber = index === 6 ? 0 : index + 1;
+
+        if (!(dayEnd === index || dayEnd === nextDayNumber)) {
+            throw new BadRequest(translateText('errors.wrongWorkingPeriods', request.locale));
+        }
+
+        const timesAreValid = [timeStart, timeEnd].every((time) => typeof time === 'number' && time >= 0 && time <= 2359);
+
+        if (!timesAreValid) {
+            throw new BadRequest(translateText('errors.wrongWorkingPeriods', request.locale));
+        }
+
+        if (dayStart === dayEnd && timeEnd < timeStart) {
+            throw new BadRequest(translateText('errors.wrongWorkingPeriods', request.locale));
+        }
     });
 
     next();
@@ -263,7 +279,7 @@ function validatePlaceParams(request: express.Request, response: express.Respons
 
 async function addPlace(request: express.Request, response: express.Response) {
     const {
-        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds,
+        name, latitude, longitude, restDuration, restCost, companySize, isActiveRest, categoryIds, periods,
     } = request.body;
 
     const placeModel = {
@@ -273,7 +289,7 @@ async function addPlace(request: express.Request, response: express.Response) {
         restDuration,
         restCost,
         companySize,
-        isActiveRest: restType === 'true',
+        isActiveRest,
         confirmed: false,
     };
 
@@ -286,19 +302,48 @@ async function addPlace(request: express.Request, response: express.Response) {
     const place = await RestPlace.create(placeModel);
     await place.$set('categories', categories);
 
+    const workingPeriods = periods.map((period: any) => {
+        const params: any = {
+            placeId: place.id,
+            dayOfWeekStart: period.dayStart,
+        };
+
+        if (period.dayOff) {
+            params.startTime = 0;
+            params.endTime = 0;
+            params.dayOfWeekEnd = period.dayStart;
+        } else if (period.worksAllDay) {
+            params.startTime = 0;
+            params.endTime = 2359;
+            params.dayOfWeekEnd = period.dayStart;
+        } else {
+            params.startTime = period.timeStart;
+            params.endTime = period.timeEnd;
+            params.dayOfWeekEnd = period.dayEnd ?? period.dayStart;
+        }
+
+        return WorkingPeriod.build(params);
+    });
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const periodModel of workingPeriods) {
+        // eslint-disable-next-line no-await-in-loop
+        await periodModel.save();
+    }
+
     response.json({ created: true });
 }
 
 async function updatePlace(request: express.Request, response: express.Response) {
     const {
-        name, latitude, longitude, restDuration, restCost, companySize, restType, categoryIds, id
+        name, latitude, longitude, restDuration, restCost, companySize, isActiveRest, categoryIds, id, periods
     } = request.body;
 
     if (!id) {
         throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
     }
 
-    const place = await RestPlace.findOne({ where: { id } });
+    const place = await RestPlace.findOne({ where: { id }, include: [WorkingPeriod] });
 
     if (!place) {
         throw new BadRequest(translateText('errors.placeNotFound', request.locale));
@@ -311,7 +356,7 @@ async function updatePlace(request: express.Request, response: express.Response)
         restDuration,
         restCost,
         companySize,
-        isActiveRest: restType === 'true',
+        isActiveRest,
     };
 
     const categories = await Category.findAll({
@@ -322,6 +367,30 @@ async function updatePlace(request: express.Request, response: express.Response)
 
     await place.update(placeModel);
     await place.$set('categories', categories);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const periodModel of place.workingPeriods) {
+        const period = periods.find((item: any) => periodModel.dayOfWeekStart === item.dayStart);
+
+        const params: any = {};
+
+        if (period.dayOff) {
+            params.startTime = 0;
+            params.endTime = 0;
+            params.dayOfWeekEnd = period.dayStart;
+        } else if (period.worksAllDay) {
+            params.startTime = 0;
+            params.endTime = 2359;
+            params.dayOfWeekEnd = period.dayStart;
+        } else {
+            params.startTime = period.timeStart;
+            params.endTime = period.timeEnd;
+            params.dayOfWeekEnd = period.dayEnd ?? period.dayStart;
+        }
+
+        // eslint-disable-next-line no-await-in-loop
+        await periodModel.update(params);
+    }
 
     response.json({ updated: true });
 }
