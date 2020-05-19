@@ -4,7 +4,7 @@ import { authorized } from '../interceptors';
 import { translateText } from '../util';
 
 import {
-    Categories, CompanySizes, RestCosts, RestDurations, RestTypes,
+    Categories, CompanySizes, RestCosts, RestDurations,
 } from '../staticModels';
 
 const router = express.Router();

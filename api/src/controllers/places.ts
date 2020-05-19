@@ -7,7 +7,7 @@ import { BadRequest } from '@curveball/http-errors';
 import { Category, RestPlace, WorkingPeriod } from '../models';
 
 import {
-    Categories, CompanySizes, PlaceConfirmedStatuses, RestCosts, RestDurations, RestTypes
+    Categories, CompanySizes, RestCosts, RestDurations,
 } from '../staticModels';
 
 import {
@@ -52,8 +52,8 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         where.isActiveRest = restType === 'true';
     }
 
-    if (PlaceConfirmedStatuses.isValid(Number(confirmed))) {
-        where.confirmed = Number(confirmed) === PlaceConfirmedStatuses.Confirmed;
+    if (['true', 'false'].includes(confirmed)) {
+        where.confirmed = confirmed === 'true';
     }
 
     let places = await RestPlace.findAll({
@@ -224,7 +224,7 @@ function validatePlaceParams(request: express.Request, response: express.Respons
         throw new BadRequest(translateText('errors.wrongPlaceCompanySize', request.locale));
     }
 
-    if (!(restType && RestTypes.isValid(Number(restType)))) {
+    if (!['true', 'false'].includes(restType)) {
         throw new BadRequest(translateText('errors.wrongPlaceRestType', request.locale));
     }
 
@@ -273,7 +273,7 @@ async function addPlace(request: express.Request, response: express.Response) {
         restDuration,
         restCost,
         companySize,
-        isActiveRest: restType === RestTypes.Active,
+        isActiveRest: restType === 'true',
         confirmed: false,
     };
 
@@ -311,7 +311,7 @@ async function updatePlace(request: express.Request, response: express.Response)
         restDuration,
         restCost,
         companySize,
-        isActiveRest: restType === RestTypes.Active,
+        isActiveRest: restType === 'true',
     };
 
     const categories = await Category.findAll({
