@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mysql:
+    container_name: mysql
+    image: alberkut/ma-project_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ma-project
+      MYSQL_USER: ma-user
+      MYSQL_PASSWORD: password
+    volumes:
+      - /MA.-Project/mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+
+  api:
+    depends_on:
+      - mysql
+    container_name: api
+    image: alberkut/ma-project_api
+    ports:
+      - "8080:3000"
+    restart: always
+
+  frontend:
+    depends_on:
+      - api
+    container_name: frontend
+    image: alberkut/ma-project_frontend
+    ports:
+      - "3000:80"
+    restart: always
+
+  nginx:
+    depends_on:
+      - api
+      - frontend
+    container_name: nginx
+    image: alberkut/ma-project_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+
