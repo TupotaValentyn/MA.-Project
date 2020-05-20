@@ -13,7 +13,6 @@ import { getLogger } from 'log4js';
 import { translateText, isPointInsideCircle } from './util';
 
 import config from './config';
-import createSequelizeInstance from './sequelize';
 
 import { Category, RestPlace, WorkingPeriod } from './models';
 
@@ -286,10 +285,8 @@ function log(data: string) {
     stream.write('\n');
 }
 
-(async function run() {
+export default async () => {
     try {
-        createSequelizeInstance();
-
         const categories = await Category.findAll();
 
         for (const categoryData of categories) {
@@ -300,4 +297,4 @@ function log(data: string) {
     } catch (error) {
         console.error(error);
     }
-}());
+};

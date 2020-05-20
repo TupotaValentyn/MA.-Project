@@ -7,10 +7,8 @@ import connectToSequelize from './sequelize';
     try {
         await connectToSequelize();
 
-        console.log('Connected to DB');
-
         server.listen(config.PORT, () => {
-            console.log(`Server successfully started at ${config.PORT}.`);
+            console.log(`\nServer successfully started at ${config.PORT}.`);
         });
     } catch (e) {
         console.error(e);

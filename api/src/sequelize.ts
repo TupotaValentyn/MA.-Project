@@ -1,6 +1,10 @@
 import { Sequelize } from 'sequelize-typescript';
 
+// @ts-ignore
+import mysql from 'mysql2/promise';
+
 import config from './config';
+import loadPlaces from './loadAndParseRestPlaces';
 
 import {
     User, WorkingPeriod, RestPlace, Category, Review, RestPlaceCategory
@@ -9,7 +13,28 @@ import {
 import Categories from './staticModels/Categories';
 
 export default async (): Promise<Sequelize> => {
-    console.log('Connecting to DB...');
+    console.log('Check if DB exists...\n');
+
+    const connection = await mysql.createConnection({
+        host: config.DB_HOST,
+        user: config.DB_USER,
+        password: config.DB_PASSWORD,
+    });
+
+    const [rows] = await connection.execute(`SHOW DATABASES LIKE '${config.DB_NAME}'`);
+    const dbExists = rows && rows.length > 0;
+
+    if (dbExists) {
+        console.log('DB already exists');
+    } else {
+        console.log('DB doesn\'t exist, creating it.');
+
+        await connection.execute(`CREATE DATABASE ${config.DB_NAME}`);
+
+        console.log('DB created.');
+    }
+
+    console.log('\nConnecting to DB...');
     console.log(`DB_NAME=${config.DB_NAME}`);
     console.log(`DB_HOST=${config.DB_HOST}`);
 
@@ -32,8 +57,11 @@ export default async (): Promise<Sequelize> => {
 
     sequelize.addModels([User, Review, Category, RestPlace, WorkingPeriod, RestPlaceCategory]);
 
-    // eslint-disable-next-line no-use-before-define
-    await populateDB(sequelize);
+    if (!dbExists) {
+        await populateDB(sequelize);
+    }
+
+    console.log('Connected to DB');
 
     return sequelize;
 };
@@ -41,17 +69,14 @@ export default async (): Promise<Sequelize> => {
 async function populateDB(sequelizeInstance: Sequelize) {
     await sequelizeInstance.sync({ alter: true });
 
-    console.log('Categories - Start');
+    console.log('\nCategories - Start');
 
-    // eslint-disable-next-line no-restricted-syntax,no-use-before-define
     for (const categoryData of Categories.getAll()) {
-        // eslint-disable-next-line no-await-in-loop
         const categoryModel = await Category.findOne({
             where: { googleId: categoryData.googleId }
         });
 
         if (!categoryModel) {
-            // eslint-disable-next-line no-await-in-loop
             await Category.create(categoryData);
         }
     }
@@ -87,4 +112,6 @@ async function populateDB(sequelizeInstance: Sequelize) {
     }
 
     console.log('User - Done\n');
+
+    await loadPlaces();
 }
