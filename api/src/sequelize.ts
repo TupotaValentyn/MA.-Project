@@ -29,7 +29,7 @@ export default async (): Promise<Sequelize> => {
     } else {
         console.log('DB doesn\'t exist, creating it.');
 
-        await connection.execute(`CREATE DATABASE ${config.DB_NAME}`);
+        await connection.execute(`CREATE DATABASE ${config.DB_NAME} /*!40100 COLLATE 'utf8mb4_general_ci' */`);
 
         console.log('DB created.');
     }

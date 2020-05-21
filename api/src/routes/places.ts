@@ -103,7 +103,7 @@ router.post('/delete', authorized, protectedRoute, placesController.deletePlaces
 
 /**
  * @swagger
- * /places/request_new:
+ * /places/add:
  *    post:
  *      tags:
  *        - Places
@@ -162,7 +162,7 @@ router.post('/delete', authorized, protectedRoute, placesController.deletePlaces
  *        - default: []
  *
  */
-router.post('/request_new', authorized, placesController.validatePlaceParams, placesController.addPlace);
+router.post('/add', authorized, placesController.validatePlaceParams, placesController.addPlace);
 
 /**
  * @swagger

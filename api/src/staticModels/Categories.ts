@@ -165,7 +165,7 @@ class Categories {
                 defaultRestDuration: RestDurations.Medium,
                 defaultCompanySize: CompanySizes.Medium,
                 defaultRestCost: RestCosts.Free,
-                isActiveRest: false,
+                isActiveRest: true,
             },
 
             {
