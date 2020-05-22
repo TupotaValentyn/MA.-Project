@@ -7,6 +7,7 @@ import { authorized } from '../interceptors';
 import { translateText } from '../util';
 import { User } from '../models';
 import config from '../config';
+import { usersController } from '../controllers';
 
 
 const router = express.Router();
@@ -34,20 +35,7 @@ const router = express.Router();
  *          description: Неправильный запрос. Некорректный/несуществующий token авторизации.
  *
  */
-router.get('/:token', async (request, response) => {
-    const { token } = request.params;
-
-    if (!token) {
-        throw new BadRequest(translateText('errors.wrongAuthToken', request.locale));
-    }
-
-    try {
-        const userData = await verify(token, process.env.JWT_SECRET) as UserPublicData;
-        response.json({ userData });
-    } catch (error) {
-        throw new BadRequest(translateText('errors.wrongAuthToken', request.locale));
-    }
-});
+router.get('/:token', usersController.getUserByToken);
 
 /**
  * @swagger
@@ -72,15 +60,6 @@ router.get('/:token', async (request, response) => {
  *        - default: []
  *
  */
-router.post('/change_locale', authorized, async (request, response) => {
-    const { locale } = request.body;
-    const validatedLocale = config.AVAILABLE_LOCALES.includes(locale) ? locale : config.DEFAULT_LOCALE;
-
-    const userModel = await User.findOne({ where: { id: request.user.id } });
-    userModel.locale = validatedLocale;
-    await userModel.save();
-
-    response.json({ newLocale: validatedLocale });
-});
+router.post('/change_locale', authorized, usersController.changeLocale);
 
 export default router;
