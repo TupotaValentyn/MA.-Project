@@ -114,12 +114,12 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
 
         if (workingPeriod) {
             model.workingPeriod = {
-                closeTime: '',
-                openTime: '',
-                openTimeNumeric: workingPeriod.startTime,
-                closeTimeNumeric: workingPeriod.endTime,
-                dayOfWeekOpen: workingPeriod.dayOfWeekStart,
-                dayOfWeekClose: workingPeriod.dayOfWeekEnd,
+                timeStart: '',
+                timeEnd: '',
+                timeStartNumeric: workingPeriod.startTime,
+                timeEndNumeric: workingPeriod.endTime,
+                dayStart: workingPeriod.dayOfWeekStart,
+                dayEnd: workingPeriod.dayOfWeekEnd,
                 worksAllDay: false,
                 dayOff: false
             };
@@ -128,14 +128,14 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
                 const hours = Math.floor(workingPeriod.startTime / 100);
                 const minutes = workingPeriod.startTime % 100;
 
-                model.workingPeriod.openTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+                model.workingPeriod.timeStart = `${formatNumber(hours)}:${formatNumber(minutes)}`;
             }
 
             if (workingPeriod.endTime !== undefined) {
                 const hours = Math.floor(workingPeriod.endTime / 100);
                 const minutes = workingPeriod.endTime % 100;
 
-                model.workingPeriod.closeTime = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+                model.workingPeriod.timeEnd = `${formatNumber(hours)}:${formatNumber(minutes)}`;
             }
 
             if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
