@@ -1,14 +1,11 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany, DataType, ForeignKey, BelongsTo,
+    Column, Model, Table, PrimaryKey, AutoIncrement, HasMany, BelongsToMany, DataType,
 } from 'sequelize-typescript';
 
 import { Review } from './Review';
 import { WorkingPeriod } from './WorkingPeriod';
 import { Category } from './Category';
 import { RestPlaceCategory } from './RestPlaceCategory';
-import { Duration } from './Duration';
-import { Cost } from './Cost';
-import { CompanySize } from './CompanySize';
 
 @Table
 export class RestPlace extends Model<RestPlace> {
@@ -45,25 +42,16 @@ export class RestPlace extends Model<RestPlace> {
     isActiveRest: boolean;
 
     @Column
-    @ForeignKey(() => Duration)
-    restDurationId: number;
-
-    @BelongsTo(() => Duration)
-    restDuration: Duration;
+    restDuration: number;
 
     @Column
-    @ForeignKey(() => Cost)
-    restCostId: number;
-
-    @BelongsTo(() => Cost)
-    restCost: Cost;
+    restCost: number;
 
     @Column
-    @ForeignKey(() => CompanySize)
-    companySizeId: number;
+    companySize: number;
 
-    @BelongsTo(() => CompanySize)
-    companySize: CompanySize;
+    @Column({ defaultValue: true })
+    confirmed: boolean;
 
     @HasMany(() => Review)
     reviews: Review[];

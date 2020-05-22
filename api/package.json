@@ -9,8 +9,6 @@
         "build": "tsc && npm run copyTranslations && npm run copyTemplates",
         "prestart": "npm run build",
         "start": "node dist/src/app.js",
-        "loadPlaces": "npx ts-node src/loadAndParseRestPlaces",
-        "prepareDB": "npx ts-node ./src/migrations/prepareDB",
         "copyTranslations": "mkdir -p ./dist/src/translations/ && cp -r ./src/translations/*.json ./dist/src/translations/",
         "copyTemplates": "mkdir -p ./dist/src/templates/ && cp -r ./src/templates/*.ejs ./dist/src/templates/"
     },
@@ -44,7 +42,7 @@
     },
     "dependencies": {
         "@curveball/http-errors": "^0.3.0",
-        "@googlemaps/google-maps-services-js": "^2.4.2",
+        "@googlemaps/google-maps-services-js": "^2.6.1",
         "axios": "^0.19.2",
         "bcrypt": "^4.0.1",
         "body-parser": "^1.19.0",
@@ -54,6 +52,7 @@
         "ejs": "^3.0.1",
         "express": "^4.17.1",
         "express-async-errors": "^3.1.1",
+        "express-validator": "^6.4.1",
         "google-auth-library": "^5.10.1",
         "http-custom-errors": "^8.0.0",
         "jsonwebtoken": "^8.5.1",

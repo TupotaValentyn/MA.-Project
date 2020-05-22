@@ -127,16 +127,16 @@ export interface CompanySizeModel extends DefaultModel {}
  *     description: "Модель для описания графика работы заведения за 1 день."
  *     type: object
  *     properties:
- *       dayOfWeekOpen:
+ *       dayStart:
  *         type: number
  *         description: Номер дня недели, когда заведение открылось (0 - воскресенье, 6 - суббота)
- *       dayOfWeekClose:
+ *       dayEnd:
  *         type: number
  *         description: Номер дня недели, когда заведение закроется (0 - воскресенье, 6 - суббота)
- *       openTime:
+ *       timeStart:
  *         type: string
  *         description: Время, когда заведение открылось (00:00 - 23:59)
- *       closeTime:
+ *       timeEnd:
  *         type: string
  *         description: Время, когда заведение закроется (00:00 - 23:59)
  *       worksAllDay:
@@ -145,12 +145,20 @@ export interface CompanySizeModel extends DefaultModel {}
  *       dayOff:
  *         type: boolean
  *         description: true, если в заведении выходной в этот день
+ *       timeStartNumeric:
+ *         type: number
+ *         description: Время начала смены в числовом формате [0-2359]
+ *       timeEndNumeric:
+ *         type: number
+ *         description: Время окончания смены в числовом формате [0-2359]
  */
 export interface WorkingPeriod {
-    openTime: string;
-    closeTime: string;
-    dayOfWeekOpen: number;
-    dayOfWeekClose: number;
+    timeStart: string;
+    timeStartNumeric?: number;
+    timeEnd: string;
+    timeEndNumeric?: number;
+    dayStart: number;
+    dayEnd: number;
     worksAllDay: boolean;
     dayOff: boolean;
 }
@@ -230,4 +238,20 @@ declare global {
             locale?: 'ru' | 'ua',
         }
     }
+}
+
+export interface DefaultStaticModel {
+    id: number;
+    nameTextId: string;
+}
+
+export interface RestDurationStaticModel extends DefaultStaticModel {}
+export interface RestCostStaticModel extends DefaultStaticModel {}
+export interface CompanySizeStaticModel extends DefaultStaticModel {}
+export interface CategoryStaticModel extends DefaultStaticModel {
+    googleId: string;
+    defaultRestDuration: number;
+    defaultCompanySize: number;
+    defaultRestCost: number;
+    isActiveRest: boolean;
 }

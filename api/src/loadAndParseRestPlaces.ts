@@ -13,7 +13,6 @@ import { getLogger } from 'log4js';
 import { translateText, isPointInsideCircle } from './util';
 
 import config from './config';
-import createSequelizeInstance from './sequelize';
 
 import { Category, RestPlace, WorkingPeriod } from './models';
 
@@ -97,8 +96,6 @@ async function processCategory(category: Category) {
     log(`В категории "${categoryRuName}" отфильтровано ${uniquePlaces.length} уникальных мест\n`);
 
     const fields = getFieldNames();
-    const cherkasyCenter = { lat: 49.444431, lng: 32.059769 };
-    const cherkasyBoundsRadius = 15; // km
 
     // Get details for each place and map them to our DB model
     for (const uniquePlace of uniquePlaces) {
@@ -116,8 +113,8 @@ async function processCategory(category: Category) {
         const placeDetails = response.data.result;
 
         const isPlaceInsideCherkasyBounds = isPointInsideCircle(
-            cherkasyCenter,
-            cherkasyBoundsRadius,
+            config.CHERKASY_CENTER,
+            config.CHERKASY_BOUNDS_RADIUS,
             { lat: placeDetails.geometry.location.lat, lng: placeDetails.geometry.location.lng }
         );
 
@@ -134,19 +131,6 @@ async function processCategory(category: Category) {
             continue;
         }
 
-        const placeModel = {
-            googleId: placeDetails.place_id,
-            name: placeDetails.name,
-            latitude: placeDetails.geometry.location.lat,
-            longitude: placeDetails.geometry.location.lng,
-            googleMeanRating: placeDetails.rating,
-            googleReviewsCount: (placeDetails as any).user_ratings_total,
-            restDurationId: category.defaultRestDurationId,
-            restCostId: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDurationId,
-            companySizeId: category.defaultCompanySizeId,
-            isActiveRest: category.isActiveRest,
-        };
-
         // Check if this place already exists in DB
         const dbPlaceModel = await RestPlace.findOne({
             where: { googleId: placeDetails.place_id },
@@ -156,6 +140,19 @@ async function processCategory(category: Category) {
         // No place in DB yet
         if (!dbPlaceModel) {
             log(`Места "${uniquePlace.name}" нет в БД, создаем`);
+
+            const placeModel = {
+                googleId: placeDetails.place_id,
+                name: placeDetails.name,
+                latitude: placeDetails.geometry.location.lat,
+                longitude: placeDetails.geometry.location.lng,
+                googleMeanRating: placeDetails.rating,
+                googleReviewsCount: (placeDetails as any).user_ratings_total,
+                restDuration: category.defaultRestDuration,
+                restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
+                companySize: category.defaultCompanySize,
+                isActiveRest: category.isActiveRest,
+            };
 
             const place = await RestPlace.create(placeModel);
             await place.$add('categories', [category]);
@@ -199,6 +196,16 @@ async function processCategory(category: Category) {
                 await workingPeriod.save();
             }
         }
+
+        // Update non-static data
+        await dbPlaceModel.update({
+            name: placeDetails.name,
+            latitude: placeDetails.geometry.location.lat,
+            longitude: placeDetails.geometry.location.lng,
+            googleMeanRating: placeDetails.rating,
+            googleReviewsCount: (placeDetails as any).user_ratings_total,
+            restCost: placeDetails.price_level ? placeDetails.price_level + 1 : category.defaultRestDuration,
+        });
 
         log(`Место "${uniquePlace.name}" успешно обновлено`);
         log('--------------------------------');
@@ -278,10 +285,8 @@ function log(data: string) {
     stream.write('\n');
 }
 
-(async function run() {
+export default async () => {
     try {
-        createSequelizeInstance();
-
         const categories = await Category.findAll();
 
         for (const categoryData of categories) {
@@ -292,4 +297,4 @@ function log(data: string) {
     } catch (error) {
         console.error(error);
     }
-}());
+};
