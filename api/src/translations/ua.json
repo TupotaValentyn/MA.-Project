@@ -11,7 +11,20 @@
         "emailAlreadyConfirmed": "Пошта вже підтверджена",
         "actionIsForbidden": "Подію не дозволено",
         "wrongAuthHeader": "Неправильний заголовок",
-        "wrongAuthToken": "Недійсний токен"
+        "wrongAuthToken": "Недійсний токен",
+
+        "wrongPlaceId": "Неправильний ID закладу",
+        "wrongPlaceName": "Неправильна назва закладу",
+        "wrongPlaceGeoLocation": "Неправильні координати закладу",
+        "wrongPlaceRestDuration": "Некоректна тривалість відпочинку",
+        "wrongPlaceRestCost": "Некоректна вартість відпочинку",
+        "wrongPlaceCompanySize": "Некоректний розмір компанії",
+        "wrongPlaceRestType": "Некоректний тип відпочинку",
+        "wrongPlaceCategories": "Вказані некоректні категорії закладу",
+        "placeNotFound": "Заклад не знайдено",
+        "placeIsNotInCherkasy": "Заклад знаходиться не в Черкасах",
+        "wrongWorkingPeriods": "Некоректний графік роботи закладу",
+        "periodForDayNotSpecified": "Не вказаний графік для одного із днів"
     },
 
     "emailConfirmed": "Дякуємо, Ваша пошта підтверждена! Поверніться на сайт і натисніть кнопку \"Перевірити підтвердження\"",
