@@ -24,13 +24,20 @@
         "placeNotFound": "Заклад не знайдено",
         "placeIsNotInCherkasy": "Заклад знаходиться не в Черкасах",
         "wrongWorkingPeriods": "Некоректний графік роботи закладу",
-        "periodForDayNotSpecified": "Не вказаний графік для одного із днів"
+        "periodForDayNotSpecified": "Не вказаний графік для одного із днів",
+
+        "wrongRequestParams": "Неправильні параметри запиту",
+        "userNotFound": "Користувача не знайдено"
     },
 
     "emailConfirmed": "Дякуємо, Ваша пошта підтверждена! Поверніться на сайт і натисніть кнопку \"Перевірити підтвердження\"",
     "confirmationEmailTitle": "Реєстрація в системі",
     "confirmationEmailMessage": "Ви успішно зареєструвались в системі!",
     "confirmationEmailButtonText": "Підтвердити пошту",
+
+    "resetPasswordEmailTitle": "Відновлення паролю",
+    "resetPasswordEmailMessage": "Ви запросили відновлення паролю користувача. Для задання нового паролю перейдіть за посиланням нижче.",
+    "resetPasswordEmailLinkText": "Змінити пароль",
 
     "restPlaceCategory": {
         "amusementPark": "Парк розваг",

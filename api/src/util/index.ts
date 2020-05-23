@@ -4,6 +4,7 @@ import generateTokenData from './generateTokenData';
 import createMailTransporter from './createMailTransporter';
 import generateUserHash from './generateUserHash';
 import sendConfirmationEmail from './sendConfirmationEmail';
+import sendPasswordResetEmail from './sendPasswordResetEmail';
 import getTemplateHTML from './getTemplateHTML';
 import isPointInsideCircle from './isPointInsideCircle';
 import isWorkingNow from './isWorkingNow';
@@ -22,4 +23,5 @@ export {
     isWorkingNow,
     getWorkingPeriodForCurrentDay,
     formatNumber,
+    sendPasswordResetEmail,
 };
