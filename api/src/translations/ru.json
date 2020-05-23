@@ -24,13 +24,20 @@
         "placeNotFound": "Заведение не найдено",
         "placeIsNotInCherkasy": "Заведение не находится в Черкассах",
         "wrongWorkingPeriods": "Некорректный график работы заведения",
-        "periodForDayNotSpecified": "Не указан график работы для одного из дней"
+        "periodForDayNotSpecified": "Не указан график работы для одного из дней",
+
+        "wrongRequestParams": "Неправильные параметры запроса",
+        "userNotFound": "Пользователь не найден"
     },
 
     "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
     "confirmationEmailTitle": "Регистрация в системе",
     "confirmationEmailMessage": "Вы успешно зарегистрировались в системе!",
     "confirmationEmailButtonText": "Подтвердить почту",
+
+    "resetPasswordEmailTitle": "Восстановление пароля",
+    "resetPasswordEmailMessage": "Вы запросили восстановление пароля пользователя. Для сброса пароля перейдите по ссылке ниже.",
+    "resetPasswordEmailLinkText": "Сменить пароль",
 
     "restPlaceCategory": {
         "amusementPark": "Парк развлечений",

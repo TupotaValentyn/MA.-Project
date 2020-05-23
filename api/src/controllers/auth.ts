@@ -140,8 +140,9 @@ async function resendConfirmationEmail(request: express.Request, response: expre
 
     const newUserHash = generateUserHash(userByHash.email);
 
-    userByHash.userHash = newUserHash;
-    await userByHash.save();
+    await userByHash.update({
+        userHash: newUserHash,
+    });
 
     await sendConfirmationEmail(userByHash.email, newUserHash, request.locale);
 

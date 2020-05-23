@@ -16,6 +16,7 @@ export default {
     MAIL_PASSWORD: process.env.MAIL_PASSWORD || 'root',
 
     SERVER_URL: process.env.SERVER_URL,
+    FRONT_END_URL: process.env.FRONT_END_URL,
 
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
 

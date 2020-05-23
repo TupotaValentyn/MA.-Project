@@ -62,4 +62,8 @@ router.get('/:token', usersController.getUserByToken);
  */
 router.post('/change_locale', authorized, usersController.changeLocale);
 
+router.post('/reset_password', usersController.resetPassword);
+
+router.post('/update_password', usersController.updatePassword);
+
 export default router;
