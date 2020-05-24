@@ -255,3 +255,42 @@ export interface CategoryStaticModel extends DefaultStaticModel {
     defaultRestCost: number;
     isActiveRest: boolean;
 }
+
+/**
+ * @swagger
+ *
+ * definitions:
+ *   ReviewModel:
+ *     description: Модель для описания отзыва на заведение
+ *     type: object
+ *     properties:
+ *       id:
+ *         type: number
+ *       comment:
+ *         type: string
+ *         description: Текст отзыва
+ *       rating:
+ *         type: number
+ *         description: Оценка отзыва
+ *       created:
+ *         type: number
+ *         description: Таймстамп, когда отзыв был создан
+ *       user:
+ *         type: object
+ *         description: Описание пользователя-автора отзыва
+ *         properties:
+ *           id:
+ *             type: number
+ *           email:
+ *             type: string
+ */
+export interface ReviewModel {
+    id: number;
+    comment: string;
+    rating: number;
+    created: number;
+    user: {
+        id: number;
+        email: string;
+    }
+}

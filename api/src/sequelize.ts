@@ -57,8 +57,10 @@ export default async (): Promise<Sequelize> => {
 
     sequelize.addModels([User, Review, Category, RestPlace, WorkingPeriod, RestPlaceCategory]);
 
+    await sequelize.sync({ alter: true });
+
     if (!dbExists) {
-        await populateDB(sequelize);
+        await populateDB();
     }
 
     console.log('Connected to DB');
@@ -66,9 +68,7 @@ export default async (): Promise<Sequelize> => {
     return sequelize;
 };
 
-async function populateDB(sequelizeInstance: Sequelize) {
-    await sequelizeInstance.sync({ alter: true });
-
+async function populateDB() {
     console.log('\nCategories - Start');
 
     for (const categoryData of Categories.getAll()) {
