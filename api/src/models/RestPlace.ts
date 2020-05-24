@@ -33,7 +33,7 @@ export class RestPlace extends Model<RestPlace> {
     googleReviewsCount: number;
 
     @Column({ defaultValue: 0, type: DataType.DOUBLE })
-    meanRating: number;
+    totalRating: number;
 
     @Column({ defaultValue: 0 })
     reviewsCount: number;

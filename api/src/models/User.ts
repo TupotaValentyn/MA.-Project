@@ -1,8 +1,9 @@
 import {
-    Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement
+    Column, Model, Table, AllowNull, PrimaryKey, AutoIncrement, HasMany,
 } from 'sequelize-typescript';
 
 import config from '../config';
+import { Review } from './Review';
 
 @Table
 export class User extends Model<User> {
@@ -39,4 +40,7 @@ export class User extends Model<User> {
 
     @Column({ defaultValue: false })
     isConfirmed: boolean;
+
+    @HasMany(() => Review)
+    reviews: Review[];
 }

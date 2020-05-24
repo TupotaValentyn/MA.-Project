@@ -84,7 +84,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
             longitude: place.longitude,
             googleMeanRating: place.googleMeanRating,
             googleReviewsCount: place.googleReviewsCount,
-            meanRating: place.meanRating,
+            meanRating: place.totalRating / place.reviewsCount,
             reviewsCount: place.reviewsCount,
             isActiveRest: place.isActiveRest,
         };
