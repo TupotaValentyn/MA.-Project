@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<style>
+    .mail-title {
+        font-family: Roboto, serif;
+    }
+
+    .confirm-button {
+        padding: 0 18px;
+        font-size: 16px;
+        line-height: 32px;
+        outline: none;
+        border-radius: 9px;
+        margin: 3px 0 0;
+        transition: border .3s linear,background .3s linear;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        box-sizing: border-box;
+        white-space: nowrap;
+        color: #fafafc;
+        border: 2px solid #00c57c;
+        background: #00c57c;
+    }
+
+    .confirm-button:hover {
+        border: 2px solid #00b06a;
+        background: #00b06a;
+    }
+</style>
+
+<h3 class="mail-title"><%= message %></h3>
+
+<a class="confirm-button" href="<%= serverURL %>/auth/verify_email/<%= userHash %>?locale=<%= locale %>">
+    <%= buttonText %>
+</a>
+</body>
+</html>

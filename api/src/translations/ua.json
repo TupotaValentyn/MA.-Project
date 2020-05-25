@@ -1,0 +1,82 @@
+{
+    "errors": {
+        "noUserWithEmail": "Користувача з таким email не існує",
+        "wrongPassword": "Неправильный пароль",
+        "wrongEmail": "Некоректний email",
+        "notUniqueEmail": "Користувач з таким email вже зареєстрований в системі",
+        "wrongHash": "Неправильный хеш",
+        "wrongGoogleToken": "Не заданий token",
+        "wrongFacebookToken": "Не заданий accessToken",
+        "wrongFacebookUserId": "Не заданий userId",
+        "emailAlreadyConfirmed": "Пошта вже підтверджена",
+        "actionIsForbidden": "Подію не дозволено",
+        "wrongAuthHeader": "Неправильний заголовок",
+        "wrongAuthToken": "Недійсний токен",
+
+        "wrongPlaceId": "Неправильний ID закладу",
+        "wrongPlaceName": "Неправильна назва закладу",
+        "wrongPlaceGeoLocation": "Неправильні координати закладу",
+        "wrongPlaceRestDuration": "Некоректна тривалість відпочинку",
+        "wrongPlaceRestCost": "Некоректна вартість відпочинку",
+        "wrongPlaceCompanySize": "Некоректний розмір компанії",
+        "wrongPlaceRestType": "Некоректний тип відпочинку",
+        "wrongPlaceCategories": "Вказані некоректні категорії закладу",
+        "placeNotFound": "Заклад не знайдено",
+        "placeIsNotInCherkasy": "Заклад знаходиться не в Черкасах",
+        "wrongWorkingPeriods": "Некоректний графік роботи закладу",
+        "periodForDayNotSpecified": "Не вказаний графік для одного із днів",
+
+        "wrongRequestParams": "Неправильні параметри запиту",
+        "userNotFound": "Користувача не знайдено",
+
+        "reviewNotFound": "Відгук не знайдено"
+    },
+
+    "emailConfirmed": "Дякуємо, Ваша пошта підтверждена! Поверніться на сайт і натисніть кнопку \"Перевірити підтвердження\"",
+    "confirmationEmailTitle": "Реєстрація в системі",
+    "confirmationEmailMessage": "Ви успішно зареєструвались в системі!",
+    "confirmationEmailButtonText": "Підтвердити пошту",
+
+    "resetPasswordEmailTitle": "Відновлення паролю",
+    "resetPasswordEmailMessage": "Ви запросили відновлення паролю користувача. Для задання нового паролю перейдіть за посиланням нижче.",
+    "resetPasswordEmailLinkText": "Змінити пароль",
+
+    "restPlaceCategory": {
+        "amusementPark": "Парк розваг",
+        "aquarium": "Акваріум",
+        "artGallery": "Галерея мистецтв",
+        "bar": "Бар",
+        "cafe": "Кафе",
+        "library": "Бібліотека",
+        "movieTheater": "Кінотеатр",
+        "museum": "Музей",
+        "nightClub": "Нічний клуб",
+        "park": "Парк",
+        "restaurant": "Ресторан",
+        "spa": "СПА",
+        "stadium": "Стадіон",
+        "touristAttraction": "Визначна пам'ятка для туристів",
+        "zoo": "Зоопарк"
+    },
+
+    "restCost": {
+        "free": "Безкоштовний",
+        "inexpensive": "Недорогий",
+        "moderate": "Середній",
+        "expensive": "Дорогий",
+        "veryExpensive": "Дуже дорогий"
+    },
+
+    "restDuration": {
+        "low": "Нетривалий",
+        "medium": "Середній",
+        "high": "Тривалий"
+    },
+
+    "companySize": {
+        "solo": "1 людина",
+        "little": "2-3 людини",
+        "medium": "Невелика компанія",
+        "large": "Велика компанія"
+    }
+}

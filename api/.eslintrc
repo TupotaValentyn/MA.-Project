@@ -1,0 +1,35 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "extends": ["airbnb"],
+    "settings": {
+        "import/extensions": [".js",".ts"],
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "node": {
+                "extensions": [".js",".ts",".tsx"]
+            }
+        }
+    },
+    "rules": {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-useless-constructor": "error",
+        "@typescript-eslint/no-unused-vars": "off",
+        "no-console": "off",
+        "no-debugger": "off",
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "comma-dangle": "off",
+        "quotes": ["warn", "single"],
+        "import/extensions": "off",
+        "import/no-unresolved": "off",
+        "import/prefer-default-export": "off",
+        "import/no-cycle": "off",
+        "max-len": ["warn", 150],
+        "consistent-return": "off",
+        "no-use-before-define": "off",
+        "no-restricted-syntax": "off",
+        "no-await-in-loop": "off"
+    }
+}
