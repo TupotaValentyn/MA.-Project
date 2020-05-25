@@ -1,13 +1,13 @@
 import { takeEvery } from '@redux-saga/core/effects';
 import { makeSaga } from '../utils/makeSaga';
 import {
-  getFiltersActions,
-  getFiltersRequested as getFilterRequestedAction
-} from '../slices/filters';
+  getPlacesActions,
+  getPlacesRequested as getPlacesRequestedAction
+} from '../slices/places';
 import { getPlaces } from '../services/api/other/places';
 
-const getFiltersRequested = makeSaga('getPlaces', getFiltersActions, getPlaces);
+const getFiltersRequested = makeSaga('getPlaces', getPlacesActions, getPlaces);
 
 export default function* placesSaga() {
-  yield takeEvery(getFilterRequestedAction.type, getFiltersRequested);
+  yield takeEvery(getPlacesRequestedAction.type, getFiltersRequested);
 }

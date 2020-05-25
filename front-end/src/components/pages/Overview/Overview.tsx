@@ -1,19 +1,21 @@
 import React, { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import GoogleMaps from '../../common/GoogleMap/GoogleMap';
+import GoogleMaps from '../../common/GoogleMap';
 import { RootStore } from '../../../reducers';
 import { State, StateStatuses } from '../../../utils/State';
 import { userRequested } from '../../../slices/user';
 import { getFiltersRequested } from '../../../slices/filters';
 import { getPlacesRequested } from '../../../slices/places';
+import Filters from '../../common/Filters';
 
 type Props = {};
 
 const useClasses = makeStyles({
   mapWrapper: {
     height: '100%',
-    width: '100%'
+    width: '100%',
+    display: 'flex'
   }
 });
 
@@ -36,6 +38,7 @@ const Overview: FC<Props> = () => {
   return (
     <div className={mapWrapper}>
       <GoogleMaps />
+      <Filters />
     </div>
   );
 };

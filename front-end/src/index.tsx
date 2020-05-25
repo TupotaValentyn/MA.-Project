@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import mapboxgl from 'mapbox-gl';
 import * as serviceWorker from './serviceWorker';
 import rootStore from './rootStore';
 import './index.css';
