@@ -8,7 +8,7 @@ import connectToSequelize from './sequelize';
         await connectToSequelize();
 
         server.listen(config.PORT, () => {
-            console.log(`Server successfully started at ${config.PORT}.`);
+            console.log(`\nServer successfully started at ${config.PORT}.`);
         });
     } catch (e) {
         console.error(e);

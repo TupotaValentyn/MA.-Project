@@ -11,13 +11,13 @@ export default async (request: express.Request, response: express.Response, next
     const { authorization } = request.headers;
 
     if (!authorization) {
-        throw new Forbidden(translateText('errors.actionIsForbidden'));
+        throw new Forbidden(translateText('errors.actionIsForbidden', request.locale));
     }
 
     const [type, token] = authorization.split(' ');
 
     if (!(token && type === 'Bearer')) {
-        throw new Forbidden(translateText('errors.wrongAuthHeader'));
+        throw new Forbidden(translateText('errors.wrongAuthHeader', request.locale));
     }
 
     try {
@@ -27,11 +27,11 @@ export default async (request: express.Request, response: express.Response, next
         const { name } = error;
 
         if (name === 'TokenExpiredError') {
-            throw new Unauthorized(translateText('errors.wrongAuthToken'));
+            throw new Unauthorized(translateText('errors.wrongAuthToken', request.locale));
         }
 
         if (name === 'JsonWebTokenError') {
-            throw new Forbidden(translateText('errors.wrongAuthToken'));
+            throw new Forbidden(translateText('errors.wrongAuthToken', request.locale));
         }
 
         throw error;

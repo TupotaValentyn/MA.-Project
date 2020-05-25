@@ -11,11 +11,35 @@
         "emailAlreadyConfirmed": "Почта уже подтверждена",
         "actionIsForbidden": "Действие запрещено",
         "wrongAuthHeader": "Невалидный заголовок",
-        "wrongAuthToken": "Недействительный токен"
+        "wrongAuthToken": "Недействительный токен",
+
+        "wrongPlaceId": "Неправильный ID заведения",
+        "wrongPlaceName": "Неправильное название заведения",
+        "wrongPlaceGeoLocation": "Неправильные координаты заведения",
+        "wrongPlaceRestDuration": "Некорректная длительность отдыха",
+        "wrongPlaceRestCost": "Некорректная стоимость отдыха",
+        "wrongPlaceCompanySize": "Некорректный размер компании",
+        "wrongPlaceRestType": "Некорректный тип отдыха",
+        "wrongPlaceCategories": "Указаны некорректные категории заведения",
+        "placeNotFound": "Заведение не найдено",
+        "placeIsNotInCherkasy": "Заведение не находится в Черкассах",
+        "wrongWorkingPeriods": "Некорректный график работы заведения",
+        "periodForDayNotSpecified": "Не указан график работы для одного из дней",
+
+        "wrongRequestParams": "Неправильные параметры запроса",
+        "userNotFound": "Пользователь не найден",
+
+        "reviewNotFound": "Отзыв не найден"
     },
 
     "emailConfirmed": "Спасибо, Ваша почта подтверждена! Вернитесь на сайт и нажмите кнопку \"Проверить подтверждение\"",
     "confirmationEmailTitle": "Регистрация в системе",
+    "confirmationEmailMessage": "Вы успешно зарегистрировались в системе!",
+    "confirmationEmailButtonText": "Подтвердить почту",
+
+    "resetPasswordEmailTitle": "Восстановление пароля",
+    "resetPasswordEmailMessage": "Вы запросили восстановление пароля пользователя. Для сброса пароля перейдите по ссылке ниже.",
+    "resetPasswordEmailLinkText": "Сменить пароль",
 
     "restPlaceCategory": {
         "amusementPark": "Парк развлечений",

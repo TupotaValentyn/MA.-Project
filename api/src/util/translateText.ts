@@ -3,7 +3,7 @@ const ua = require('../translations/ua.json');
 
 export default (
     textId: string,
-    locale: string = 'ru',
+    locale: string = 'ua',
     replacements: (string | number)[] = []
 ): string => {
     const idsParts = textId.split('.');

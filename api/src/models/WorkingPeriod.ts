@@ -1,5 +1,5 @@
 import {
-    Column, Model, Table, PrimaryKey, AutoIncrement, ForeignKey, BelongsTo, DataType,
+    Column, Model, Table, PrimaryKey, AutoIncrement, ForeignKey, BelongsTo,
 } from 'sequelize-typescript';
 
 import { RestPlace } from './RestPlace';
@@ -18,14 +18,14 @@ export class WorkingPeriod extends Model<WorkingPeriod> {
     @Column
     dayOfWeekStart: number;
 
-    @Column({ type: DataType.TIME })
-    startTime: Date;
+    @Column
+    startTime: number;
 
     @Column
     dayOfWeekEnd: number;
 
-    @Column({ type: DataType.TIME })
-    endTime: Date;
+    @Column
+    endTime: number;
 
     @BelongsTo(() => RestPlace)
     restPlace: RestPlace;

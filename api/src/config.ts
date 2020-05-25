@@ -16,6 +16,13 @@ export default {
     MAIL_PASSWORD: process.env.MAIL_PASSWORD || 'root',
 
     SERVER_URL: process.env.SERVER_URL,
+    FRONT_END_URL: process.env.FRONT_END_URL,
 
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
+
+    AVAILABLE_LOCALES: ['ua', 'ru'],
+    DEFAULT_LOCALE: 'ua',
+
+    CHERKASY_CENTER: { lat: 49.444431, lng: 32.059769 },
+    CHERKASY_BOUNDS_RADIUS: 15, // km
 };

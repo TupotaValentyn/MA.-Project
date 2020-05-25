@@ -1,16 +1,6 @@
 import express from 'express';
-import bcrypt from 'bcrypt';
-import axios from 'axios';
 
-import { Op } from 'sequelize';
-import { OAuth2Client } from 'google-auth-library';
-import { BadRequest } from '@curveball/http-errors';
-import { TokenData, UserPublicData } from 'index';
-import { User } from '../models';
-
-import {
-    generateTokenData, generateUserHash, isValidEmail, sendConfirmationEmail, getTemplateHTML, translateText
-} from '../util';
+import { authController } from '../controllers';
 
 const router = express.Router();
 
@@ -49,49 +39,7 @@ const router = express.Router();
  *          description: Неправильный запрос. Несуществующий email или неправильный пароль.
  *
  */
-router.post('/local', async (request, response) => {
-    const requestBody = { email: '', password: '', ...request.body };
-
-    const email = requestBody.email.toString().trim();
-    const password = requestBody.password.toString().trim();
-
-    const userByEmail = await User.findOne({
-        where: {
-            email,
-            password: {
-                [Op.ne]: null,
-            },
-        },
-    });
-
-    if (!userByEmail) {
-        throw new BadRequest(translateText('errors.noUserWithEmail'));
-    }
-
-    const isCorrectPassword = await bcrypt.compare(password, userByEmail.password);
-
-    if (!isCorrectPassword) {
-        throw new BadRequest(translateText('errors.wrongPassword'));
-    }
-
-    if (!userByEmail.isConfirmed) {
-        return response.json({
-            userHash: userByEmail.userHash,
-        });
-    }
-
-    const userPublicData: UserPublicData = {
-        id: userByEmail.id,
-        email: userByEmail.email,
-        isConfirmed: userByEmail.isConfirmed,
-        isAdmin: userByEmail.isAdmin,
-        authType: 'local',
-    };
-
-    const tokenData: TokenData = generateTokenData(userPublicData);
-
-    response.json({ tokenData });
-});
+router.post('/local', authController.signInUsingPassword);
 
 /**
  * @swagger
@@ -127,40 +75,7 @@ router.post('/local', async (request, response) => {
  *          description: Неправильный запрос. Некорректный email/пароль, пользователь с таким email уже зарегистрирован в системе.
  *
  */
-router.post('/register', async (request: express.Request, response: express.Response) => {
-    const requestBody = { email: '', password: '', ...request.body };
-
-    const email = requestBody.email.toString().trim();
-    const password = requestBody.password.toString().trim();
-
-    if (!isValidEmail(email)) {
-        throw new BadRequest(translateText('errors.wrongEmail'));
-    }
-
-    if (password.length < 8) {
-        throw new BadRequest(translateText('errors.wrongPassword'));
-    }
-
-    const usersWithSameMail = await User.findAll({ where: { email } });
-
-    if (usersWithSameMail.length) {
-        throw new BadRequest(translateText('errors.notUniqueEmail'));
-    }
-
-    const salt = await bcrypt.genSalt(3);
-    const encryptedPassword = await bcrypt.hash(password, salt);
-
-    const userHash = generateUserHash(email);
-
-    await User.create({
-        email,
-        userHash,
-        password: encryptedPassword,
-    });
-
-    await sendConfirmationEmail(email, userHash);
-    response.json({ userHash });
-});
+router.post('/register', authController.register);
 
 /**
  * @swagger
@@ -188,35 +103,7 @@ router.post('/register', async (request: express.Request, response: express.Resp
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
  */
-router.get('/check_verification/:userHash', async (request, response) => {
-    const { userHash } = request.params;
-
-    const userByHash = await User.findOne({
-        where: { userHash },
-    });
-
-    if (!userByHash) {
-        throw new BadRequest(translateText('errors.wrongHash'));
-    }
-
-    if (!userByHash.isConfirmed) {
-        return response.json({
-            isConfirmed: false,
-        });
-    }
-
-    const userPublicData: UserPublicData = {
-        id: userByHash.id,
-        email: userByHash.email,
-        isConfirmed: userByHash.isConfirmed,
-        isAdmin: userByHash.isAdmin,
-        authType: 'local',
-    };
-
-    const tokenData: TokenData = generateTokenData(userPublicData);
-
-    response.json({ tokenData });
-});
+router.get('/check_verification/:userHash', authController.checkAccountVerification);
 
 /**
  * @swagger
@@ -242,26 +129,7 @@ router.get('/check_verification/:userHash', async (request, response) => {
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
  */
-router.post('/resend_confirmation/:userHash', async (request, response) => {
-    const { userHash } = request.params;
-
-    const userByHash = await User.findOne({
-        where: { userHash },
-    });
-
-    if (!userByHash) {
-        throw new BadRequest(translateText('errors.wrongHash'));
-    }
-
-    const newUserHash = generateUserHash(userByHash.email);
-
-    userByHash.userHash = newUserHash;
-    await userByHash.save();
-
-    await sendConfirmationEmail(userByHash.email, newUserHash);
-
-    response.json({ userHash: newUserHash });
-});
+router.post('/resend_confirmation/:userHash', authController.resendConfirmationEmail);
 
 /**
  * @swagger
@@ -292,50 +160,7 @@ router.post('/resend_confirmation/:userHash', async (request, response) => {
  *          description: Неправильный запрос. Не передан хеш пользователя.
  *
  */
-router.post('/google', async (request, response) => {
-    const { token } = request.body;
-
-    if (!token) {
-        throw new BadRequest(translateText('errors.wrongGoogleToken'));
-    }
-
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const client = new OAuth2Client(clientId);
-
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: clientId,
-    });
-
-    const { sub: userId, email } = ticket.getPayload();
-
-    let userByEmail = await User.findOne({ where: { email } });
-
-    if (userByEmail) {
-        userByEmail.googleId = userId;
-        userByEmail.isConfirmed = true;
-
-        await userByEmail.save();
-    } else {
-        userByEmail = await User.create({
-            email,
-            googleId: userId,
-            isConfirmed: true,
-        });
-    }
-
-    const userPublicData: UserPublicData = {
-        id: userByEmail.id,
-        email: userByEmail.email,
-        isConfirmed: userByEmail.isConfirmed,
-        isAdmin: userByEmail.isAdmin,
-        authType: 'google',
-    };
-
-    const tokenData: TokenData = generateTokenData(userPublicData);
-
-    response.json({ tokenData });
-});
+router.post('/google', authController.signInUsingGoogle);
 
 /**
  * @swagger
@@ -369,80 +194,8 @@ router.post('/google', async (request, response) => {
  *          description: Неправильный запрос. Некорректный/несуществующий хеш пользователя.
  *
  */
-router.post('/facebook', async (request, response) => {
-    const { accessToken, userId } = request.body;
+router.post('/facebook', authController.signInUsingFacebook);
 
-    if (!accessToken) {
-        throw new BadRequest(translateText('errors.wrongFacebookToken'));
-    }
-
-    if (!userId) {
-        throw new BadRequest(translateText('errors.wrongFacebookUserId'));
-    }
-
-    const url = `https://graph.facebook.com/v2.6/${userId}?fields=email&access_token=${accessToken}`;
-
-    const fbResponse = await axios.get(url);
-    const { email, id } = fbResponse.data;
-
-    let userByEmail = await User.findOne({ where: { email } });
-
-    if (userByEmail) {
-        userByEmail.facebookId = id;
-        userByEmail.isConfirmed = true;
-
-        await userByEmail.save();
-    } else {
-        userByEmail = await User.create({
-            email,
-            facebookId: id,
-            isConfirmed: true,
-        });
-    }
-
-    const userPublicData: UserPublicData = {
-        id: userByEmail.id,
-        email: userByEmail.email,
-        isConfirmed: userByEmail.isConfirmed,
-        isAdmin: userByEmail.isAdmin,
-        authType: 'facebook',
-    };
-
-    const tokenData: TokenData = generateTokenData(userPublicData);
-
-    response.json({ tokenData });
-});
-
-router.get('/verify_email/:userHash', async (request, response) => {
-    const { userHash } = request.params;
-
-    const userByHash = await User.findOne({
-        where: { userHash },
-    });
-
-    if (!userByHash) {
-        const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translateText('errors.wrongHash'),
-        });
-
-        return response.send(pageHTML);
-    }
-
-    if (userByHash.isConfirmed) {
-        const pageHTML = await getTemplateHTML('email_confirmed', {
-            message: translateText('errors.emailAlreadyConfirmed'),
-        });
-
-        return response.send(pageHTML);
-    }
-
-    await User.update({ isConfirmed: true, userHash: null }, { where: { userHash } });
-
-    const pageHTML = await getTemplateHTML('email_confirmed', {
-        message: translateText('emailConfirmed'),
-    });
-
-    response.send(pageHTML);
-});
+router.get('/verify_email/:userHash', authController.verifyEmail);
 
 export default router;

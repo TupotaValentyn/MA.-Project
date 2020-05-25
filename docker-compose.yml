@@ -1,0 +1,50 @@
+version: '3'
+services:
+  mysql:
+    container_name: mysql
+    build:
+      context: ./build/
+      dockerfile: Dockerfile-mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - /MA.-Project/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: ma-project
+      MYSQL_USER: ma-user
+      MYSQL_PASSWORD: password
+    restart: always
+
+  api:
+    container_name: api
+    depends_on:
+      - mysql
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile-api
+    ports:
+      - "8080:3000" # api port: 8080
+    restart: always
+
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile-front
+    ports:
+      - "3000:80" # front port: 3000
+    restart: always
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - api
+      - frontend
+    build:
+      context: ./build/
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+

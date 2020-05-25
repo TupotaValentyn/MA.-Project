@@ -2,7 +2,7 @@ import {
     Column, Model, Table, PrimaryKey, AutoIncrement, ForeignKey, BelongsTo, DataType
 } from 'sequelize-typescript';
 
-import { RestPlace } from './RestPlace';
+import { RestPlace, User } from './index';
 
 @Table
 export class Review extends Model<Review> {
@@ -11,16 +11,26 @@ export class Review extends Model<Review> {
     @Column({ primaryKey: true })
     id: number;
 
-    @Column
-    @ForeignKey(() => RestPlace)
-    restPlaceId: number;
-
     @Column({ type: DataType.TEXT })
-    review: string;
+    comment: string;
 
     @Column
     rating: number;
 
+    @Column
+    created: number;
+
+    @Column
+    @ForeignKey(() => RestPlace)
+    restPlaceId: number;
+
     @BelongsTo(() => RestPlace)
     restPlace: RestPlace;
+
+    @Column
+    @ForeignKey(() => User)
+    userId: number;
+
+    @BelongsTo(() => User)
+    user: User;
 }
