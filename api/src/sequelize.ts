@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize-typescript';
 import mysql from 'mysql2/promise';
 
 import config from './config';
-import loadPlaces from './loadAndParseRestPlaces';
+import loadPlaces from './loadPlaces';
 
 import {
     User, WorkingPeriod, RestPlace, Category, Review, RestPlaceCategory

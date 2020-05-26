@@ -41,6 +41,9 @@
     "resetPasswordEmailMessage": "Ви запросили відновлення паролю користувача. Для задання нового паролю перейдіть за посиланням нижче.",
     "resetPasswordEmailLinkText": "Змінити пароль",
 
+    "anyVariant1": "Будь-який",
+    "anyVariant2": "Будь-яка",
+
     "restPlaceCategory": {
         "amusementPark": "Парк розваг",
         "aquarium": "Акваріум",
