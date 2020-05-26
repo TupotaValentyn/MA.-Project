@@ -1,3 +1,5 @@
+import { User } from '../models';
+
 const supertest = require('supertest');
 
 describe('Auth.spec', () => {
@@ -48,6 +50,23 @@ describe('Auth.spec', () => {
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe('Користувач з таким email вже зареєстрований в системі');
+
+        done();
+    });
+
+    it('POST /register: returns userHash on successful registration', async (done) => {
+        const email = `user${Math.random()}@test.com`;
+
+        const response = await supertest(global.serverInstance)
+            .post('/auth/register')
+            .send({ password: '12345678', email });
+
+        expect(response.status).toBe(200);
+        expect(typeof response.body.userHash).toBe('string');
+
+        await User.destroy({
+            where: { email },
+        });
 
         done();
     });
