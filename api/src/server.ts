@@ -15,9 +15,8 @@ import connectToSequelize from './sequelize';
 import config from './config';
 import setupCron from './setupCron';
 
-export default async (): Promise<{ nodeServer: http.Server, sequelizeInstance: Sequelize }> => {
-    // const sequelizeInstance = await connectToSequelize();
-
+export default async (): Promise<{ server: http.Server, sequelize: Sequelize }> => {
+    const sequelizeInstance = await connectToSequelize();
     const app = express();
 
     app.use(cors());
@@ -33,13 +32,7 @@ export default async (): Promise<{ nodeServer: http.Server, sequelizeInstance: S
         console.log(`\nServer successfully started at ${config.PORT}.`);
     });
 
-    app.on('close', () => {
-        console.log('close');
+    setupCron();
 
-        // sequelizeInstance.close();
-    });
-
-    // setupCron();
-
-    return { nodeServer: server, sequelizeInstance: null };
+    return { server, sequelize: sequelizeInstance };
 };

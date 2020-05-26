@@ -5,7 +5,7 @@
         "dev": "nodemon src/app.ts",
         "lint": "npx eslint . --ignore-path .gitignore --ext .js,.ts --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests",
-        "test": "jest --no-cache --silent --passWithNoTests",
+        "test": "jest --no-cache --passWithNoTests",
         "build": "tsc && npm run copyTranslations && npm run copyTemplates",
         "prestart": "npm run build",
         "start": "node dist/src/app.js",

@@ -36,6 +36,8 @@ export default async (): Promise<Sequelize> => {
         console.log('DB created.');
     }
 
+    connection.close();
+
     console.log('\nConnecting to DB...');
     console.log(`DB_NAME=${config.DB_NAME}`);
     console.log(`DB_HOST=${config.DB_HOST}`);
