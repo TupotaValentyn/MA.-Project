@@ -1,48 +1,69 @@
 #!/bin/bash
 
-cd ~/ && git clone https://github.com/TupotaValentyn/MA.-Project.git
+nginxImageID=`docker images | grep "ma-project_nginx" | awk '{print $3}'`
+mysqlImageID=`docker images | grep "ma-project_mysql" | awk '{print $3}'`
+frontendImageID=`docker images | grep "ma-project_frontend" | awk '{print $3}'`
+apiImageID=`docker images | grep "ma-project_api" | awk '{print $3}'`
+
+nginx="alberkut/ma-project_nginx"
+mysql="alberkut/ma-project_mysql"
+frontend="alberkut/ma-project_frontend"
+api="alberkut/ma-project_api"
+
+user=`echo $USER`
+rootDirPath="/home/$user/Documents"
+projectPath="${rootDirPath}/MA.-Project/"
+frontPath="${projectPath}/front-end/"
+apiPath="${projectPath}/api/"
+
+gitBranchName="dev"
+
+sshPathToKey="~/.ssh/admin-key.pem"
+sshHostURL="ubuntu@3.250.170.88"
+
+cd $rootDirPath && git clone https://github.com/TupotaValentyn/MA.-Project.git
 # !!! DEV BRANCH !!!
-cd ~/MA.-Project/ && git checkout dev
+cd $projectPath && git checkout $gitBranchName
 
 # Build frontend
-cd ~/MA.-Project/front-end/
+cd $frontPath
 npm install
 npm run build
 
 # Build backend
-cd ~/MA.-Project/api/
+cd $apiPath
 npm install
 
 # Build THIS ALL!!!
-cd ~/MA.-Project/
+cd $projectPath
 docker-compose build
 
-nginxImageId=`docker images | grep "ma-project_nginx" | awk '{print $3}'`
-frontendImageId=`docker images | grep "ma-project_frontend" | awk '{print $3}'`
-apiImageId=`docker images | grep "ma-project_api" | awk '{print $3}'`
-mysqlImageId=`docker images | grep "ma-project_mysql" | awk '{print $3}'`
-
 # Push Nginx
-docker tag $nginxImageId alberkut/ma-project_nginx
-docker push alberkut/ma-project_nginx
-# Push Frontend
-docker tag $frontendImageId alberkut/ma-project_frontend
-docker push alberkut/ma-project_frontend
-# Push API
-docker tag $apiImageId alberkut/ma-project_api
-docker push alberkut/ma-project_api
+docker tag $nginxImageId $nginx && docker push $nginx
 # Push MySql
-docker tag $mysqlImageId alberkut/ma-project_mysql
-docker push alberkut/ma-project_mysql
+docker tag $mysqlImageId $mysql && docker push $mysql
+# Push Frontend
+docker tag $frontendImageId $frontend && docker push $frontend
+# Push API
+docker tag $apiImageId $api && docker push $api
 
 # Delete used repository
-rm -rf ~/MA-.Project/
+rm -rf $projectPath
+
+# Ssh connect
+ssh -i $sshPathToKey $sshHostURL << EOF
+	cd ~/MA.-Project/
+	docker pull $nginx
+	docker pull $mysql
+	docker pull $frontend
+	docker pull $api
+
+	docker-compose down
+	docker-compose up -d
+EOF
 
 echo "#################################################"
-echo "#               TODO: Custom path,              #"
-echo "#               TODO: Custom branch,            #"
 echo "#               TODO: Optimization Push,        #"
 echo "#               TODO: Confirmation to delete,   #"
-echo "#               TODO: Deployment automation.    #"
 echo "#################################################"
 
