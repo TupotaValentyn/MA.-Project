@@ -4,7 +4,7 @@
 /* eslint no-continue: 0 */
 /* eslint no-use-before-define: 0 */
 
-import fs from 'fs';
+import fs, { WriteStream } from 'fs';
 import path from 'path';
 import { Client } from '@googlemaps/google-maps-services-js';
 import { promisify } from 'util';
@@ -22,7 +22,7 @@ if (!fs.existsSync(logsDirectoryPath)) {
     fs.mkdirSync(path.join(__dirname, '../logs'));
 }
 
-const stream = fs.createWriteStream(path.join(__dirname, '../logs/load.log'), { flags: 'w' });
+let stream: WriteStream = null;
 
 const logger = getLogger('LoadPlaces');
 logger.level = 'debug';
@@ -287,6 +287,7 @@ function log(data: string) {
 
 export default async () => {
     try {
+        stream = fs.createWriteStream(path.join(__dirname, '../logs/load.log'), { flags: 'w' });
         const categories = await Category.findAll();
 
         for (const categoryData of categories) {

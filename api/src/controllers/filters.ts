@@ -19,10 +19,10 @@ async function getFilters(request: express.Request, response: express.Response) 
         .map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, request.locale) }));
 
     response.json({
-        categories,
-        costs,
-        restDurations,
-        companySizes,
+        categories: [{ id: 0, name: translateText('anyVariant2', request.locale) }, ...categories],
+        costs: [{ id: 0, name: translateText('anyVariant2', request.locale) }, ...costs],
+        restDurations: [{ id: 0, name: translateText('anyVariant2', request.locale) }, ...restDurations],
+        companySizes: [{ id: 0, name: translateText('anyVariant1', request.locale) }, ...companySizes],
     });
 }
 
