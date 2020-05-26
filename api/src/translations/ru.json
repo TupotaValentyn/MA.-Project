@@ -40,6 +40,9 @@
     "resetPasswordEmailTitle": "Восстановление пароля",
     "resetPasswordEmailMessage": "Вы запросили восстановление пароля пользователя. Для сброса пароля перейдите по ссылке ниже.",
     "resetPasswordEmailLinkText": "Сменить пароль",
+    
+    "anyVariant1": "Любой",
+    "anyVariant2": "Любая",
 
     "restPlaceCategory": {
         "amusementPark": "Парк развлечений",

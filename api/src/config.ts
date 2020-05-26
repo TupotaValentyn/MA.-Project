@@ -23,6 +23,6 @@ export default {
     AVAILABLE_LOCALES: ['ua', 'ru'],
     DEFAULT_LOCALE: 'ua',
 
-    CHERKASY_CENTER: { lat: 49.444431, lng: 32.059769 },
-    CHERKASY_BOUNDS_RADIUS: 15, // km
+    CHERKASY_CENTER: { lat: 49.4257529, lng: 32.0580019 },
+    CHERKASY_BOUNDS_RADIUS: 6, // km
 };
