@@ -26,6 +26,8 @@ export default async (): Promise<Sequelize> => {
 
     if (dbExists) {
         console.log('DB already exists');
+    } else if (process.env.NODE_ENV === 'test') {
+        throw new Error('Unable connect to DB');
     } else {
         console.log('DB doesn\'t exist, creating it.');
 
