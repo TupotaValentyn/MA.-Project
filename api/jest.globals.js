@@ -20,6 +20,10 @@ beforeAll((done) => {
         });
 });
 
+afterEach(() => {
+    jest.resetAllMocks();
+});
+
 afterAll(async (done) => {
     console.log('Global afterAll');
 
