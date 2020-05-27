@@ -2,8 +2,8 @@ import { User } from '../models';
 
 const supertest = require('supertest');
 
-describe('Auth.spec', () => {
-    it('POST /register: triggers an error if email is not passed', async (done) => {
+describe('auth::register', () => {
+    it('triggers an error if email is not passed', async (done) => {
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ password: '12345678' });
@@ -13,7 +13,7 @@ describe('Auth.spec', () => {
         done();
     });
 
-    it('POST /register: triggers an error if email is incorrect', async (done) => {
+    it('triggers an error if email is incorrect', async (done) => {
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ password: '12345678', email: '123' });
@@ -23,7 +23,7 @@ describe('Auth.spec', () => {
         done();
     });
 
-    it('POST /register: triggers an error if password is not passed', async (done) => {
+    it('triggers an error if password is not passed', async (done) => {
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ email: 'admin@test.com' });
@@ -33,7 +33,7 @@ describe('Auth.spec', () => {
         done();
     });
 
-    it('POST /register: triggers an error if password is incorrect', async (done) => {
+    it('triggers an error if password is incorrect', async (done) => {
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ password: '123456', email: 'admin@test.com' });
@@ -43,7 +43,7 @@ describe('Auth.spec', () => {
         done();
     });
 
-    it('POST /register: triggers an error if user exists', async (done) => {
+    it('triggers an error if user exists', async (done) => {
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ password: '12345678', email: 'admin@test.com' });
@@ -54,19 +54,29 @@ describe('Auth.spec', () => {
         done();
     });
 
-    it('POST /register: returns userHash on successful registration', async (done) => {
+    it('successfully creates new user', async (done) => {
         const email = `user${Math.random()}@test.com`;
 
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
             .send({ password: '12345678', email });
 
-        expect(response.status).toBe(200);
-        expect(typeof response.body.userHash).toBe('string');
+        const createdUser = await User.findOne({
+            where: { email },
+        });
 
         await User.destroy({
             where: { email },
         });
+
+        expect(createdUser).not.toBe(null);
+        expect(createdUser.email).toBe(email);
+        expect(createdUser.locale).toBe('ua');
+        expect(createdUser.isConfirmed).toBe(false);
+        expect(createdUser.isAdmin).toBe(false);
+
+        expect(response.status).toBe(200);
+        expect(typeof response.body.userHash).toBe('string');
 
         done();
     });

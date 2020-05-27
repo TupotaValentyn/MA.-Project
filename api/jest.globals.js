@@ -14,7 +14,8 @@ beforeAll((done) => {
             global.sequelizeInstance = sequelize;
 
             done();
-        }).catch(() => {
+        }).catch((error) => {
+            console.log(error);
             process.exit(1);
         });
 });
