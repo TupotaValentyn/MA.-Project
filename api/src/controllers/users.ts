@@ -11,10 +11,6 @@ import { User } from '../models';
 async function getUserByToken(request: express.Request, response: express.Response) {
     const { token } = request.params;
 
-    if (!token) {
-        throw new BadRequest(translateText('errors.wrongAuthToken', request.locale));
-    }
-
     try {
         const userData = await verify(token, process.env.JWT_SECRET) as UserPublicData;
         response.json({ userData });
