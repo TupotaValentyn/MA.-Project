@@ -93,7 +93,12 @@ async function register(request: express.Request, response: express.Response) {
         locale: request.locale,
     });
 
-    await sendConfirmationEmail(email, userHash, request.locale);
+    try {
+        await sendConfirmationEmail(email, userHash, request.locale);
+    } catch (error) {
+        console.log(error);
+    }
+
     response.json({ userHash });
 }
 
@@ -144,7 +149,11 @@ async function resendConfirmationEmail(request: express.Request, response: expre
         userHash: newUserHash,
     });
 
-    await sendConfirmationEmail(userByHash.email, newUserHash, request.locale);
+    try {
+        await sendConfirmationEmail(userByHash.email, newUserHash, request.locale);
+    } catch (error) {
+        console.log(error);
+    }
 
     response.json({ userHash: newUserHash });
 }

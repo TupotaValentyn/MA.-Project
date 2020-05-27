@@ -1,10 +1,10 @@
 {
     "errors": {
         "noUserWithEmail": "Користувача з таким email не існує",
-        "wrongPassword": "Неправильный пароль",
+        "wrongPassword": "Неправильний пароль",
         "wrongEmail": "Некоректний email",
         "notUniqueEmail": "Користувач з таким email вже зареєстрований в системі",
-        "wrongHash": "Неправильный хеш",
+        "wrongHash": "Неправильний хеш",
         "wrongGoogleToken": "Не заданий token",
         "wrongFacebookToken": "Не заданий accessToken",
         "wrongFacebookUserId": "Не заданий userId",

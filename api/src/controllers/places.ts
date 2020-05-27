@@ -64,7 +64,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         }, WorkingPeriod],
     });
 
-    if (distance && distance >= 0.5 && distance <= 15 && userLatitude && userLongitude) {
+    if (distance && distance >= 0.5 && distance <= config.CHERKASY_BOUNDS_RADIUS && userLatitude && userLongitude) {
         places = places.filter((place) => isPointInsideCircle(
             { lat: userLatitude, lng: userLongitude },
             distance,

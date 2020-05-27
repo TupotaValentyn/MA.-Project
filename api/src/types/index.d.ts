@@ -1,3 +1,6 @@
+import http from 'http';
+import { Sequelize } from 'sequelize-typescript';
+
 /**
  * @swagger
  *
@@ -236,6 +239,13 @@ declare global {
         interface Request {
             user?: UserPublicData,
             locale?: 'ru' | 'ua',
+        }
+    }
+
+    namespace NodeJS {
+        interface Global {
+            serverInstance: http.Server;
+            sequelizeInstance: Sequelize;
         }
     }
 }
