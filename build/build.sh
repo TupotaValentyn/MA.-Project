@@ -1,14 +1,11 @@
 #!/bin/bash
 
-nginxImageID=`docker images | grep "ma-project_nginx" | awk '{print $3}'`
-mysqlImageID=`docker images | grep "ma-project_mysql" | awk '{print $3}'`
-frontendImageID=`docker images | grep "ma-project_frontend" | awk '{print $3}'`
-apiImageID=`docker images | grep "ma-project_api" | awk '{print $3}'`
+version="0.0.1"
 
-nginx="alberkut/ma-project_nginx"
-mysql="alberkut/ma-project_mysql"
-frontend="alberkut/ma-project_frontend"
-api="alberkut/ma-project_api"
+nginx="alberkut/ma-project_nginx:latest"
+mysql="alberkut/ma-project_mysql:latest"
+frontend="alberkut/ma-project_frontend:latest"
+api="alberkut/ma-project_api:latest"
 
 user=`echo $USER`
 rootDirPath="/home/$user/Documents"
@@ -38,14 +35,24 @@ npm install
 cd $projectPath
 docker-compose build
 
+nginxImageID=`docker images | grep "ma-project_nginx" | awk '{print $3}'`
+mysqlImageID=`docker images | grep "ma-project_mysql" | awk '{print $3}'`
+frontendImageID=`docker images | grep "ma-project_frontend" | awk '{print $3}'`
+apiImageID=`docker images | grep "ma-project_api" | awk '{print $3}'`
+
+echo "#############################################"
+echo $nginxImageID
+echo $apiImageID
+echo "#############################################"
+
 # Push Nginx
-docker tag $nginxImageId $nginx && docker push $nginx
+docker tag $nginxImageID $nginx && docker push $nginx
 # Push MySql
-docker tag $mysqlImageId $mysql && docker push $mysql
+docker tag $mysqlImageID $mysql && docker push $mysql
 # Push Frontend
-docker tag $frontendImageId $frontend && docker push $frontend
+docker tag $frontendImageID $frontend && docker push $frontend
 # Push API
-docker tag $apiImageId $api && docker push $api
+docker tag $apiImageID $api && docker push $api
 
 # Delete used repository
 rm -rf $projectPath
