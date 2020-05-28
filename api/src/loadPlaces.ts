@@ -22,10 +22,16 @@ if (!fs.existsSync(logsDirectoryPath)) {
     fs.mkdirSync(path.join(__dirname, '../logs'));
 }
 
-let stream: WriteStream = null;
+const stream: WriteStream = null;
 
-const logger = getLogger('LoadPlaces');
-logger.level = 'debug';
+const logger = getLogger(/* 'LoadPlaces' */);
+
+console.log(123);
+
+logger.level = 'info';
+
+logger.warn('asd');
+
 
 const promisifiedSetTimeout = promisify(setTimeout);
 
@@ -286,16 +292,16 @@ function log(data: string) {
 }
 
 export default async () => {
-    try {
-        stream = fs.createWriteStream(path.join(__dirname, '../logs/load.log'), { flags: 'w' });
-        const categories = await Category.findAll();
-
-        for (const categoryData of categories) {
-            await processCategory(categoryData);
-        }
-
-        stream.close();
-    } catch (error) {
-        console.error(error);
-    }
+    // try {
+    //     stream = fs.createWriteStream(path.join(__dirname, '../logs/load.log'), { flags: 'w' });
+    //     const categories = await Category.findAll();
+    //
+    //     for (const categoryData of categories) {
+    //         await processCategory(categoryData);
+    //     }
+    //
+    //     stream.close();
+    // } catch (error) {
+    //     console.error(error);
+    // }
 };
