@@ -57,6 +57,8 @@ docker tag $frontendImageID $frontend && docker push $frontend
 # Push API
 docker tag $apiImageID $api && docker push $api
 
+scp -i $sshPathToKey ./host/docker-compose.yml $sshHostURL:~/MA.-Project/
+
 # Delete used repository
 rm -rf $projectPath
 
