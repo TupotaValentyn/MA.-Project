@@ -12,7 +12,7 @@ async function getUserByToken(request: express.Request, response: express.Respon
     const { token } = request.params;
 
     try {
-        const userData = await verify(token, process.env.JWT_SECRET) as UserPublicData;
+        const userData = await verify(token, config.JWT_SECRET) as UserPublicData;
         response.json({ userData });
     } catch (error) {
         throw new BadRequest(translateText('errors.wrongAuthToken', request.locale));

@@ -33,7 +33,9 @@ export default async (): Promise<{ server: http.Server, sequelize: Sequelize }> 
         logger.info(`Server successfully started at ${config.PORT}.`);
     });
 
-    setupCron();
+    if (config.NODE_ENV === 'production') {
+        setupCron();
+    }
 
     return { server, sequelize: sequelizeInstance };
 };

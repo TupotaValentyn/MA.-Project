@@ -89,7 +89,7 @@ async function processCategory(category: Category) {
 
         const response = await client.placeDetails({
             params: {
-                key: process.env.GOOGLE_PLACES_API_KEY,
+                key: config.GOOGLE_PLACES_API_KEY,
                 place_id: uniquePlace.place_id,
                 fields,
                 language: 'ru' as Language,
