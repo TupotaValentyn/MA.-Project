@@ -2,6 +2,6 @@ import { getLogger } from 'log4js';
 
 const logger = getLogger();
 
-logger.level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+logger.level = process.env.NODE_ENV === 'development' ? 'debug' : 'info';
 
 export default logger;
