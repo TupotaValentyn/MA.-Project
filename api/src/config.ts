@@ -37,4 +37,6 @@ export default {
 
     CHERKASY_CENTER: { lat: 49.4257529, lng: 32.0580019 },
     CHERKASY_BOUNDS_RADIUS: 6, // km
+
+    NODE_ENV: process.env.NODE_ENV || 'development',
 };
