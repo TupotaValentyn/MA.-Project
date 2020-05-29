@@ -1,10 +1,11 @@
+const logger = require('./src/logger').default;
 const initServer = require('./src/server').default;
 
 // Little fix for Jest, see https://stackoverflow.com/a/54175600
 require('mysql2/node_modules/iconv-lite').encodingExists('foo');
 
 beforeAll((done) => {
-    console.log('Global beforeAll');
+    logger.info('Global beforeAll');
 
     initServer()
         .then((instances) => {
@@ -15,7 +16,7 @@ beforeAll((done) => {
 
             done();
         }).catch((error) => {
-            console.log(error);
+            logger.fatal(error.message);
             process.exit(1);
         });
 });
@@ -25,7 +26,7 @@ afterEach(() => {
 });
 
 afterAll(async (done) => {
-    console.log('Global afterAll');
+    logger.info('Global afterAll');
 
     await global.sequelizeInstance.close();
     global.serverInstance.close(done);

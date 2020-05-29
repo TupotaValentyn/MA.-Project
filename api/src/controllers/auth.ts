@@ -17,6 +17,9 @@ import {
     translateText,
 } from '../util';
 
+import logger from '../logger';
+import config from '../config';
+
 async function signInUsingPassword(request: express.Request, response: express.Response) {
     const requestBody = { email: '', password: '', ...request.body };
 
@@ -96,7 +99,8 @@ async function register(request: express.Request, response: express.Response) {
     try {
         await sendConfirmationEmail(email, userHash, request.locale);
     } catch (error) {
-        console.log(error);
+        logger.error(`An error occurred while sending email to ${email}`);
+        logger.error(error.message);
     }
 
     response.json({ userHash });
@@ -152,7 +156,8 @@ async function resendConfirmationEmail(request: express.Request, response: expre
     try {
         await sendConfirmationEmail(userByHash.email, newUserHash, request.locale);
     } catch (error) {
-        console.log(error);
+        logger.error(`An error occurred while sending email to ${userByHash.email}`);
+        logger.error(error.message);
     }
 
     response.json({ userHash: newUserHash });
@@ -165,7 +170,7 @@ async function signInUsingGoogle(request: express.Request, response: express.Res
         throw new BadRequest(translateText('errors.wrongGoogleToken', request.locale));
     }
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientId = config.GOOGLE_PLACES_API_KEY;
     const client = new OAuth2Client(clientId);
 
     const ticket = await client.verifyIdToken({

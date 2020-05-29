@@ -13,6 +13,7 @@ import errorsHandler from './routes/errorsHandler';
 import { i18n } from './interceptors';
 import connectToSequelize from './sequelize';
 import config from './config';
+import logger from './logger';
 import setupCron from './setupCron';
 
 export default async (): Promise<{ server: http.Server, sequelize: Sequelize }> => {
@@ -29,10 +30,12 @@ export default async (): Promise<{ server: http.Server, sequelize: Sequelize }> 
     app.use(errorsHandler);
 
     const server = app.listen(config.PORT, () => {
-        console.log(`\nServer successfully started at ${config.PORT}.`);
+        logger.info(`Server successfully started at ${config.PORT}.`);
     });
 
-    setupCron();
+    if (config.NODE_ENV === 'production') {
+        setupCron();
+    }
 
     return { server, sequelize: sequelizeInstance };
 };

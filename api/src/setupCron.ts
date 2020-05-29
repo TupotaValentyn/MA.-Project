@@ -1,15 +1,16 @@
 import cron from 'node-cron';
 import loadPlaces from './loadPlaces';
+import logger from './logger';
 
 export default () => {
-    cron.schedule('0 0 0 * * *', async () => {
+    cron.schedule('0 0 3 * * *', async () => {
         try {
-            console.log('\n\nPlaces update: Start');
+            logger.info('Places update: Start');
             await loadPlaces();
-            console.log('Places update: Done\n\n');
+            logger.info('Places update: Done');
         } catch (error) {
-            console.log(error.message);
-            console.log('Places update: Failed\n\n');
+            logger.error(error.message);
+            logger.error('Places update: Failed');
         }
     });
 };

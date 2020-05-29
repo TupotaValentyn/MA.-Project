@@ -15,6 +15,7 @@ import {
 } from '../util';
 
 import config from '../config';
+import logger from '../logger';
 
 async function getPlacesByFilters(request: express.Request, response: express.Response) {
     const {
@@ -161,7 +162,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         return model;
     });
 
-    console.log(places.length);
+    logger.debug(`Places selected: ${places.length}`);
 
     response.json({
         places: models,
