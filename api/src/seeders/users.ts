@@ -1,23 +1,8 @@
-import Categories from './staticModels/Categories';
-import { Category, User } from './models';
-import loadPlaces from './loadPlaces';
+import logger from '../logger';
+import { User } from '../models';
 
-async function populateDB() {
-    console.log('\nCategories - Start');
-
-    for (const categoryData of Categories.getAll()) {
-        const categoryModel = await Category.findOne({
-            where: { googleId: categoryData.googleId }
-        });
-
-        if (!categoryModel) {
-            await Category.create(categoryData);
-        }
-    }
-
-    console.log('Categories - Done\n');
-
-    console.log('User - Start');
+export default async () => {
+    logger.info('User - Start');
 
     const admin = await User.findOne({
         where: { email: 'admin@test.com' }
@@ -45,7 +30,5 @@ async function populateDB() {
         });
     }
 
-    console.log('User - Done\n');
-
-    await loadPlaces();
-}
+    logger.info('User - Done');
+};
