@@ -200,6 +200,9 @@ export interface WorkingPeriod {
  *       isActiveRest:
  *         type: boolean
  *         description: Флажок типа отдыха заведения (true - активный, false - пассивный)
+ *       isWorkingNow:
+ *         type: boolean
+ *         description: Флажок открыто ли сейчас заведение
  *       restDuration:
  *         type: RestDurationModel
  *         description: Описание продолжительности отдыха в заведении
@@ -227,6 +230,7 @@ export interface RestPlaceModel {
     meanRating: number;
     reviewsCount: number;
     isActiveRest: boolean;
+    isWorkingNow: boolean;
     restDuration?: RestDurationModel;
     restCost?: RestCostModel;
     companySize?: CompanySizeModel;

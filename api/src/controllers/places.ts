@@ -85,9 +85,10 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
             longitude: place.longitude,
             googleMeanRating: place.googleMeanRating,
             googleReviewsCount: place.googleReviewsCount,
-            meanRating: place.totalRating / place.reviewsCount,
+            meanRating: place.reviewsCount > 0 ? place.totalRating / place.reviewsCount : 0,
             reviewsCount: place.reviewsCount,
             isActiveRest: place.isActiveRest,
+            isWorkingNow: isWorkingNow(place),
         };
 
         const placeRestDuration = RestDurations.findById(place.restDuration);
