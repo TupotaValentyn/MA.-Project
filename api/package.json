@@ -6,7 +6,7 @@
         "lint": "npx eslint . --ignore-path .gitignore --ext .js,.ts --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests --runInBand",
         "test": "jest --no-cache --silent --passWithNoTests --runInBand",
-        "build": "tsc",
+        "build": "tsc && npm run copyTranslations && npm run copyTemplates",
         "prestart": "npm run build",
         "start": "NODE_ENV='production' node dist/src/app.js",
         "copyTranslations": "mkdir -p ./dist/src/translations/ && cp -r ./src/translations/*.json ./dist/src/translations/",

@@ -3,7 +3,7 @@ import { getLogger } from 'log4js';
 const logger = getLogger();
 
 const logLevels: any = {
-    test: 'info',
+    test: 'fatal',
     production: 'info',
     development: 'debug',
 };

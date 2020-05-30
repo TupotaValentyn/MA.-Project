@@ -70,7 +70,11 @@ async function addReview(request: express.Request, response: express.Response) {
         }
     };
 
-    response.json({ review: reviewModel });
+    response.json({
+        review: reviewModel,
+        placeReviewCount: place.reviewsCount,
+        placeMeanRating: place.totalRating / place.reviewsCount,
+    });
 }
 
 async function removeReview(request: express.Request, response: express.Response) {
@@ -103,6 +107,8 @@ async function removeReview(request: express.Request, response: express.Response
 
     return response.json({
         removed: true,
+        placeReviewCount: review.restPlace.reviewsCount,
+        placeMeanRating: review.restPlace.reviewsCount > 0 ? review.restPlace.totalRating / review.restPlace.reviewsCount : 0
     });
 }
 
