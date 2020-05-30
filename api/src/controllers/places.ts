@@ -15,6 +15,7 @@ import {
 } from '../util';
 
 import config from '../config';
+import logger from '../logger';
 
 async function getPlacesByFilters(request: express.Request, response: express.Response) {
     const {
@@ -84,9 +85,10 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
             longitude: place.longitude,
             googleMeanRating: place.googleMeanRating,
             googleReviewsCount: place.googleReviewsCount,
-            meanRating: place.totalRating / place.reviewsCount,
+            meanRating: place.reviewsCount > 0 ? place.totalRating / place.reviewsCount : 0,
             reviewsCount: place.reviewsCount,
             isActiveRest: place.isActiveRest,
+            isWorkingNow: isWorkingNow(place),
         };
 
         const placeRestDuration = RestDurations.findById(place.restDuration);
@@ -161,7 +163,7 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         return model;
     });
 
-    console.log(places.length);
+    logger.debug(`Places selected: ${places.length}`);
 
     response.json({
         places: models,

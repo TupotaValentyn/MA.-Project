@@ -8,9 +8,10 @@
         "test": "jest --no-cache --silent --passWithNoTests --runInBand",
         "build": "tsc && npm run copyTranslations && npm run copyTemplates",
         "prestart": "npm run build",
-        "start": "node dist/src/app.js",
+        "start": "NODE_ENV='production' node dist/src/app.js",
         "copyTranslations": "mkdir -p ./dist/src/translations/ && cp -r ./src/translations/*.json ./dist/src/translations/",
-        "copyTemplates": "mkdir -p ./dist/src/templates/ && cp -r ./src/templates/*.ejs ./dist/src/templates/"
+        "copyTemplates": "mkdir -p ./dist/src/templates/ && cp -r ./src/templates/*.ejs ./dist/src/templates/",
+        "db:seed": "npx ts-node ./src/seeders"
     },
     "author": "Dmitry Kit",
     "devDependencies": {

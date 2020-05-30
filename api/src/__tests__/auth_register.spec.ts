@@ -44,9 +44,20 @@ describe('auth::register', () => {
     });
 
     it('triggers an error if user exists', async (done) => {
+        const email = `user${Math.random()}@test.com`;
+        const password = '12345678';
+
+        await supertest(global.serverInstance)
+            .post('/auth/register')
+            .send({ password, email });
+
         const response = await supertest(global.serverInstance)
             .post('/auth/register')
-            .send({ password: '12345678', email: 'admin@test.com' });
+            .send({ password, email });
+
+        await User.destroy({
+            where: { email },
+        });
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe('Користувач з таким email вже зареєстрований в системі');

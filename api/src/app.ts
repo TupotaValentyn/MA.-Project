@@ -1,6 +1,7 @@
 import initServer from './server';
+import logger from './logger';
 
 initServer().catch((error) => {
-    console.error(error);
+    logger.fatal(error.message);
     process.exit(1);
 });

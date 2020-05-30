@@ -3,6 +3,7 @@ import express from 'express';
 import {
     Categories, CompanySizes, RestCosts, RestDurations
 } from '../staticModels';
+
 import { translateText } from '../util';
 
 async function getFilters(request: express.Request, response: express.Response) {

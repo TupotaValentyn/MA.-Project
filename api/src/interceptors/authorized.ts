@@ -6,6 +6,7 @@ import { Forbidden, Unauthorized } from '@curveball/http-errors';
 import { UserPublicData } from 'index';
 
 import { translateText } from '../util';
+import config from '../config';
 
 export default async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     const { authorization } = request.headers;
@@ -21,7 +22,7 @@ export default async (request: express.Request, response: express.Response, next
     }
 
     try {
-        request.user = await verify(token, process.env.JWT_SECRET) as UserPublicData;
+        request.user = await verify(token, config.JWT_SECRET) as UserPublicData;
         next();
     } catch (error) {
         const { name } = error;
