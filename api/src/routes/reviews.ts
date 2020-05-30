@@ -56,7 +56,8 @@ router.get('/', authorized, reviewsController.getReviews);
  *            type: number
  *      responses:
  *        '200':
- *          description: "Отзыв успешно добавлен. Возвращает модель добавленного отзыва вида ```{ review: ReviewModel }```"
+ *          description: "Отзыв успешно добавлен. Возвращает модель добавленного отзыва, измененное кол-во отзывов и
+ *          новую среднюю оценку заведения вида ```{ review: ReviewModel, placeReviewCount: number, placeMeanRating: number }```"
  *        '400':
  *          description: "Неправильный запрос. Не передан ID заведения, заведение не найдено или переданы неправильные параметры"
  *      security:
@@ -82,7 +83,8 @@ router.post('/add', authorized, reviewsController.addReview);
  *            type: number
  *      responses:
  *        '200':
- *          description: "Отзыв успешно удален. Возвращает ответ вида ```{ removed: boolean }```"
+ *          description: "Отзыв успешно удален. Возвращает измененное кол-во отзывов и
+ *          новую среднюю оценку заведения вида ```{ removed: boolean, placeReviewCount: number, placeMeanRating: number }```"
  *        '400':
  *          description: "Неправильный запрос. Не передан ID отзыва или отзыв не найден"
  *        '403':
