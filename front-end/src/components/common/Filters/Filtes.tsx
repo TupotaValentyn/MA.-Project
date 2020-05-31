@@ -21,7 +21,7 @@ const useClasses = makeStyles(() => {
     formClasses: {
       display: 'flex',
       flexDirection: 'column',
-      width: '100%'
+      width: 320
     }
   };
 });
@@ -88,7 +88,7 @@ const Filters: FC<Props> = () => {
   return (
     <form onSubmit={handleSubmit} className={formClasses}>
       <FormControl>
-        <InputLabel>Categories</InputLabel>
+        <InputLabel>Категорії</InputLabel>
         <Select
           name="categories"
           value={values.categories}
@@ -106,7 +106,7 @@ const Filters: FC<Props> = () => {
       </FormControl>
 
       <FormControl>
-        <InputLabel>Company sizes</InputLabel>
+        <InputLabel>К-ть людей</InputLabel>
         <Select
           name="companySizes"
           value={values.companySizes}
@@ -124,7 +124,7 @@ const Filters: FC<Props> = () => {
       </FormControl>
 
       <FormControl>
-        <InputLabel>Costs</InputLabel>
+        <InputLabel>Ціна</InputLabel>
         <Select
           name="costs"
           value={values.costs}
@@ -142,7 +142,7 @@ const Filters: FC<Props> = () => {
       </FormControl>
 
       <FormControl>
-        <InputLabel>Costs</InputLabel>
+        <InputLabel>Час відпочинку</InputLabel>
         <Select
           name="costs"
           onChange={handleChange}

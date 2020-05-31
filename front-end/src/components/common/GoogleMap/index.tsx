@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux';
 import { StateStatuses } from '../../../utils/State';
 import Tooltip from './Tooltip/Tooltip';
 
-type Props = {};
+type Props = { selfPosition: any };
 
-const Map: FC<Props> = () => {
+const Map: FC<Props> = ({ selfPosition }) => {
   const response = useSelector((store: any) => store.placesState);
   const [points, setPoints] = useState([]);
 
@@ -24,7 +24,7 @@ const Map: FC<Props> = () => {
         defaultCenter={{ lng: 32.02, lat: 49.4174 }}
         defaultZoom={13}
       >
-        {(points.length > 0 &&
+        {points.length > 0 &&
           points.map((marker: any) => {
             return (
               <Tooltip
@@ -33,7 +33,8 @@ const Map: FC<Props> = () => {
                 marker={marker}
               />
             );
-          })) || <span>test</span>}
+          })}
+        {selfPosition && <Tooltip {...selfPosition} self />}
       </GoogleMapReact>
     </div>
   );
