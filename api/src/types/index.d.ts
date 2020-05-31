@@ -1,3 +1,6 @@
+import http from 'http';
+import { Sequelize } from 'sequelize-typescript';
+
 /**
  * @swagger
  *
@@ -197,6 +200,9 @@ export interface WorkingPeriod {
  *       isActiveRest:
  *         type: boolean
  *         description: Флажок типа отдыха заведения (true - активный, false - пассивный)
+ *       isWorkingNow:
+ *         type: boolean
+ *         description: Флажок открыто ли сейчас заведение
  *       restDuration:
  *         type: RestDurationModel
  *         description: Описание продолжительности отдыха в заведении
@@ -224,6 +230,7 @@ export interface RestPlaceModel {
     meanRating: number;
     reviewsCount: number;
     isActiveRest: boolean;
+    isWorkingNow: boolean;
     restDuration?: RestDurationModel;
     restCost?: RestCostModel;
     companySize?: CompanySizeModel;
@@ -236,6 +243,13 @@ declare global {
         interface Request {
             user?: UserPublicData,
             locale?: 'ru' | 'ua',
+        }
+    }
+
+    namespace NodeJS {
+        interface Global {
+            serverInstance: http.Server;
+            sequelizeInstance: Sequelize;
         }
     }
 }

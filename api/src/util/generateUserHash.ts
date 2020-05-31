@@ -3,7 +3,7 @@ import crypto from 'crypto';
 export default (email: string): string => {
     const dataToEncrypt = {
         email,
-        r: Math.random(),
+        randomPart: Math.random(),
     };
 
     return crypto

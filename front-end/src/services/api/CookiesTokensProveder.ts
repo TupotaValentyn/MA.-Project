@@ -1,7 +1,10 @@
 import Cookies, { Cookie } from 'universal-cookie';
 import { ITokensProvider, TokensDto } from './apiTypes';
 
-const DOMAIN = process.env.REACT_APP_DOMAIN as string;
+// const DOMAIN = process.env.REACT_APP_DOMAIN as string;
+const DOMAIN = window.location.hostname;
+
+console.log(DOMAIN);
 
 export enum StorageStrategy {
   LOCAL = 'LOCAL',
