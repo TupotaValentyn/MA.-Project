@@ -21,4 +21,6 @@ const router = express.Router();
  */
 router.get('/', authorized, filtersController.getFilters);
 
+router.get('/v2', authorized, filtersController.getFilters2);
+
 export default router;
