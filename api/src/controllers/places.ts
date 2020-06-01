@@ -4,7 +4,9 @@ import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
 
 import { BadRequest } from '@curveball/http-errors';
-import { Category, RestPlace, WorkingPeriod } from '../models';
+import {
+    Category, RestPlace, Review, WorkingPeriod
+} from '../models';
 
 import {
     Categories, CompanySizes, RestCosts, RestDurations,
@@ -19,7 +21,7 @@ import logger from '../logger';
 
 async function getPlacesByFilters(request: express.Request, response: express.Response) {
     const {
-        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, confirmed
+        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, ignoreStatus
     } = request.query;
 
     const where: any = {};
@@ -51,9 +53,9 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         where.isActiveRest = restType === 'true';
     }
 
-    // if (['true', 'false'].includes(confirmed)) {
-    //     where.confirmed = confirmed === 'true';
-    // }
+    if (ignoreStatus !== 'true') {
+        where.confirmed = true;
+    }
 
     let places = await RestPlace.findAll({
         where,
@@ -184,6 +186,12 @@ async function deletePlaces(request: express.Request, response: express.Response
     if (!(ids && Array.isArray(ids) && ids.length > 0)) {
         throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
     }
+
+    await Review.destroy({
+        where: {
+            restPlaceId: { [Op.in]: ids }
+        },
+    });
 
     const removedPlacesCount = await RestPlace.destroy({
         where: {
