@@ -170,8 +170,12 @@ async function signInUsingGoogle(request: express.Request, response: express.Res
         throw new BadRequest(translateText('errors.wrongGoogleToken', request.locale));
     }
 
-    const clientId = config.GOOGLE_PLACES_API_KEY;
+    const clientId = process.env.GOOGLE_PLACES_API_KEY;
     const client = new OAuth2Client(clientId);
+
+    logger.error(clientId);
+    logger.error(token);
+    logger.error(clientId);
 
     const ticket = await client.verifyIdToken({
         idToken: token,

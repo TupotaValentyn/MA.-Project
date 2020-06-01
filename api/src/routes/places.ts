@@ -52,6 +52,11 @@ const router = express.Router();
  *          schema:
  *            type: boolean
  *        - in: "query"
+ *          name: "ignoreStatus"
+ *          description: "Если передать true, в выборку попадут все места, а не только подтвержденные"
+ *          schema:
+ *            type: boolean
+ *        - in: "query"
  *          name: "distance"
  *          description: "Значение фильтра максимального расстояния до заведения. Валидные значения - [0.5-6].
  *          Также необходимо передать текущие гео-координаты пользователя (поля userLatitude, userLongitude).
