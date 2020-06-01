@@ -203,6 +203,9 @@ export interface WorkingPeriod {
  *       isWorkingNow:
  *         type: boolean
  *         description: Флажок открыто ли сейчас заведение
+ *       isConfirmed:
+ *         type: boolean
+ *         description: Флажок подтверждено ли заведение
  *       restDuration:
  *         type: RestDurationModel
  *         description: Описание продолжительности отдыха в заведении
@@ -212,10 +215,14 @@ export interface WorkingPeriod {
  *       companySize:
  *         type: CompanySizeModel
  *         description: Описание размера компании, стандартного для отдыха в заведении
- *       workingPeriod:
+ *       workingPeriodForToday:
  *         type: WorkingPeriod?
  *         description: "Описание графика работы заведения на текущий день (смену).
- *         Поля не будет, если нет данных о графике работы заведения"
+ *         Поле равно null, если нет данных о графике работы заведения"
+ *       workingPeriods:
+ *         type: WorkingPeriod[]
+ *         description: "Описание графика работы заведения.
+ *         Поле равно null, если нет данных о графике работы заведения"
  *       categories:
  *         type: RestPlaceCategoryModel[]
  *         description: Описание категорий, в которые входит заведение
@@ -231,10 +238,12 @@ export interface RestPlaceModel {
     reviewsCount: number;
     isActiveRest: boolean;
     isWorkingNow: boolean;
+    isConfirmed: boolean;
     restDuration?: RestDurationModel;
     restCost?: RestCostModel;
     companySize?: CompanySizeModel;
-    workingPeriod?: WorkingPeriod;
+    workingPeriods: WorkingPeriod[];
+    workingPeriodForToday?: WorkingPeriod;
     categories?: RestPlaceCategoryModel[];
 }
 
