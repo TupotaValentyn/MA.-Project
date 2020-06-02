@@ -352,6 +352,7 @@ async function updatePlace(request: express.Request, response: express.Response)
         restCost,
         companySize,
         isActiveRest,
+        manuallyUpdated: true,
     };
 
     const categories = await Category.findAll({
