@@ -1,4 +1,0 @@
-FROM mysql:5.7
-COPY conf/db.sql dump/
-EXPOSE 3306
-
