@@ -4,7 +4,6 @@ import { BadRequest } from '@curveball/http-errors';
 import { TokenData, UserPublicData } from 'index';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 import { User } from '../models';
 
@@ -18,7 +17,6 @@ import {
 } from '../util';
 
 import logger from '../logger';
-import config from '../config';
 
 async function signInUsingPassword(request: express.Request, response: express.Response) {
     const requestBody = { email: '', password: '', ...request.body };
@@ -170,15 +168,8 @@ async function signInUsingGoogle(request: express.Request, response: express.Res
         throw new BadRequest(translateText('errors.wrongGoogleToken', request.locale));
     }
 
-    const clientId = config.GOOGLE_PLACES_API_KEY;
-    const client = new OAuth2Client(clientId);
-
-    const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: clientId,
-    });
-
-    const { sub: userId, email } = ticket.getPayload();
+    const userDataResponse = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+    const { sub: userId, email } = userDataResponse.data;
 
     let userByEmail = await User.findOne({ where: { email } });
 

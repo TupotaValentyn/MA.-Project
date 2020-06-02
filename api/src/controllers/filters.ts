@@ -6,18 +6,31 @@ import {
 
 import { translateText } from '../util';
 
-async function getFilters(request: express.Request, response: express.Response) {
+function getFilterModels(locale: string) {
     const categories = Categories.getAll()
-        .map((category) => ({ id: category.id, name: translateText(category.nameTextId, request.locale) }));
+        .map((category) => ({ id: category.id, name: translateText(category.nameTextId, locale) }));
 
     const costs = RestCosts.getAll()
-        .map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, request.locale) }));
+        .map((cost) => ({ id: cost.id, name: translateText(cost.nameTextId, locale) }));
 
     const restDurations = RestDurations.getAll()
-        .map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId, request.locale) }));
+        .map((duration) => ({ id: duration.id, name: translateText(duration.nameTextId, locale) }));
 
     const companySizes = CompanySizes.getAll()
-        .map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, request.locale) }));
+        .map((companySize) => ({ id: companySize.id, name: translateText(companySize.nameTextId, locale) }));
+
+    return {
+        categories,
+        costs,
+        restDurations,
+        companySizes,
+    };
+}
+
+async function getFilters(request: express.Request, response: express.Response) {
+    const {
+        categories, costs, companySizes, restDurations
+    } = getFilterModels(request.locale);
 
     response.json({
         categories: [{ id: 0, name: translateText('anyVariant2', request.locale) }, ...categories],
@@ -27,6 +40,12 @@ async function getFilters(request: express.Request, response: express.Response) 
     });
 }
 
+async function getFilters2(request: express.Request, response: express.Response) {
+    const filterModels = getFilterModels(request.locale);
+    response.json(filterModels);
+}
+
 export default {
     getFilters,
+    getFilters2,
 };

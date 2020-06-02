@@ -4,7 +4,9 @@ import { Op } from 'sequelize';
 import { RestPlaceModel } from 'index';
 
 import { BadRequest } from '@curveball/http-errors';
-import { Category, RestPlace, WorkingPeriod } from '../models';
+import {
+    Category, RestPlace, Review, WorkingPeriod
+} from '../models';
 
 import {
     Categories, CompanySizes, RestCosts, RestDurations,
@@ -19,12 +21,10 @@ import logger from '../logger';
 
 async function getPlacesByFilters(request: express.Request, response: express.Response) {
     const {
-        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, confirmed
+        categories, restCost, restDuration, companySize, restType, distance, userLatitude, userLongitude, workingOnly, ignoreStatus
     } = request.query;
 
-    const where: any = {
-        confirmed: true,
-    };
+    const where: any = {};
 
     if (categories) {
         const selectedCategories: number[] = typeof categories === 'string' ? [Number(categories)] : categories.map(Number);
@@ -53,8 +53,8 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
         where.isActiveRest = restType === 'true';
     }
 
-    if (['true', 'false'].includes(confirmed)) {
-        where.confirmed = confirmed === 'true';
+    if (ignoreStatus !== 'true') {
+        where.confirmed = true;
     }
 
     let places = await RestPlace.findAll({
@@ -89,6 +89,9 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
             reviewsCount: place.reviewsCount,
             isActiveRest: place.isActiveRest,
             isWorkingNow: isWorkingNow(place),
+            isConfirmed: place.confirmed,
+            workingPeriods: null,
+            workingPeriodForToday: null,
         };
 
         const placeRestDuration = RestDurations.findById(place.restDuration);
@@ -114,46 +117,10 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
 
         const workingPeriod = getWorkingPeriodForCurrentDay(place.workingPeriods);
 
-        if (workingPeriod) {
-            model.workingPeriod = {
-                timeStart: '',
-                timeEnd: '',
-                timeStartNumeric: workingPeriod.startTime,
-                timeEndNumeric: workingPeriod.endTime,
-                dayStart: workingPeriod.dayOfWeekStart,
-                dayEnd: workingPeriod.dayOfWeekEnd,
-                worksAllDay: false,
-                dayOff: false
-            };
-
-            if (workingPeriod.startTime !== undefined) {
-                const hours = Math.floor(workingPeriod.startTime / 100);
-                const minutes = workingPeriod.startTime % 100;
-
-                model.workingPeriod.timeStart = `${formatNumber(hours)}:${formatNumber(minutes)}`;
-            }
-
-            if (workingPeriod.endTime !== undefined) {
-                const hours = Math.floor(workingPeriod.endTime / 100);
-                const minutes = workingPeriod.endTime % 100;
-
-                model.workingPeriod.timeEnd = `${formatNumber(hours)}:${formatNumber(minutes)}`;
-            }
-
-            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
-                && workingPeriod.startTime === 0
-                && workingPeriod.endTime === 2359
-            ) {
-                model.workingPeriod.worksAllDay = true;
-            }
-
-            if (workingPeriod.dayOfWeekStart === workingPeriod.dayOfWeekEnd
-                && workingPeriod.startTime === 0
-                && workingPeriod.endTime === 0
-            ) {
-                model.workingPeriod.dayOff = true;
-            }
-        }
+        model.workingPeriodForToday = workingPeriod ? processWorkingPeriod(workingPeriod) : null;
+        model.workingPeriods = place.workingPeriods
+            ? place.workingPeriods.map((period) => processWorkingPeriod(period))
+            : null;
 
         model.categories = place.categories.map((category) => ({
             id: category.id,
@@ -170,12 +137,61 @@ async function getPlacesByFilters(request: express.Request, response: express.Re
     });
 }
 
+function processWorkingPeriod(period?: WorkingPeriod) {
+    const workingPeriod = {
+        timeStart: '',
+        timeEnd: '',
+        timeStartNumeric: period.startTime,
+        timeEndNumeric: period.endTime,
+        dayStart: period.dayOfWeekStart,
+        dayEnd: period.dayOfWeekEnd,
+        worksAllDay: false,
+        dayOff: false
+    };
+
+    if (period.startTime !== undefined) {
+        const hours = Math.floor(period.startTime / 100);
+        const minutes = period.startTime % 100;
+
+        workingPeriod.timeStart = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+    }
+
+    if (period.endTime !== undefined) {
+        const hours = Math.floor(period.endTime / 100);
+        const minutes = period.endTime % 100;
+
+        workingPeriod.timeEnd = `${formatNumber(hours)}:${formatNumber(minutes)}`;
+    }
+
+    if (period.dayOfWeekStart === period.dayOfWeekEnd
+        && period.startTime === 0
+        && period.endTime === 2359
+    ) {
+        workingPeriod.worksAllDay = true;
+    }
+
+    if (period.dayOfWeekStart === period.dayOfWeekEnd
+        && period.startTime === 0
+        && period.endTime === 0
+    ) {
+        workingPeriod.dayOff = true;
+    }
+
+    return workingPeriod;
+}
+
 async function deletePlaces(request: express.Request, response: express.Response) {
     const { ids } = request.body;
 
     if (!(ids && Array.isArray(ids) && ids.length > 0)) {
         throw new BadRequest(translateText('errors.wrongPlaceId', request.locale));
     }
+
+    await Review.destroy({
+        where: {
+            restPlaceId: { [Op.in]: ids }
+        },
+    });
 
     const removedPlacesCount = await RestPlace.destroy({
         where: {
@@ -336,6 +352,7 @@ async function updatePlace(request: express.Request, response: express.Response)
         restCost,
         companySize,
         isActiveRest,
+        manuallyUpdated: true,
     };
 
     const categories = await Category.findAll({
