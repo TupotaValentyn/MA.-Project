@@ -53,6 +53,9 @@ export class RestPlace extends Model<RestPlace> {
     @Column({ defaultValue: true })
     confirmed: boolean;
 
+    @Column({ defaultValue: false })
+    manuallyUpdated: boolean;
+
     @HasMany(() => Review)
     reviews: Review[];
 

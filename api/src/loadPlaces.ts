@@ -157,6 +157,11 @@ async function processCategory(category: Category) {
             continue;
         }
 
+        if (dbPlaceModel.manuallyUpdated) {
+            logger.debug(`Место "${uniquePlace.name}" обновлено вручную, пропускаем`);
+            continue;
+        }
+
         logger.debug(`Место "${uniquePlace.name}" есть в БД, обновляем информацию о нем`);
 
         // Update categories
