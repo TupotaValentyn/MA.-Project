@@ -57,7 +57,25 @@ const Filters: FC<Props> = ({ selfPosition }) => {
   const onSubmit = (val: any) => {
     const { lat: userLatitude, lng: userLongitude } = selfPosition;
     console.log(selfPosition);
-    dispatch(getPlacesRequested({ ...val }));
+    const {
+      companySizes: companySize,
+      costs: restCost,
+      restDurations: restDuration,
+      restType,
+      distance,
+      workingOnly
+    } = val;
+
+    dispatch(
+      getPlacesRequested({
+        categories: val.categories,
+        companySize,
+        restCost,
+        restDuration: val.restDurations,
+        restType,
+        workingOnly
+      })
+    );
   };
 
   const {
