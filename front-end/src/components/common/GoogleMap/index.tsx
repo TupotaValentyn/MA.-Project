@@ -1,3 +1,4 @@
+/* global google */
 import React, { FC, useEffect, useState } from 'react';
 import GoogleMapReact from 'google-map-react';
 import { useSelector } from 'react-redux';

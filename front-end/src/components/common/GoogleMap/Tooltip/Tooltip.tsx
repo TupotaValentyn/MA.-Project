@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Theme } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Tooltip as MatTooltip } from '@material-ui/core';
 
 type Props = { name: string; self?: boolean };
 
@@ -24,13 +25,15 @@ const useClasses = makeStyles((theme: Theme) => {
 const Tooltip: FC<any> = ({ marker, self = false }) => {
   const { imageBox, imageBoxSelf } = useClasses();
   return (
-    <div key={marker?.id}>
-      <img
-        className={self ? imageBoxSelf : imageBox}
-        src={self ? '/images/user-location-marker.png' : '/images/marker.png'}
-        alt="marker"
-      />
-    </div>
+    <MatTooltip title={marker?.name || 'You are here'}>
+      <div key={marker?.id}>
+        <img
+          className={self ? imageBoxSelf : imageBox}
+          src={self ? '/images/user-location-marker.png' : '/images/marker.png'}
+          alt="marker"
+        />
+      </div>
+    </MatTooltip>
   );
 };
 

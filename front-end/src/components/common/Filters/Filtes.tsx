@@ -4,17 +4,24 @@ import * as Yup from 'yup';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
-  Select
+  Select,
+  Slider,
+  Typography
 } from '@material-ui/core';
 import { useFormik } from 'formik';
 import { RootStore } from '../../../reducers';
 import { StateStatuses } from '../../../utils/State';
 import { getPlacesRequested } from '../../../slices/places';
+import { restTypeData } from './data';
 
-type Props = {};
+type Props = {
+  selfPosition: any;
+};
 
 const useClasses = makeStyles(() => {
   return {
@@ -26,7 +33,7 @@ const useClasses = makeStyles(() => {
   };
 });
 
-const Filters: FC<Props> = () => {
+const Filters: FC<Props> = ({ selfPosition }) => {
   const dispatch = useDispatch();
   const [categories, setCategories] = useState([{ name: 'category', id: 1 }]);
   const [companySizes, setCompanySizes] = useState([
@@ -48,31 +55,42 @@ const Filters: FC<Props> = () => {
   const { formClasses } = useClasses();
 
   const onSubmit = (val: any) => {
-    dispatch(getPlacesRequested(val));
+    const { lat: userLatitude, lng: userLongitude } = selfPosition;
+    console.log(selfPosition);
+    dispatch(getPlacesRequested({ ...val, userLatitude, userLongitude }));
   };
 
   const {
     values,
-    errors,
     setFieldValue,
     handleChange,
     handleSubmit,
     handleBlur
   } = useFormik({
     initialValues: {
-      categories: 1,
+      categories: 0,
       companySizes: 1,
       costs: 1,
-      restDurations: 1
+      restDurations: 1,
+      restType: false,
+      distance: 6,
+      workingOnly: false
     },
     validationSchema: Yup.object().shape({
       categories: Yup.number().required(),
       companySizes: Yup.number().required(),
       costs: Yup.number().required(),
-      restDurations: Yup.number().required()
+      restDurations: Yup.number().required(),
+      restType: Yup.boolean().required(),
+      distance: Yup.number().required(),
+      workingOnly: Yup.boolean().required()
     }),
     onSubmit
   });
+
+  const handleSliderChange = (event: any, value: any) => {
+    setFieldValue('distance', value);
+  };
 
   useEffect(() => {
     if (filtersState.status === StateStatuses.LOADED) {
@@ -81,8 +99,6 @@ const Filters: FC<Props> = () => {
       setCosts(filtersState.payload.costs);
       setRestDurations(filtersState.payload.restDurations);
     }
-
-    console.log(values);
   }, [filtersState, values]);
 
   return (
@@ -158,7 +174,54 @@ const Filters: FC<Props> = () => {
           })}
         </Select>
       </FormControl>
-      <Button type="submit">Submit</Button>
+
+      <FormControl>
+        <InputLabel>{restTypeData.label}</InputLabel>
+        <Select
+          name="restType"
+          onChange={handleChange}
+          onBlur={handleBlur}
+          value={values.restType}
+        >
+          {restTypeData.options.map((option: any) => {
+            return (
+              <MenuItem key={option.value} value={option.value}>
+                {option.content}
+              </MenuItem>
+            );
+          })}
+        </Select>
+      </FormControl>
+
+      <FormControl component="div" style={{ padding: '0 32px' }}>
+        <Typography id="discrete-slider" gutterBottom>
+          Відстань до закладу
+        </Typography>
+        <Slider
+          name="distance"
+          defaultValue={30}
+          onChange={handleSliderChange}
+          getAriaValueText={() => `${values.distance}`}
+          aria-labelledby="discrete-slider"
+          valueLabelDisplay="auto"
+          step={0.5}
+          marks
+          min={0.5}
+          max={6}
+        />
+      </FormControl>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={values.workingOnly}
+            onChange={handleChange}
+            name="workingOnly"
+            color="primary"
+          />
+        }
+        label="Відкрито"
+      />
+      <Button type="submit">Підібрати заклади</Button>
     </form>
   );
 };

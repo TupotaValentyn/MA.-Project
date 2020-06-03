@@ -59,7 +59,7 @@ const Overview: FC<Props> = () => {
   return (
     <div className={mapWrapper}>
       <GoogleMaps selfPosition={selfLocation} />
-      <Filters />
+      <Filters selfPosition={selfLocation} />
     </div>
   );
 };
