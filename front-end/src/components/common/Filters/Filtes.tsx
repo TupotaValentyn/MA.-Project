@@ -46,7 +46,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
   const [restDurations, setRestDurations] = useState([
     {
       name: 'category',
-      id: 1
+      id: 0
     }
   ]);
 
@@ -69,9 +69,9 @@ const Filters: FC<Props> = ({ selfPosition }) => {
   } = useFormik({
     initialValues: {
       categories: 0,
-      companySizes: 1,
-      costs: 1,
-      restDurations: 1,
+      companySizes: 0,
+      costs: 0,
+      restDurations: 0,
       restType: false,
       // distance: 6,
       workingOnly: false
@@ -122,7 +122,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       </FormControl>
 
       <FormControl>
-        <InputLabel>К-ть людей</InputLabel>
+        <InputLabel>Розмір компанії</InputLabel>
         <Select
           name="companySizes"
           value={values.companySizes}
@@ -158,14 +158,15 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       </FormControl>
 
       <FormControl>
-        <InputLabel>Час відпочинку</InputLabel>
+        <InputLabel>Тривалість відпочинку</InputLabel>
         <Select
-          name="costs"
+          name="restDurations"
           onChange={handleChange}
           value={values.restDurations}
           onBlur={handleBlur}
         >
           {restDurations.map((duration: any) => {
+            console.log(duration);
             return (
               <MenuItem key={duration.id} value={duration.id}>
                 {duration.name}
