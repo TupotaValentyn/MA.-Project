@@ -129,7 +129,6 @@ const FormBuilder: FC<Props> = ({
   };
 
   const selectField = (select: any | undefined) => {
-    console.log('[HERE]', select);
     if (select) {
       const { name, label, options } = select;
       return (

@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import GoogleMaps from '../../common/GoogleMap';
@@ -19,12 +19,33 @@ const useClasses = makeStyles({
   }
 });
 
+type SelfLocationType = {
+  lat: number;
+  lng: number;
+};
+
 const Overview: FC<Props> = () => {
   const dispatch = useDispatch();
   const { mapWrapper } = useClasses();
   const tokensState = useSelector<RootStore, State<any>>((store) => {
     return store.tokensState;
   });
+
+  const [selfLocation, setSelfLocation] = useState<SelfLocationType>({
+    lng: 0,
+    lat: 0
+  });
+
+  useEffect(() => {
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const {
+          coords: { latitude, longitude }
+        } = position;
+        setSelfLocation({ lat: latitude, lng: longitude });
+      });
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     if (tokensState.status === StateStatuses.LOADED) {
@@ -37,8 +58,8 @@ const Overview: FC<Props> = () => {
 
   return (
     <div className={mapWrapper}>
-      <GoogleMaps />
-      <Filters />
+      <GoogleMaps selfPosition={selfLocation} />
+      <Filters selfPosition={selfLocation} />
     </div>
   );
 };
