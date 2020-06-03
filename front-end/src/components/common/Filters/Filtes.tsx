@@ -57,7 +57,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
   const onSubmit = (val: any) => {
     const { lat: userLatitude, lng: userLongitude } = selfPosition;
     console.log(selfPosition);
-    dispatch(getPlacesRequested({ ...val, userLatitude, userLongitude }));
+    dispatch(getPlacesRequested({ ...val }));
   };
 
   const {
@@ -73,7 +73,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       costs: 1,
       restDurations: 1,
       restType: false,
-      distance: 6,
+      // distance: 6,
       workingOnly: false
     },
     validationSchema: Yup.object().shape({
@@ -82,7 +82,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       costs: Yup.number().required(),
       restDurations: Yup.number().required(),
       restType: Yup.boolean().required(),
-      distance: Yup.number().required(),
+      // distance: Yup.number().required(),
       workingOnly: Yup.boolean().required()
     }),
     onSubmit
@@ -193,23 +193,6 @@ const Filters: FC<Props> = ({ selfPosition }) => {
         </Select>
       </FormControl>
 
-      <FormControl component="div" style={{ padding: '0 32px' }}>
-        <Typography id="discrete-slider" gutterBottom>
-          Відстань до закладу
-        </Typography>
-        <Slider
-          name="distance"
-          defaultValue={30}
-          onChange={handleSliderChange}
-          getAriaValueText={() => `${values.distance}`}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={0.5}
-          marks
-          min={0.5}
-          max={6}
-        />
-      </FormControl>
       <FormControlLabel
         control={
           <Checkbox

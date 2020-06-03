@@ -46,10 +46,6 @@ const Auth: FC<Props> = ({ children }) => {
     }
   }, [loginState]);
 
-  if (tokensProvider.loadTokens()) {
-    console.log('token loaded');
-  }
-
   const toLoginRedirect = () => {
     return <Redirect to={`${ROUTES.LOGIN}`} />;
   };
