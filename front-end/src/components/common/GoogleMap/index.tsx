@@ -20,7 +20,6 @@ const Map: FC<Props> = ({ selfPosition }) => {
   return (
     <div style={{ height: '100vh', width: '80%' }}>
       <GoogleMapReact
-        // bootstrapURLKeys={{ key: 'AIzaSyDVTycMkhBNuW6y7KF--HOYze6L-a5OQOk' }}
         bootstrapURLKeys={{ key: 'AIzaSyDRyf29LX_icEKctrk9-RFAxenzdUoTzKQ' }}
         defaultCenter={{ lng: 32.02, lat: 49.4174 }}
         defaultZoom={13}
