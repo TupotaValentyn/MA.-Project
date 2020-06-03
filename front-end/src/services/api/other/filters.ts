@@ -8,7 +8,6 @@ export const getFilters = async (params: any) => {
       params
     })
     .then((response) => {
-      console.log(response);
       return response.data;
     });
 };

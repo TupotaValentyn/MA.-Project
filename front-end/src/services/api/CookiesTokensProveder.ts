@@ -4,8 +4,6 @@ import { ITokensProvider, TokensDto } from './apiTypes';
 // const DOMAIN = process.env.REACT_APP_DOMAIN as string;
 const DOMAIN = window.location.hostname;
 
-console.log(DOMAIN);
-
 export enum StorageStrategy {
   LOCAL = 'LOCAL',
   SESSION = 'SESSION'
@@ -61,7 +59,6 @@ class CookiesTokensProvider implements ITokensProvider {
   // }
 
   saveTokens(tokens: TokensDto) {
-    console.log(tokens);
     this.saveAccessToken(tokens.token);
     // this.saveRefreshToken(tokens.refreshToken);
   }
