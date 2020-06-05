@@ -219,7 +219,7 @@ const Register: FC<Props> = () => {
             type="submit"
             variant="contained"
           >
-            Увійти
+            Зареєструватись
           </Button>
 
           <Button

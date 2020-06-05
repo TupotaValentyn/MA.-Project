@@ -77,24 +77,26 @@ const Login: FC<Props> = () => {
   }, [context]);
 
   const onSubmit = async (values: any) => {
-    try {
-      const { tokenData, userHash } = await login(values);
-
-      if (tokenData) {
-        console.log(tokenData);
-        // TODO: save token data and redirect user to /
-      } else {
-        history.push({
-          pathname: '/confirm-email',
-          search: `?userHash=${userHash}`
-        });
-      }
-    } catch (error) {
-      setNotificationData({
-        status: 'error',
-        message: error.response.data.error
-      });
-    }
+    dispatch(loginRequested(values));
+    // try {
+    //
+    //   const { tokenData, userHash } = await login(values);
+    //
+    //   if (tokenData) {
+    //     console.log(tokenData);
+    //     // TODO: save token data and redirect user to /
+    //   } else {
+    //     history.push({
+    //       pathname: '/confirm-email',
+    //       search: `?userHash=${userHash}`
+    //     });
+    //   }
+    // } catch (error) {
+    //   setNotificationData({
+    //     status: 'error',
+    //     message: error.response.data.error
+    //   });
+    // }
   };
 
   const initGoogleAuth = async () => {

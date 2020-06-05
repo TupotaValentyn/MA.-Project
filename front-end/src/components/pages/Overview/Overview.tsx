@@ -52,9 +52,9 @@ const Overview: FC<Props> = () => {
     if (tokensState.status === StateStatuses.LOADED) {
       const { token } = tokensState.payload.tokenData;
       dispatch(userRequested(token));
-      dispatch(getFiltersRequested());
-      dispatch(getPlacesRequested());
     }
+    dispatch(getFiltersRequested());
+    dispatch(getPlacesRequested());
   }, []);
 
   return (

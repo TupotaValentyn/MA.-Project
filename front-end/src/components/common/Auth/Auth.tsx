@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 import { Redirect } from 'react-router-dom';
 import { RootStore } from '../../../reducers';
 import { AuthProvider } from '../../../context/authContext';
@@ -25,9 +26,14 @@ const initAuthState = {
 const Auth: FC<Props> = ({ children }) => {
   const [authState, setAuthState] = useState(initAuthState);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const loginState = useSelector<RootStore, State<any>>(
     (state) => state.tokensState
+  );
+
+  const checkVerification = useSelector<RootStore, State<any>>(
+    (state) => state.checkEmailVerification
   );
 
   useEffect(() => {
@@ -44,7 +50,23 @@ const Auth: FC<Props> = ({ children }) => {
         };
       });
     }
-  }, [loginState]);
+
+    console.log(checkVerification);
+    if (checkVerification.status === StateStatuses.LOADED) {
+      const tokens = checkVerification.payload.tokenData;
+
+      tokensProvider.saveTokens(tokens);
+      setAuthState((prevState) => {
+        return {
+          ...prevState,
+          authenticated: true,
+          token: checkVerification.payload.tokenData,
+          isAdmin: false
+        };
+      });
+      history.push('/');
+    }
+  }, [loginState, checkVerification]);
 
   const toLoginRedirect = () => {
     return <Redirect to={`${ROUTES.LOGIN}`} />;

@@ -1,14 +1,13 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { Button, FormHelperText, Snackbar, TextField } from '@material-ui/core';
+import { Button, Snackbar } from '@material-ui/core';
+import { useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import { useFormik } from 'formik';
-import { checkEmailVerification, resendEmail } from '@services/api/auth/auth';
+import { resendEmail } from '@services/api/auth/auth';
 import { Alert } from '@material-ui/lab';
-import { tokensProvider } from '@services/api';
+import { checkEmailVerificationRequested } from '../../../slices/auth';
 import authContext, { AuthContext } from '../../../context/authContext';
 import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
-import { TokenData } from '../../../../../api/src/types';
 
 type Props = {};
 
@@ -56,6 +55,7 @@ const ConfirmEmail: FC<Props> = () => {
     message: string;
   } | null>(null);
 
+  const dispatch = useDispatch();
   const { search } = history.location;
   const queryUserHash = search.split('=')[1] || '';
 
@@ -64,25 +64,11 @@ const ConfirmEmail: FC<Props> = () => {
   const checkVerification = async () => {
     setNotificationData(null);
 
-    try {
-      const { tokenData } = await checkEmailVerification({
+    dispatch(
+      checkEmailVerificationRequested({
         userHash
-      });
-
-      if (tokenData) {
-        // TODO: save token data and redirect user to /
-      } else {
-        setNotificationData({
-          status: 'error',
-          message: 'Пошта не підтверджена'
-        });
-      }
-    } catch (error) {
-      setNotificationData({
-        status: 'error',
-        message: error.response.data.error
-      });
-    }
+      })
+    );
   };
 
   const resendVerificationEmail = async () => {
