@@ -18,11 +18,12 @@ const Map: FC<Props> = ({ selfPosition }) => {
   }, [response]);
 
   return (
-    <div style={{ height: '100vh', width: '80%' }}>
+    <div style={{ height: '100vh', width: '100%' }}>
       <GoogleMapReact
         bootstrapURLKeys={{ key: 'AIzaSyDRyf29LX_icEKctrk9-RFAxenzdUoTzKQ' }}
         defaultCenter={{ lng: 32.02, lat: 49.4174 }}
         defaultZoom={13}
+        options={{ streetViewControl: true }}
       >
         {points.length > 0 &&
           points.map((marker: any) => {

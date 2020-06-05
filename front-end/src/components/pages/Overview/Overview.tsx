@@ -8,6 +8,7 @@ import { userRequested } from '../../../slices/user';
 import { getFiltersRequested } from '../../../slices/filters';
 import { getPlacesRequested } from '../../../slices/places';
 import Filters from '../../common/Filters';
+import Header from '../../common/Header';
 
 type Props = {};
 
@@ -37,14 +38,14 @@ const Overview: FC<Props> = () => {
   });
 
   useEffect(() => {
-    setInterval(() => {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const {
-          coords: { latitude, longitude }
-        } = position;
-        setSelfLocation({ lat: latitude, lng: longitude });
-      });
-    }, 3000);
+    // setInterval(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const {
+        coords: { latitude, longitude }
+      } = position;
+      setSelfLocation({ lat: latitude, lng: longitude });
+    });
+    // }, 3000);
   }, []);
 
   useEffect(() => {
@@ -57,9 +58,11 @@ const Overview: FC<Props> = () => {
   }, []);
 
   return (
-    <div className={mapWrapper}>
-      <GoogleMaps selfPosition={selfLocation} />
-      <Filters selfPosition={selfLocation} />
+    <div>
+      <Header />
+      <div className={mapWrapper}>
+        <GoogleMaps selfPosition={selfLocation} />
+      </div>
     </div>
   );
 };

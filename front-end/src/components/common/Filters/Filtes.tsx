@@ -28,7 +28,8 @@ const useClasses = makeStyles(() => {
     formClasses: {
       display: 'flex',
       flexDirection: 'column',
-      width: 320
+      padding: 16
+      // width: 320
     }
   };
 });
@@ -73,7 +74,10 @@ const Filters: FC<Props> = ({ selfPosition }) => {
         restCost,
         restDuration: val.restDurations,
         restType,
-        workingOnly
+        workingOnly,
+        distance,
+        userLatitude,
+        userLongitude
       })
     );
   };
@@ -91,7 +95,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       costs: 0,
       restDurations: 0,
       restType: false,
-      // distance: 6,
+      distance: 6,
       workingOnly: false
     },
     validationSchema: Yup.object().shape({
@@ -100,7 +104,7 @@ const Filters: FC<Props> = ({ selfPosition }) => {
       costs: Yup.number().required(),
       restDurations: Yup.number().required(),
       restType: Yup.boolean().required(),
-      // distance: Yup.number().required(),
+      distance: Yup.number().required(),
       workingOnly: Yup.boolean().required()
     }),
     onSubmit
@@ -210,6 +214,24 @@ const Filters: FC<Props> = ({ selfPosition }) => {
             );
           })}
         </Select>
+      </FormControl>
+
+      <FormControl component="div">
+        <Typography id="discrete-slider" gutterBottom>
+          Відстань до закладу
+        </Typography>
+        <Slider
+          name="distance"
+          defaultValue={30}
+          onChange={handleSliderChange}
+          getAriaValueText={() => `${values.distance}`}
+          aria-labelledby="discrete-slider"
+          valueLabelDisplay="auto"
+          step={0.5}
+          marks
+          min={0.5}
+          max={6}
+        />
       </FormControl>
 
       <FormControlLabel
