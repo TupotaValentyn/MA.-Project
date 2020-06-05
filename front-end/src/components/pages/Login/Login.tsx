@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Button, FormHelperText, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
+import { Link } from 'react-router-dom';
 import { loginDefaultData, loginValidationSchema, Values } from './loginData';
 import { loginRequested } from '../../../slices';
 import authContext, { AuthContext } from '../../../context/authContext';
@@ -21,17 +22,21 @@ const useClasses = makeStyles(() => {
     formClass: {
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      flexBasis: '350px'
     },
     submitButton: {
       justifySelf: 'center',
       margin: '16px 0 0 0'
+    },
+    link: {
+      marginTop: '12px'
     }
   };
 });
 
 const Login: FC<Props> = () => {
-  const { formWrapper, submitButton, formClass } = useClasses();
+  const { formWrapper, submitButton, formClass, link } = useClasses();
   const dispatch = useDispatch();
   const context = useContext<AuthContext>(authContext);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -84,7 +89,7 @@ const Login: FC<Props> = () => {
           onBlur={handleBlur}
           placeholder="email"
           type="text"
-          label="Register"
+          label="Електронна пошта"
           error={handleError('email')}
           helperText={errorHintHandler('email')}
           value={values.email}
@@ -95,7 +100,7 @@ const Login: FC<Props> = () => {
           onBlur={handleBlur}
           placeholder="password"
           type="password"
-          label="Password"
+          label="Пароль"
           error={handleError('password')}
           helperText={errorHintHandler('password')}
           value={values.password}
@@ -109,6 +114,10 @@ const Login: FC<Props> = () => {
         >
           Увійти
         </Button>
+
+        <Link to="/register" className={link}>
+          Зареєструватись
+        </Link>
       </form>
     </div>
   );

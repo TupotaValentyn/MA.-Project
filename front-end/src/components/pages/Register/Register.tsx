@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { Button, FormHelperText, TextField } from '@material-ui/core';
+import { Link, useHistory } from 'react-router-dom';
+import { Button, FormHelperText, Snackbar, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
 import { register } from '@services/api/auth/auth';
@@ -34,29 +33,21 @@ const useClasses = makeStyles(() => {
       justifySelf: 'center',
       margin: '16px 0 0 0'
     },
-    errorAlertVisible: {
+    link: {
       marginTop: '12px'
-    },
-
-    errorAlertHidden: {
-      marginTop: '12px',
-      display: 'none'
     }
   };
 });
 
 const Register: FC<Props> = () => {
-  const {
-    formWrapper,
-    submitButton,
-    formClass,
-    errorAlertVisible,
-    errorAlertHidden
-  } = useClasses();
+  const { formWrapper, submitButton, formClass, link } = useClasses();
   const context = useContext<AuthContext>(authContext);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [errorText, setErrorText] = useState('');
   const history = useHistory();
+  const [notificationData, setNotificationData] = useState<{
+    status: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (context.authenticated) {
@@ -73,7 +64,10 @@ const Register: FC<Props> = () => {
         search: `?userHash=${userHash}`
       });
     } catch (error) {
-      setErrorText(error.response.data.error);
+      setNotificationData({
+        status: 'error',
+        message: error.response.data.error
+      });
     }
   };
 
@@ -141,15 +135,21 @@ const Register: FC<Props> = () => {
           Зареєструватись
         </Button>
 
-        <Alert
-          className={errorText ? errorAlertVisible : errorAlertHidden}
+        <Link to="/login" className={link}>
+          Увійти
+        </Link>
+
+        <Snackbar
+          open={!!notificationData}
+          autoHideDuration={6000}
           onClose={() => {
-            setErrorText('');
+            setNotificationData(null);
           }}
-          severity="error"
         >
-          {errorText}
-        </Alert>
+          <Alert severity={notificationData?.status}>
+            {notificationData?.message}
+          </Alert>
+        </Snackbar>
       </form>
     </div>
   );
