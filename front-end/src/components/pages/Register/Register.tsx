@@ -1,11 +1,9 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 import { Button, FormHelperText, Snackbar, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
-import { Link, useHistory } from 'react-router-dom';
 import {
-  login,
   loginWithFacebook,
   loginWithGoogle,
   register
@@ -13,8 +11,11 @@ import {
 import { Alert } from '@material-ui/lab';
 import GoogleAuthService from '@services/GoogleAuthService';
 import FacebookAuthService from '@services/FacebookAuthService';
-import { loginDefaultData, loginValidationSchema, Values } from './loginData';
-import { loginRequested } from '../../../slices';
+import {
+  registerDefaultData,
+  registerValidationSchema,
+  Values
+} from './registerData';
 import authContext, { AuthContext } from '../../../context/authContext';
 import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
 
@@ -51,20 +52,18 @@ const useClasses = makeStyles(() => {
   };
 });
 
-const Login: FC<Props> = () => {
+const Register: FC<Props> = () => {
   const {
     formWrapper,
     submitButton,
     formClass,
     link,
-    buttonsContainer,
-    primaryButton
+    primaryButton,
+    buttonsContainer
   } = useClasses();
-  const dispatch = useDispatch();
   const context = useContext<AuthContext>(authContext);
-  const history = useHistory();
   const [loggedIn, setLoggedIn] = useState(false);
-
+  const history = useHistory();
   const [notificationData, setNotificationData] = useState<{
     status: 'success' | 'error';
     message: string;
@@ -78,17 +77,12 @@ const Login: FC<Props> = () => {
 
   const onSubmit = async (values: any) => {
     try {
-      const { tokenData, userHash } = await login(values);
+      const { userHash } = await register(values);
 
-      if (tokenData) {
-        console.log(tokenData);
-        // TODO: save token data and redirect user to /
-      } else {
-        history.push({
-          pathname: '/confirm-email',
-          search: `?userHash=${userHash}`
-        });
-      }
+      history.push({
+        pathname: '/confirm-email',
+        search: `?userHash=${userHash}`
+      });
     } catch (error) {
       setNotificationData({
         status: 'error',
@@ -167,8 +161,8 @@ const Login: FC<Props> = () => {
     errors,
     touched
   } = useFormik<Values>({
-    initialValues: loginDefaultData,
-    validationSchema: loginValidationSchema,
+    initialValues: registerDefaultData,
+    validationSchema: registerValidationSchema,
     onSubmit
   });
 
@@ -248,8 +242,8 @@ const Login: FC<Props> = () => {
           </Button>
         </div>
 
-        <Link to="/register" className={link}>
-          Зареєструватись
+        <Link to="/login" className={link}>
+          Увійти
         </Link>
 
         <Snackbar
@@ -268,4 +262,4 @@ const Login: FC<Props> = () => {
   );
 };
 
-export default Login;
+export default Register;
