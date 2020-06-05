@@ -7,3 +7,9 @@ export const login = async (data: any) => {
     return response.data;
   });
 };
+
+export const register = async (data: any) => {
+  return apiClient.post(`${baseUrl}/auth/register`, data).then((response) => {
+    return response.data;
+  });
+};

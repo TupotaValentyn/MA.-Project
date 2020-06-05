@@ -1,10 +1,16 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button, FormHelperText, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
-import { loginDefaultData, loginValidationSchema, Values } from './loginData';
-import { loginRequested } from '../../../slices';
+import { register } from '@services/api/auth/auth';
+import { Alert } from '@material-ui/lab';
+import {
+  registerDefaultData,
+  registerValidationSchema,
+  Values
+} from './registerData';
 import authContext, { AuthContext } from '../../../context/authContext';
 import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
 
@@ -21,20 +27,36 @@ const useClasses = makeStyles(() => {
     formClass: {
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      flexBasis: '350px'
     },
     submitButton: {
       justifySelf: 'center',
       margin: '16px 0 0 0'
+    },
+    errorAlertVisible: {
+      marginTop: '12px'
+    },
+
+    errorAlertHidden: {
+      marginTop: '12px',
+      display: 'none'
     }
   };
 });
 
-const Login: FC<Props> = () => {
-  const { formWrapper, submitButton, formClass } = useClasses();
-  const dispatch = useDispatch();
+const Register: FC<Props> = () => {
+  const {
+    formWrapper,
+    submitButton,
+    formClass,
+    errorAlertVisible,
+    errorAlertHidden
+  } = useClasses();
   const context = useContext<AuthContext>(authContext);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [errorText, setErrorText] = useState('');
+  const history = useHistory();
 
   useEffect(() => {
     if (context.authenticated) {
@@ -42,8 +64,17 @@ const Login: FC<Props> = () => {
     }
   }, [context]);
 
-  const onSubmit = (values: any) => {
-    dispatch(loginRequested(values));
+  const onSubmit = async (values: any) => {
+    try {
+      const { userHash } = await register(values);
+
+      history.push({
+        pathname: '/confirm-email',
+        search: `?userHash=${userHash}`
+      });
+    } catch (error) {
+      setErrorText(error.response.data.error);
+    }
   };
 
   const {
@@ -54,8 +85,8 @@ const Login: FC<Props> = () => {
     errors,
     touched
   } = useFormik<Values>({
-    initialValues: loginDefaultData,
-    validationSchema: loginValidationSchema,
+    initialValues: registerDefaultData,
+    validationSchema: registerValidationSchema,
     onSubmit
   });
 
@@ -84,7 +115,7 @@ const Login: FC<Props> = () => {
           onBlur={handleBlur}
           placeholder="email"
           type="text"
-          label="Register"
+          label="Електронна пошта"
           error={handleError('email')}
           helperText={errorHintHandler('email')}
           value={values.email}
@@ -95,7 +126,7 @@ const Login: FC<Props> = () => {
           onBlur={handleBlur}
           placeholder="password"
           type="password"
-          label="Password"
+          label="Пароль"
           error={handleError('password')}
           helperText={errorHintHandler('password')}
           value={values.password}
@@ -107,11 +138,21 @@ const Login: FC<Props> = () => {
           type="submit"
           variant="contained"
         >
-          Увійти
+          Зареєструватись
         </Button>
+
+        <Alert
+          className={errorText ? errorAlertVisible : errorAlertHidden}
+          onClose={() => {
+            setErrorText('');
+          }}
+          severity="error"
+        >
+          {errorText}
+        </Alert>
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;
