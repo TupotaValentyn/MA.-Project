@@ -1,7 +1,5 @@
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID as string;
 
-console.log(GOOGLE_CLIENT_ID, process.env.REACT_APP_GOOGLE_CLIENT_ID);
-
 export default class GoogleAuthService {
   private static instance?: object;
 

@@ -1,7 +1,5 @@
 const FACEBOOK_CLIENT_ID = process.env.REACT_APP_FACEBOOK_CLIENT_ID as string;
 
-console.log(FACEBOOK_CLIENT_ID);
-
 export default class FacebookAuthService {
   private static instance?: object;
 
