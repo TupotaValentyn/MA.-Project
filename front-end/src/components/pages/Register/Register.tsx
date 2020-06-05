@@ -3,8 +3,14 @@ import { Link, useHistory } from 'react-router-dom';
 import { Button, FormHelperText, Snackbar, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
-import { register } from '@services/api/auth/auth';
+import {
+  loginWithFacebook,
+  loginWithGoogle,
+  register
+} from '@services/api/auth/auth';
 import { Alert } from '@material-ui/lab';
+import GoogleAuthService from '@services/GoogleAuthService';
+import FacebookAuthService from '@services/FacebookAuthService';
 import {
   registerDefaultData,
   registerValidationSchema,
@@ -31,16 +37,30 @@ const useClasses = makeStyles(() => {
     },
     submitButton: {
       justifySelf: 'center',
-      margin: '16px 0 0 0'
+      margin: '16px 3px 0'
     },
     link: {
       marginTop: '12px'
+    },
+    buttonsContainer: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    primaryButton: {
+      flex: 1
     }
   };
 });
 
 const Register: FC<Props> = () => {
-  const { formWrapper, submitButton, formClass, link } = useClasses();
+  const {
+    formWrapper,
+    submitButton,
+    formClass,
+    link,
+    primaryButton,
+    buttonsContainer
+  } = useClasses();
   const context = useContext<AuthContext>(authContext);
   const [loggedIn, setLoggedIn] = useState(false);
   const history = useHistory();
@@ -71,6 +91,68 @@ const Register: FC<Props> = () => {
     }
   };
 
+  const initGoogleAuth = async () => {
+    const instance: any = await GoogleAuthService.getInstance();
+
+    instance.attachClickHandler(
+      document.querySelector('.js-login-with-google'),
+      {},
+      async (googleUser: any) => {
+        try {
+          const idToken = googleUser.getAuthResponse().id_token;
+          const { tokenData } = await loginWithGoogle({ token: idToken });
+
+          console.log(tokenData);
+
+          // TODO: save token data and redirect user to /
+        } catch (error) {
+          setNotificationData({
+            status: 'error',
+            message: error.response.data.error
+          });
+        }
+      },
+      (error: any) => {
+        setNotificationData({
+          status: 'error',
+          message: error.error
+        });
+      }
+    );
+  };
+
+  initGoogleAuth();
+
+  const loginWithFB = async () => {
+    const instance: any = FacebookAuthService.getInstance();
+
+    instance.login(
+      (response: any) => {
+        if (response.status === 'connected') {
+          const { accessToken, userID: userId } = response.authResponse;
+
+          loginWithFacebook({ accessToken, userId })
+            .then(({ tokenData }) => {
+              console.log(tokenData);
+              // TODO: save token data and redirect user to /
+            })
+            .catch((error) => {
+              setNotificationData({
+                status: 'error',
+                message: error.message
+              });
+            });
+        } else {
+          setNotificationData({
+            status: 'error',
+            message: 'Виникла помилка при вході через Facebook'
+          });
+        }
+      },
+      { scope: 'email' }
+    );
+  };
+
   const {
     handleSubmit,
     handleChange,
@@ -97,6 +179,9 @@ const Register: FC<Props> = () => {
     },
     [errors, touched]
   );
+
+  const submitButtonClasses = `${submitButton} ${primaryButton}`;
+  const googleButtonClasses = `${submitButton} js-login-with-google`;
 
   return loggedIn ? (
     <AfterLoginRedirect />
@@ -126,14 +211,36 @@ const Register: FC<Props> = () => {
           value={values.password}
         />
         <FormHelperText>Мінімум 8 символів</FormHelperText>
-        <Button
-          className={submitButton}
-          color="primary"
-          type="submit"
-          variant="contained"
-        >
-          Зареєструватись
-        </Button>
+
+        <div className={buttonsContainer}>
+          <Button
+            className={submitButtonClasses}
+            color="primary"
+            type="submit"
+            variant="contained"
+          >
+            Увійти
+          </Button>
+
+          <Button
+            className={googleButtonClasses}
+            color="primary"
+            type="button"
+            variant="contained"
+          >
+            G
+          </Button>
+
+          <Button
+            className={submitButton}
+            color="primary"
+            type="button"
+            variant="contained"
+            onClick={loginWithFB}
+          >
+            F
+          </Button>
+        </div>
 
         <Link to="/login" className={link}>
           Увійти

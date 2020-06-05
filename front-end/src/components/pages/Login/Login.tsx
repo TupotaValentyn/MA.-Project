@@ -1,9 +1,18 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, FormHelperText, TextField } from '@material-ui/core';
+import { Button, FormHelperText, Snackbar, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import {
+  login,
+  loginWithFacebook,
+  loginWithGoogle,
+  register
+} from '@services/api/auth/auth';
+import { Alert } from '@material-ui/lab';
+import GoogleAuthService from '@services/GoogleAuthService';
+import FacebookAuthService from '@services/FacebookAuthService';
 import { loginDefaultData, loginValidationSchema, Values } from './loginData';
 import { loginRequested } from '../../../slices';
 import authContext, { AuthContext } from '../../../context/authContext';
@@ -27,19 +36,39 @@ const useClasses = makeStyles(() => {
     },
     submitButton: {
       justifySelf: 'center',
-      margin: '16px 0 0 0'
+      margin: '16px 3px 0'
     },
     link: {
       marginTop: '12px'
+    },
+    buttonsContainer: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    primaryButton: {
+      flex: 1
     }
   };
 });
 
 const Login: FC<Props> = () => {
-  const { formWrapper, submitButton, formClass, link } = useClasses();
+  const {
+    formWrapper,
+    submitButton,
+    formClass,
+    link,
+    buttonsContainer,
+    primaryButton
+  } = useClasses();
   const dispatch = useDispatch();
   const context = useContext<AuthContext>(authContext);
+  const history = useHistory();
   const [loggedIn, setLoggedIn] = useState(false);
+
+  const [notificationData, setNotificationData] = useState<{
+    status: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (context.authenticated) {
@@ -47,8 +76,87 @@ const Login: FC<Props> = () => {
     }
   }, [context]);
 
-  const onSubmit = (values: any) => {
-    dispatch(loginRequested(values));
+  const onSubmit = async (values: any) => {
+    try {
+      const { tokenData, userHash } = await login(values);
+
+      if (tokenData) {
+        console.log(tokenData);
+        // TODO: save token data and redirect user to /
+      } else {
+        history.push({
+          pathname: '/confirm-email',
+          search: `?userHash=${userHash}`
+        });
+      }
+    } catch (error) {
+      setNotificationData({
+        status: 'error',
+        message: error.response.data.error
+      });
+    }
+  };
+
+  const initGoogleAuth = async () => {
+    const instance: any = await GoogleAuthService.getInstance();
+
+    instance.attachClickHandler(
+      document.querySelector('.js-login-with-google'),
+      {},
+      async (googleUser: any) => {
+        try {
+          const idToken = googleUser.getAuthResponse().id_token;
+          const { tokenData } = await loginWithGoogle({ token: idToken });
+
+          console.log(tokenData);
+
+          // TODO: save token data and redirect user to /
+        } catch (error) {
+          setNotificationData({
+            status: 'error',
+            message: error.response.data.error
+          });
+        }
+      },
+      (error: any) => {
+        setNotificationData({
+          status: 'error',
+          message: error.error
+        });
+      }
+    );
+  };
+
+  initGoogleAuth();
+
+  const loginWithFB = async () => {
+    const instance: any = FacebookAuthService.getInstance();
+
+    instance.login(
+      (response: any) => {
+        if (response.status === 'connected') {
+          const { accessToken, userID: userId } = response.authResponse;
+
+          loginWithFacebook({ accessToken, userId })
+            .then(({ tokenData }) => {
+              console.log(tokenData);
+              // TODO: save token data and redirect user to /
+            })
+            .catch((error) => {
+              setNotificationData({
+                status: 'error',
+                message: error.message
+              });
+            });
+        } else {
+          setNotificationData({
+            status: 'error',
+            message: 'Виникла помилка при вході через Facebook'
+          });
+        }
+      },
+      { scope: 'email' }
+    );
   };
 
   const {
@@ -78,6 +186,9 @@ const Login: FC<Props> = () => {
     [errors, touched]
   );
 
+  const submitButtonClasses = `${submitButton} ${primaryButton}`;
+  const googleButtonClasses = `${submitButton} js-login-with-google`;
+
   return loggedIn ? (
     <AfterLoginRedirect />
   ) : (
@@ -106,18 +217,52 @@ const Login: FC<Props> = () => {
           value={values.password}
         />
         <FormHelperText>Мінімум 8 символів</FormHelperText>
-        <Button
-          className={submitButton}
-          color="primary"
-          type="submit"
-          variant="contained"
-        >
-          Увійти
-        </Button>
+
+        <div className={buttonsContainer}>
+          <Button
+            className={submitButtonClasses}
+            color="primary"
+            type="submit"
+            variant="contained"
+          >
+            Увійти
+          </Button>
+
+          <Button
+            className={googleButtonClasses}
+            color="primary"
+            type="button"
+            variant="contained"
+          >
+            G
+          </Button>
+
+          <Button
+            className={submitButton}
+            color="primary"
+            type="button"
+            variant="contained"
+            onClick={loginWithFB}
+          >
+            F
+          </Button>
+        </div>
 
         <Link to="/register" className={link}>
           Зареєструватись
         </Link>
+
+        <Snackbar
+          open={!!notificationData}
+          autoHideDuration={6000}
+          onClose={() => {
+            setNotificationData(null);
+          }}
+        >
+          <Alert severity={notificationData?.status}>
+            {notificationData?.message}
+          </Alert>
+        </Snackbar>
       </form>
     </div>
   );

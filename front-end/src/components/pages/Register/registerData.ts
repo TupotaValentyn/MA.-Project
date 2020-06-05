@@ -6,7 +6,7 @@ export type Values = {
 
 export const registerDefaultData = {
   email: '',
-  password: '12345678'
+  password: ''
 };
 
 export const registerValidationSchema = Yup.object().shape({

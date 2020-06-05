@@ -29,3 +29,15 @@ export const resendEmail = async (data: any) => {
       return response.data;
     });
 };
+
+export const loginWithGoogle = async (data: any) => {
+  return apiClient.post(`${baseUrl}/auth/google`, data).then((response) => {
+    return response.data;
+  });
+};
+
+export const loginWithFacebook = async (data: any) => {
+  return apiClient.post(`${baseUrl}/auth/facebook`, data).then((response) => {
+    return response.data;
+  });
+};

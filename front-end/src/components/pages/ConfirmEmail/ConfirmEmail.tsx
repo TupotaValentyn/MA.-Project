@@ -70,8 +70,7 @@ const ConfirmEmail: FC<Props> = () => {
       });
 
       if (tokenData) {
-        tokensProvider.saveTokens(tokenData as TokenData);
-        history.push('/');
+        // TODO: save token data and redirect user to /
       } else {
         setNotificationData({
           status: 'error',
@@ -149,8 +148,6 @@ const ConfirmEmail: FC<Props> = () => {
         <Link to="/login" className={link}>
           Перейти на сторінку входу
         </Link>
-
-        {userHash}
 
         <Snackbar
           open={!!notificationData}
