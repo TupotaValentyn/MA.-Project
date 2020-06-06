@@ -21,7 +21,7 @@ const useClasses = makeStyles((theme: Theme) => {
       cursor: 'pointer'
     },
     tooltip: {
-      backgroundColor: '#3f51b5'
+      backgroundColor: 'rgba(255,255,255, .9)'
     }
   };
 });
@@ -32,8 +32,8 @@ const useStyles = makeStyles((theme: Theme) => {
       maxWidth: 400
     },
     firstColumn: {
-      color: 'white',
-      margin: '0 16px 0 0'
+      margin: '0 16px 0 0',
+      color: 'black'
     },
     fields: {
       display: 'flex',
@@ -69,7 +69,7 @@ const ExtendedTooltip: FC<{ marker: any }> = ({ marker }) => {
           variant="caption"
           color="textSecondary"
         >
-          Рейтинг :
+          Рейтинг Google:
         </Typography>
 
         <Typography variant="caption" color="textSecondary">
@@ -129,7 +129,7 @@ const ExtendedTooltip: FC<{ marker: any }> = ({ marker }) => {
           variant="caption"
           color="textSecondary"
         >
-          Середній рейтинг :
+          Рейтинг Rest-Finder:
         </Typography>
 
         <Typography variant="caption" color="textSecondary">
@@ -149,6 +149,7 @@ const Tooltip: FC<any> = ({ marker, self = false }) => {
   const { imageBox, imageBoxSelf, tooltip } = useClasses();
   return (
     <MatTooltip
+      interactive
       classes={{ tooltip }}
       key={marker?.name}
       title={
