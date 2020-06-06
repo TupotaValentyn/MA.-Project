@@ -15,3 +15,13 @@ export const {
 export const {
   checkEmailVerificationRequested
 }: any = checkEmailVerificationActions;
+
+export const {
+  reducer: googleAuthReducer,
+  actions: googleAuthActions
+} = sliceGenerator('googleAuth');
+
+export const {
+  googleAuthRequested,
+  googleAuthSuccess
+}: any = googleAuthActions;

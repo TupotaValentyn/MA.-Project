@@ -7,7 +7,6 @@ import { State, StateStatuses } from '../../../utils/State';
 import { userRequested } from '../../../slices/user';
 import { getFiltersRequested } from '../../../slices/filters';
 import { getPlacesRequested } from '../../../slices/places';
-import Filters from '../../common/Filters';
 import Header from '../../common/Header';
 
 type Props = {};

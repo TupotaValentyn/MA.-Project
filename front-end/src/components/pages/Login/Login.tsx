@@ -14,7 +14,7 @@ import { Alert } from '@material-ui/lab';
 import GoogleAuthService from '@services/GoogleAuthService';
 import FacebookAuthService from '@services/FacebookAuthService';
 import { loginDefaultData, loginValidationSchema, Values } from './loginData';
-import { loginRequested } from '../../../slices';
+import { loginRequested, googleAuthSuccess } from '../../../slices';
 import authContext, { AuthContext } from '../../../context/authContext';
 import AfterLoginRedirect from '../../common/AfterLoginRedirect/AfterLoginRedirect';
 
@@ -99,6 +99,35 @@ const Login: FC<Props> = () => {
     // }
   };
 
+  // const initGoogleAuth = async () => {
+  //   const instance: any = await GoogleAuthService.getInstance();
+  //
+  //   instance.attachClickHandler(
+  //     document.querySelector('.js-login-with-google'),
+  //     {},
+  //     async (googleUser: any) => {
+  //       try {
+  //         const idToken = googleUser.getAuthResponse().id_token;
+  //         const { tokenData } = await loginWithGoogle({ token: idToken });
+  //
+  //         console.log(tokenData);
+  //
+  //         // TODO: save token data and redirect user to /
+  //       } catch (error) {
+  //         setNotificationData({
+  //           status: 'error',
+  //           message: error.response.data.error
+  //         });
+  //       }
+  //     },
+  //     (error: any) => {
+  //       setNotificationData({
+  //         status: 'error',
+  //         message: error.error
+  //       });
+  //     }
+  //   );
+  // };
   const initGoogleAuth = async () => {
     const instance: any = await GoogleAuthService.getInstance();
 
@@ -106,19 +135,10 @@ const Login: FC<Props> = () => {
       document.querySelector('.js-login-with-google'),
       {},
       async (googleUser: any) => {
-        try {
-          const idToken = googleUser.getAuthResponse().id_token;
-          const { tokenData } = await loginWithGoogle({ token: idToken });
+        const idToken = googleUser.getAuthResponse().id_token;
+        const { tokenData } = await loginWithGoogle({ token: idToken });
 
-          console.log(tokenData);
-
-          // TODO: save token data and redirect user to /
-        } catch (error) {
-          setNotificationData({
-            status: 'error',
-            message: error.response.data.error
-          });
-        }
+        dispatch(googleAuthSuccess(tokenData));
       },
       (error: any) => {
         setNotificationData({

@@ -121,8 +121,6 @@ const Register: FC<Props> = () => {
     );
   };
 
-  initGoogleAuth();
-
   const loginWithFB = async () => {
     const instance: any = FacebookAuthService.getInstance();
 
@@ -220,25 +218,6 @@ const Register: FC<Props> = () => {
             variant="contained"
           >
             Зареєструватись
-          </Button>
-
-          <Button
-            className={googleButtonClasses}
-            color="primary"
-            type="button"
-            variant="contained"
-          >
-            G
-          </Button>
-
-          <Button
-            className={submitButton}
-            color="primary"
-            type="button"
-            variant="contained"
-            onClick={loginWithFB}
-          >
-            F
           </Button>
         </div>
 

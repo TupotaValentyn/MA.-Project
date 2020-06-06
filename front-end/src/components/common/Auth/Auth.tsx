@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import { RootStore } from '../../../reducers';
 import { AuthProvider } from '../../../context/authContext';
 import { State, StateStatuses } from '../../../utils/State';
@@ -36,6 +35,10 @@ const Auth: FC<Props> = ({ children }) => {
     (state) => state.checkEmailVerification
   );
 
+  const googleAuth = useSelector<RootStore, State<any>>(
+    (state) => state.googleAuth
+  );
+
   useEffect(() => {
     if (loginState.status === StateStatuses.LOADED) {
       const tokens = loginState.payload.tokenData;
@@ -51,7 +54,6 @@ const Auth: FC<Props> = ({ children }) => {
       });
     }
 
-    console.log(checkVerification);
     if (checkVerification.status === StateStatuses.LOADED) {
       const tokens = checkVerification.payload.tokenData;
 
@@ -66,7 +68,21 @@ const Auth: FC<Props> = ({ children }) => {
       });
       history.push('/');
     }
-  }, [loginState, checkVerification]);
+
+    if (googleAuth.status === StateStatuses.LOADED) {
+      const token = { token: googleAuth.payload.token };
+      tokensProvider.saveTokens(token);
+      setAuthState((prevState) => {
+        return {
+          ...prevState,
+          authenticated: true,
+          token: googleAuth.payload.token,
+          isAdmin: false
+        };
+      });
+      history.push('/');
+    }
+  }, [loginState, checkVerification, googleAuth]);
 
   const toLoginRedirect = () => {
     return <Redirect to={`${ROUTES.LOGIN}`} />;
